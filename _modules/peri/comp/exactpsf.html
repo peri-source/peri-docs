@@ -1,0 +1,1019 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>peri.comp.exactpsf &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for peri.comp.exactpsf</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.ndimage</span> <span class="k">as</span> <span class="nn">nd</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span> <span class="nn">peri</span> <span class="k">import</span> <span class="n">util</span><span class="p">,</span> <span class="n">interpolation</span>
+<span class="kn">from</span> <span class="nn">peri.comp</span> <span class="k">import</span> <span class="n">psfs</span><span class="p">,</span> <span class="n">psfcalc</span>
+<span class="kn">from</span> <span class="nn">peri.fft</span> <span class="k">import</span> <span class="n">fft</span><span class="p">,</span> <span class="n">fftkwargs</span>
+
+<span class="k">def</span> <span class="nf">moment</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculates the moments of the probability distribution p with vector v &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">v</span><span class="o">*</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="p">((</span><span class="n">v</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">-</span> <span class="p">(</span><span class="n">v</span><span class="o">*</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span> <span class="p">)</span>
+
+<span class="c1">#=============================================================================</span>
+<span class="c1"># The actual interfaces that can be used in the peri system</span>
+<span class="c1">#=============================================================================</span>
+<div class="viewcode-block" id="ExactPSF"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ExactPSF">[docs]</a><span class="k">class</span> <span class="nc">ExactPSF</span><span class="p">(</span><span class="n">psfs</span><span class="o">.</span><span class="n">PSF</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">zrange</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">laser_wavelength</span><span class="o">=</span><span class="mf">0.488</span><span class="p">,</span>
+            <span class="n">zslab</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">zscale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">kfki</span><span class="o">=</span><span class="mf">0.889</span><span class="p">,</span> <span class="n">n2n1</span><span class="o">=</span><span class="mf">1.44</span><span class="o">/</span><span class="mf">1.518</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.173</span><span class="p">,</span>
+            <span class="n">polar_angle</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">pxsize</span><span class="o">=</span><span class="mf">0.125</span><span class="p">,</span> <span class="n">support_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">sigkf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">nkpts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cutoffval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">measurement_iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">k_dist</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">use_J1</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sph6_ab</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">global_zscale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">cutbyval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cutfallrate</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">cutedgeval</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span>
+            <span class="n">pinhole_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">do_pinhole</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Superclass for all the exact PSFs, i.e. any PSF that is based on</span>
+<span class="sd">        physical properties of the imaging system such as the laser</span>
+<span class="sd">        wavelength.</span>
+
+<span class="sd">        This PSF functions by calculating the local PSF for every z layer</span>
+<span class="sd">        in the image, and convolving each layer independently (numerically</span>
+<span class="sd">        the exact model of image formation).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        shape : tuple</span>
+<span class="sd">            Shape of the image in (z,y,x) pixel numbers (to be deprecated)</span>
+
+<span class="sd">        zrange : tuple</span>
+<span class="sd">            range of z pixels over which we should calculate the psf, good pixels</span>
+<span class="sd">            being zrange[0] &lt;= z &lt;= zrange[1]. currently must be set to the interior</span>
+<span class="sd">            of the image, so [state.pad, state.image.shape[0] - state.pad]</span>
+
+<span class="sd">        laser_wavelength : float</span>
+<span class="sd">            wavelength of light in um of the incoming laser light</span>
+
+<span class="sd">        zslab : float</span>
+<span class="sd">            Pixel position of the optical interface where 0 is the edge of the</span>
+<span class="sd">            image in the z direction</span>
+
+<span class="sd">        zscale : float</span>
+<span class="sd">            Scaling of the z pixel size, so that each pixel is located at</span>
+<span class="sd">            zscale*(z - zint), such that the interface does not move with zscale</span>
+
+<span class="sd">        kfki : float</span>
+<span class="sd">            Ratio of outgoing to incoming light wavevectors, 2\pi/\lambda</span>
+
+<span class="sd">        n2n1 : float</span>
+<span class="sd">            Ratio of the index mismatch across the optical interface. For typical</span>
+<span class="sd">            glass with glycerol/water 80/20 mixture this is 1.4/1.518</span>
+
+<span class="sd">        alpha : float</span>
+<span class="sd">            Aperture of the lens in radians, set by arcsin(n2n1)?</span>
+
+<span class="sd">        polar_angle : float</span>
+<span class="sd">            the angle of the light polarization with respect to the scanning axis</span>
+
+<span class="sd">        pxsize : float</span>
+<span class="sd">            the size of a xy pixel in um, defaults to cohen group size 0.125 um</span>
+
+<span class="sd">        support_factor : integer</span>
+<span class="sd">            size of the support</span>
+
+<span class="sd">        normalize : boolean</span>
+<span class="sd">            if True, use the normalization as calculated by the PSF instead of</span>
+<span class="sd">            unit normalization</span>
+
+<span class="sd">        sigkf : float</span>
+<span class="sd">            Width of wavelengths to use in the polychromatic psf, None is</span>
+<span class="sd">            monochromatic. Values for kfki = kfki +- sigkf, unitless</span>
+
+<span class="sd">        nkpts : integer</span>
+<span class="sd">            number of integration points to use for the polychromatic psf</span>
+
+<span class="sd">        cutoffval : float</span>
+<span class="sd">            Percentage of peak psf value to cutoff using a 3-axis</span>
+<span class="sd">            exp(-(r-r0)**4) function where r0 is determined by cutoffval. A</span>
+<span class="sd">            good value for this is the bit depth of the camera, or possibly the</span>
+<span class="sd">            SNR, so 1/2**8 or 1/50.</span>
+
+<span class="sd">        measurement_iterations : int</span>
+<span class="sd">            number of interations used when trying to find the center of mass</span>
+<span class="sd">            of the psf in a certain slice</span>
+
+<span class="sd">        k_dist : str</span>
+<span class="sd">            Eithe [&#39;gaussian&#39;, &#39;gamma&#39;] which control the wavevector</span>
+<span class="sd">            distribution for the polychromatic detection psf. Default</span>
+<span class="sd">            is Gaussian.</span>
+
+<span class="sd">        use_J1 : boolean</span>
+<span class="sd">            Which hdet confocal model to use. Set to True to include the</span>
+<span class="sd">            J1 term corresponding to a large-NA focusing lens, False to</span>
+<span class="sd">            exclude it. Default is True</span>
+
+<span class="sd">        cutbyval : boolean</span>
+<span class="sd">            If True, cuts the PSF based on the actual value instead of the</span>
+<span class="sd">            position associated with the nearest value.</span>
+
+<span class="sd">        cutfallrate : float</span>
+<span class="sd">            The relative value of the cutoffval over which to damp the</span>
+<span class="sd">            remaining values of the psf. 0.3 seems a good fit now.</span>
+
+<span class="sd">        cutedgeval : float</span>
+<span class="sd">            The value with which to determine the edge of the psf, typically</span>
+<span class="sd">            taken around floating point, 1e-12</span>
+
+<span class="sd">        pinhole_width : Float</span>
+<span class="sd">            The width of the line illumination, in 1/k units. Default is 1.0.</span>
+
+<span class="sd">        do_pinhole : Bool</span>
+<span class="sd">            Whether or not to include pinhole line width in the sampling.</span>
+<span class="sd">            Default is False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pxsize</span> <span class="o">=</span> <span class="n">pxsize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polar_angle</span> <span class="o">=</span> <span class="n">polar_angle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">support_factor</span> <span class="o">=</span> <span class="n">support_factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span> <span class="o">=</span> <span class="n">normalize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurement_iterations</span> <span class="o">=</span> <span class="n">measurement_iterations</span> <span class="ow">or</span> <span class="mi">11</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_zscale</span> <span class="o">=</span> <span class="n">global_zscale</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">polychromatic</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigkf</span> <span class="o">=</span> <span class="n">sigkf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nkpts</span> <span class="o">=</span> <span class="n">nkpts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutoffval</span> <span class="o">=</span> <span class="n">cutoffval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutbyval</span> <span class="o">=</span> <span class="n">cutbyval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutfallrate</span> <span class="o">=</span> <span class="n">cutfallrate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutedgeval</span> <span class="o">=</span> <span class="n">cutedgeval</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">k_dist</span> <span class="o">=</span> <span class="n">k_dist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_J1</span> <span class="o">=</span> <span class="n">use_J1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_pinhole</span> <span class="o">=</span> <span class="n">do_pinhole</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigkf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nkpts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nkpts</span> <span class="ow">or</span> <span class="mi">3</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">polychromatic</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">nkpts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sigkf</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">polychromatic</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sigkf</span> <span class="o">=</span> <span class="n">sigkf</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">polychromatic</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">sph6_ab</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">sph6_ab</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">use_sph6_ab</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1">#necessary? FIXME</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">use_sph6_ab</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">shape</span> <span class="ow">and</span> <span class="n">zrange</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">zrange</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">shape</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zrange</span> <span class="o">=</span> <span class="n">zrange</span>
+
+        <span class="c1"># text location of parameters for ease of extraction</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;kfki&#39;</span><span class="p">,</span> <span class="s1">&#39;zslab&#39;</span><span class="p">,</span> <span class="s1">&#39;zscale&#39;</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="s1">&#39;n2n1&#39;</span><span class="p">,</span> <span class="s1">&#39;laser-wavelength&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;sigkf&#39;</span><span class="p">,</span> <span class="s1">&#39;sph6-ab&#39;</span>
+        <span class="p">]</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="n">kfki</span><span class="p">,</span>   <span class="n">zslab</span><span class="p">,</span>   <span class="n">zscale</span><span class="p">,</span>   <span class="n">alpha</span><span class="p">,</span>   <span class="n">n2n1</span><span class="p">,</span>   <span class="n">laser_wavelength</span><span class="p">,</span>
+            <span class="n">sigkf</span><span class="p">,</span>    <span class="n">sph6_ab</span>
+        <span class="p">])</span>
+
+        <span class="c1"># the next statements must occur in the correct order so that</span>
+        <span class="c1"># other parameters are not deleted by mistake</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">polychromatic</span><span class="p">:</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;sigkf&#39;</span><span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">ind</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_sph6_ab</span><span class="p">:</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;sph6-ab&#39;</span><span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">ind</span><span class="p">)</span>
+
+        <span class="c1"># if not self.do_pinhole:  #this canbe appended if self.do_pinhole</span>
+            <span class="c1"># ind = params.index(&#39;pinhole-width&#39;)</span>
+            <span class="c1"># params.pop(ind)</span>
+            <span class="c1"># values = np.delete(values, ind)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="s1">&#39;zscale&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_zscale</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;psf-&#39;</span> <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">ExactPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="ExactPSF.psffunc"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ExactPSF.psffunc">[docs]</a>    <span class="k">def</span> <span class="nf">psffunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The function to evaluate the exact psf. Syntax must be:</span>
+<span class="sd">        </span>
+<span class="sd">            psf = psffunc(x, y, z, \**kwargs)</span>
+
+<span class="sd">        and return a ``[x.size, y.size, z.size]`` numpy.ndarray, where x,y,z</span>
+<span class="sd">        are 1D arrays.</span>
+<span class="sd">        Implement in subclass.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Supply psffunc in subclass&#39;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">zscale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;zscale&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_zscale</span> <span class="k">else</span> <span class="s1">&#39;psf-zscale&#39;</span>
+
+    <span class="k">def</span> <span class="nf">set_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">inner</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zrange</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zrange</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">shape</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ExactPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">inner</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExactPSF.psf_slice"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ExactPSF.psf_slice">[docs]</a>    <span class="k">def</span> <span class="nf">psf_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zint</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">zoffset</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">getextent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the 3D psf at a particular z pixel height</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        zint : float</span>
+<span class="sd">            z pixel height in image coordinates , converted to 1/k by the</span>
+<span class="sd">            function using the slab position as well</span>
+
+<span class="sd">        size : int, list, tuple</span>
+<span class="sd">            The size over which to calculate the psf, can be 1 or 3 elements</span>
+<span class="sd">            for the different axes in image pixel coordinates</span>
+
+<span class="sd">        zoffset : float</span>
+<span class="sd">            Offset in pixel units to use in the calculation of the psf</span>
+
+<span class="sd">        cutval : float</span>
+<span class="sd">            If not None, the psf will be cut along a curve corresponding to</span>
+<span class="sd">            p(r) == 0 with exponential damping exp(-d^4)</span>
+
+<span class="sd">        getextent : boolean</span>
+<span class="sd">            If True, also return the extent of the psf in pixels for example</span>
+<span class="sd">            to get the support size. Can only be used with cutval.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># calculate the current pixel value in 1/k, making sure we are above the slab</span>
+        <span class="n">zint</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_p2k</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tz</span><span class="p">(</span><span class="n">zint</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">zoffset</span><span class="o">*</span><span class="p">(</span><span class="n">zint</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">zscale</span><span class="p">],</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+
+        <span class="c1"># create the coordinate vectors for where to actually calculate the</span>
+        <span class="n">tile</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">Tile</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">centered</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">vecs</span> <span class="o">=</span> <span class="n">tile</span><span class="o">.</span><span class="n">coords</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="s1">&#39;flat&#39;</span><span class="p">)</span>
+        <span class="n">vecs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_p2k</span><span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">s</span><span class="p">,</span><span class="n">o</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">)]</span>
+
+        <span class="n">psf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psffunc</span><span class="p">(</span><span class="o">*</span><span class="n">vecs</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">zint</span><span class="o">=</span><span class="n">zint</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">pack_args</span><span class="p">())</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">tile</span><span class="o">.</span><span class="n">coords</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="s1">&#39;meshed&#39;</span><span class="p">)</span>
+
+        <span class="c1"># create a smoothly varying point spread function by cutting off the psf</span>
+        <span class="c1"># at a certain value and smoothly taking it to zero</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutoffval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutbyval</span><span class="p">:</span>
+            <span class="c1"># find the edges of the PSF</span>
+            <span class="n">edge</span> <span class="o">=</span> <span class="n">psf</span> <span class="o">&gt;</span> <span class="n">psf</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutoffval</span>
+            <span class="n">dd</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="n">morphology</span><span class="o">.</span><span class="n">distance_transform_edt</span><span class="p">(</span><span class="o">~</span><span class="n">edge</span><span class="p">)</span>
+
+            <span class="c1"># calculate the new PSF and normalize it to the new support</span>
+            <span class="n">psf</span> <span class="o">=</span> <span class="n">psf</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">dd</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span>
+            <span class="n">psf</span> <span class="o">/=</span> <span class="n">psf</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">getextent</span><span class="p">:</span>
+                <span class="c1"># the size is determined by the edge plus a 2 pad for the</span>
+                <span class="c1"># exponential damping to zero at the edge</span>
+                <span class="n">size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+                    <span class="p">(</span><span class="n">vec</span><span class="o">*</span><span class="n">edge</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">vec</span><span class="o">*</span><span class="n">edge</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">])</span><span class="o">.</span><span class="n">T</span>
+                <span class="k">return</span> <span class="n">psf</span><span class="p">,</span> <span class="n">vec</span><span class="p">,</span> <span class="n">size</span>
+            <span class="k">return</span> <span class="n">psf</span><span class="p">,</span> <span class="n">vec</span>
+
+        <span class="c1"># perform a cut by value instead</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutoffval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutbyval</span><span class="p">:</span>
+            <span class="n">cutval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutoffval</span> <span class="o">*</span> <span class="n">psf</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+            <span class="n">dd</span> <span class="o">=</span> <span class="p">(</span><span class="n">psf</span> <span class="o">-</span> <span class="n">cutval</span><span class="p">)</span> <span class="o">/</span> <span class="n">cutval</span>
+            <span class="n">dd</span><span class="p">[</span><span class="n">dd</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+
+            <span class="c1"># calculate the new PSF and normalize it to the new support</span>
+            <span class="n">psf</span> <span class="o">=</span> <span class="n">psf</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">dd</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutfallrate</span><span class="p">)</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span>
+            <span class="n">psf</span> <span class="o">/=</span> <span class="n">psf</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+            <span class="c1"># let the small values determine the edges</span>
+            <span class="n">edge</span> <span class="o">=</span> <span class="n">psf</span> <span class="o">&gt;</span> <span class="n">cutval</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutedgeval</span>
+            <span class="k">if</span> <span class="n">getextent</span><span class="p">:</span>
+                <span class="c1"># the size is determined by the edge plus a 2 pad for the</span>
+                <span class="c1"># exponential damping to zero at the edge</span>
+                <span class="n">size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+                    <span class="p">(</span><span class="n">vec</span><span class="o">*</span><span class="n">edge</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">vec</span><span class="o">*</span><span class="n">edge</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">])</span><span class="o">.</span><span class="n">T</span>
+                <span class="k">return</span> <span class="n">psf</span><span class="p">,</span> <span class="n">vec</span><span class="p">,</span> <span class="n">size</span>
+            <span class="k">return</span> <span class="n">psf</span><span class="p">,</span> <span class="n">vec</span>
+
+        <span class="k">return</span> <span class="n">psf</span><span class="p">,</span> <span class="n">vec</span></div>
+
+    <span class="k">def</span> <span class="nf">todict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)}</span>
+
+<div class="viewcode-block" id="ExactPSF.pack_args"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ExactPSF.pack_args">[docs]</a>    <span class="k">def</span> <span class="nf">pack_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pack the parameters into the form necessary for the integration</span>
+<span class="sd">        routines above in psfcalc.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Implement in Subclass&#39;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_p2k</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Convert from pixel to 1/k_incoming (laser_wavelength/(2\pi)) units &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pxsize</span><span class="o">*</span><span class="n">v</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;psf-laser-wavelength&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_tz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Transform z to real-space coordinates from tile coordinates &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">z</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;psf-zslab&#39;</span><span class="p">])</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">zscale</span><span class="p">]</span>
+
+<div class="viewcode-block" id="ExactPSF.drift"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ExactPSF.drift">[docs]</a>    <span class="k">def</span> <span class="nf">drift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Give the pixel offset at a given z value for the current parameters &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drift_poly</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExactPSF.measure_size_drift"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ExactPSF.measure_size_drift">[docs]</a>    <span class="k">def</span> <span class="nf">measure_size_drift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">31</span><span class="p">,</span> <span class="n">zoffset</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the &#39;size&#39; of the psf in each direction a particular z (px) &quot;&quot;&quot;</span>
+        <span class="n">drift</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">measurement_iterations</span><span class="p">):</span>
+            <span class="n">psf</span><span class="p">,</span> <span class="n">vec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psf_slice</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">zoffset</span><span class="o">=</span><span class="n">zoffset</span><span class="o">+</span><span class="n">drift</span><span class="p">)</span>
+            <span class="n">psf</span> <span class="o">=</span> <span class="n">psf</span> <span class="o">/</span> <span class="n">psf</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+            <span class="n">drift</span> <span class="o">+=</span> <span class="n">moment</span><span class="p">(</span><span class="n">psf</span><span class="p">,</span> <span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">psize</span> <span class="o">=</span> <span class="p">[</span><span class="n">moment</span><span class="p">(</span><span class="n">psf</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">vec</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">psize</span><span class="p">),</span> <span class="n">drift</span></div>
+
+<div class="viewcode-block" id="ExactPSF.characterize_psf"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ExactPSF.characterize_psf">[docs]</a>    <span class="k">def</span> <span class="nf">characterize_psf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get support size and drift polynomial for current set of params &quot;&quot;&quot;</span>
+        <span class="c1"># there may be an issue with the support and characterization--</span>
+        <span class="c1"># it might be best to do the characterization with the same support</span>
+        <span class="c1"># as the calculated psf.</span>
+        <span class="n">l</span><span class="p">,</span><span class="n">u</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;psf-zslab&#39;</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">size_l</span><span class="p">,</span> <span class="n">drift_l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measure_size_drift</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+        <span class="n">size_u</span><span class="p">,</span> <span class="n">drift_u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measure_size_drift</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="c1"># must be odd for now or have a better system for getting the center</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">support</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">oddify</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">support_factor</span><span class="o">*</span><span class="n">size_u</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drift_poly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">([</span><span class="n">l</span><span class="p">,</span> <span class="n">u</span><span class="p">],</span> <span class="p">[</span><span class="n">drift_l</span><span class="p">,</span> <span class="n">drift_u</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutoffval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">psf</span><span class="p">,</span> <span class="n">vec</span><span class="p">,</span> <span class="n">size_l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psf_slice</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">51</span><span class="p">,</span> <span class="n">zoffset</span><span class="o">=</span><span class="n">drift_l</span><span class="p">,</span> <span class="n">getextent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">psf</span><span class="p">,</span> <span class="n">vec</span><span class="p">,</span> <span class="n">size_u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psf_slice</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">51</span><span class="p">,</span> <span class="n">zoffset</span><span class="o">=</span><span class="n">drift_u</span><span class="p">,</span> <span class="n">getextent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">ss</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">size_l</span><span class="p">,</span> <span class="n">size_u</span><span class="p">]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">support</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">oddify</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="o">*</span><span class="n">ss</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">get_padding_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">Tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_values</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">characterize_psf</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">slices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">zdrift</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drift</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">psf</span><span class="p">,</span> <span class="n">vec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psf_slice</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">,</span> <span class="n">zoffset</span><span class="o">=</span><span class="n">zdrift</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">psf</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">slices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_values</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+        <span class="c1">#Clipping params to computable values:</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;psf-alpha&#39;</span><span class="p">]</span>
+        <span class="n">zscale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">zscale</span><span class="p">]</span>
+        <span class="n">wavelength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;psf-laser-wavelength&#39;</span><span class="p">]</span>
+        <span class="n">max_alpha</span><span class="p">,</span> <span class="n">max_zscale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mf">100.</span>
+
+        <span class="k">if</span> <span class="n">alpha</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span> <span class="ow">or</span> <span class="n">alpha</span> <span class="o">&gt;</span> <span class="n">max_alpha</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Invalid alpha, clipping&#39;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;psf-alpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_alpha</span><span class="o">-</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">zscale</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span> <span class="ow">or</span> <span class="n">zscale</span> <span class="o">&gt;</span> <span class="n">max_zscale</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Invalid zscale, clipping&#39;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">zscale</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">zscale</span><span class="p">,</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_zscale</span><span class="o">-</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">wavelength</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Invalid laser wavelength, clipping&#39;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;psf-laser-wavelength&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">wavelength</span><span class="p">,</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set_tile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;tile&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span> <span class="o">!=</span> <span class="n">tile</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tile</span> <span class="o">=</span> <span class="n">tile</span>
+
+    <span class="k">def</span> <span class="nf">_kpad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">finalshape</span><span class="p">,</span> <span class="n">zpad</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        fftshift and pad the field with zeros until it has size finalshape.</span>
+<span class="sd">        if zpad is off, then no padding is put on the z direction. returns</span>
+<span class="sd">        the fourier transform of the field</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">currshape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">finalshape</span> <span class="o">&lt;</span> <span class="n">currshape</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;PSF tile size is less than minimum support size&quot;</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">finalshape</span> <span class="o">-</span> <span class="n">currshape</span>
+
+        <span class="c1"># fix off-by-one issues when going odd to even tile sizes</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="n">d</span> <span class="o">%</span> <span class="mi">2</span>
+        <span class="n">d</span> <span class="o">/=</span> <span class="mi">2</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">zpad</span><span class="p">:</span>
+            <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">axes</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">pad</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">((</span><span class="n">d</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="n">o</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">d</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">rpsf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">rpsf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftshift</span><span class="p">(</span><span class="n">rpsf</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+        <span class="n">kpsf</span> <span class="o">=</span> <span class="n">fft</span><span class="o">.</span><span class="n">rfftn</span><span class="p">(</span><span class="n">rpsf</span><span class="p">,</span> <span class="o">**</span><span class="n">fftkwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">norm</span><span class="p">:</span>
+            <span class="n">kpsf</span> <span class="o">/=</span> <span class="n">kpsf</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">kpsf</span>
+
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Field passed to PSF incorrect shape&quot;</span><span class="p">)</span>
+
+        <span class="n">outfield</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+        <span class="n">zc</span><span class="p">,</span><span class="n">yc</span><span class="p">,</span><span class="n">xc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">coords</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="s1">&#39;flat&#39;</span><span class="p">)</span>
+
+        <span class="c1"># here&#39;s the plan. we are going to rotate the field so that the current</span>
+        <span class="c1"># plane of interest is in the center. we then crop the image to the</span>
+        <span class="c1"># size of the support so that we are only convolving a small region.</span>
+        <span class="c1"># finally, take the mid plane back out as the solution.</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">z</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">zc</span><span class="p">):</span>
+            <span class="c1"># pad the psf slice for the convolution</span>
+            <span class="n">fs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">fs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">z</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">z</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">continue</span>
+
+            <span class="n">zslice</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">middle</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+
+            <span class="n">subpsf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slices</span><span class="p">[</span><span class="n">zslice</span><span class="p">],</span> <span class="n">fs</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">subfield</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">middle</span> <span class="o">-</span> <span class="n">i</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">subfield</span> <span class="o">=</span> <span class="n">subfield</span><span class="p">[</span><span class="n">middle</span><span class="o">-</span><span class="n">fs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span><span class="n">middle</span><span class="o">+</span><span class="n">fs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">kshape</span> <span class="o">=</span> <span class="n">subfield</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">kfield</span> <span class="o">=</span> <span class="n">fft</span><span class="o">.</span><span class="n">rfftn</span><span class="p">(</span><span class="n">subfield</span><span class="p">,</span> <span class="o">**</span><span class="n">fftkwargs</span><span class="p">)</span>
+
+            <span class="n">outfield</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fft</span><span class="o">.</span><span class="n">irfftn</span><span class="p">(</span><span class="n">kfield</span> <span class="o">*</span> <span class="n">subpsf</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">kshape</span><span class="p">,</span> <span class="o">**</span><span class="n">fftkwargs</span><span class="p">))[</span><span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">outfield</span>
+
+    <span class="k">def</span> <span class="nf">nopickle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ExactPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">nopickle</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span>
+            <span class="s1">&#39;_rx&#39;</span><span class="p">,</span> <span class="s1">&#39;_ry&#39;</span><span class="p">,</span> <span class="s1">&#39;_rz&#39;</span><span class="p">,</span> <span class="s1">&#39;_rlen&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;_memoize_clear&#39;</span><span class="p">,</span> <span class="s1">&#39;_memoize_caches&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;rpsf&#39;</span><span class="p">,</span> <span class="s1">&#39;kpsf&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;cheb&#39;</span><span class="p">,</span> <span class="s1">&#39;slices&#39;</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">odict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">util</span><span class="o">.</span><span class="n">cdd</span><span class="p">(</span><span class="n">odict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nopickle</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">odict</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">idict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patch</span><span class="p">({</span><span class="s1">&#39;global_zscale&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ExactLineScanConfocalPSF"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ExactLineScanConfocalPSF">[docs]</a><span class="k">class</span> <span class="nc">ExactLineScanConfocalPSF</span><span class="p">(</span><span class="n">ExactPSF</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">zrange</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">laser_wavelength</span><span class="o">=</span><span class="mf">0.488</span><span class="p">,</span> <span class="n">zslab</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+            <span class="n">zscale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">kfki</span><span class="o">=</span><span class="mf">0.889</span><span class="p">,</span> <span class="n">n2n1</span><span class="o">=</span><span class="mf">1.44</span><span class="o">/</span><span class="mf">1.518</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.173</span><span class="p">,</span> <span class="n">polar_angle</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+            <span class="n">pxsize</span><span class="o">=</span><span class="mf">0.125</span><span class="p">,</span> <span class="n">support_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sigkf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">nkpts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cutoffval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">measurement_iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">k_dist</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">use_J1</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sph6_ab</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">global_zscale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">cutbyval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cutfallrate</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">cutedgeval</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span>
+            <span class="n">pinhole_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">do_pinhole</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        PSF for line-scanning confocal microscopes that can be used with the</span>
+<span class="sd">        peri framework.  Calculates the spatially varying point spread</span>
+<span class="sd">        function for confocal microscopes and allows them to be applied to</span>
+<span class="sd">        images as a convolution.</span>
+
+<span class="sd">        This PSF assumes that the z extent is large compared to the image size</span>
+<span class="sd">        and so calculates the local PSF for every z layer in the image.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        shape : tuple</span>
+<span class="sd">            Shape of the image in (z,y,x) pixel numbers (to be deprecated)</span>
+
+<span class="sd">        zrange : tuple</span>
+<span class="sd">            range of z pixels over which we should calculate the psf, good pixels</span>
+<span class="sd">            being zrange[0] &lt;= z &lt;= zrange[1]. currently must be set to the interior</span>
+<span class="sd">            of the image, so [state.pad, state.image.shape[0] - state.pad]</span>
+
+<span class="sd">        laser_wavelength : float</span>
+<span class="sd">            wavelength of light in um of the incoming laser light</span>
+
+<span class="sd">        zslab : float</span>
+<span class="sd">            Pixel position of the optical interface where 0 is the edge of the</span>
+<span class="sd">            image in the z direction</span>
+
+<span class="sd">        zscale : float</span>
+<span class="sd">            Scaling of the z pixel size, so that each pixel is located at</span>
+<span class="sd">            zscale*(z - zint), such that the interface does not move with zscale</span>
+
+<span class="sd">        kfki : float</span>
+<span class="sd">            Ratio of outgoing to incoming light wavevectors, 2\pi/\lambda</span>
+
+<span class="sd">        n2n1 : float</span>
+<span class="sd">            Ratio of the index mismatch across the optical interface. For typical</span>
+<span class="sd">            glass with glycerol/water 80/20 mixture this is 1.4/1.518</span>
+
+<span class="sd">        alpha : float</span>
+<span class="sd">            Aperture of the lens in radians, set by arcsin(n2n1)?</span>
+
+<span class="sd">        polar_angle : float</span>
+<span class="sd">            the angle of the light polarization with respect to the scanning axis</span>
+
+<span class="sd">        pxsize : float</span>
+<span class="sd">            the size of a xy pixel in um, defaults to cohen group size 0.125 um</span>
+
+<span class="sd">        support_factor : integer</span>
+<span class="sd">            size of the support</span>
+
+<span class="sd">        normalize : boolean</span>
+<span class="sd">            if True, use the normalization as calculated by the PSF instead of</span>
+<span class="sd">            unit normalization</span>
+
+<span class="sd">        sigkf : float</span>
+<span class="sd">            Width of wavelengths to use in the polychromatic psf, None is</span>
+<span class="sd">            monochromatic. Values for kfki = kfki +- sigkf, unitless</span>
+
+<span class="sd">        nkpts : integer</span>
+<span class="sd">            number of integration points to use for the polychromatic psf</span>
+
+<span class="sd">        cutoffval : float</span>
+<span class="sd">            Percentage of peak psf value to cutoff using a 3-axis</span>
+<span class="sd">            exp(-(r-r0)**4) function where r0 is determined by cutoffval. A</span>
+<span class="sd">            good value for this is the bit depth of the camera, or possibly the</span>
+<span class="sd">            SNR, so 1/2**8 or 1/50.</span>
+
+<span class="sd">        measurement_iterations : int</span>
+<span class="sd">            number of interations used when trying to find the center of mass</span>
+<span class="sd">            of the psf in a certain slice</span>
+
+<span class="sd">        k_dist : str</span>
+<span class="sd">            Eithe [&#39;gaussian&#39;, &#39;gamma&#39;] which control the wavevector</span>
+<span class="sd">            distribution for the polychromatic detection psf. Default</span>
+<span class="sd">            is Gaussian.</span>
+
+<span class="sd">        use_J1 : boolean</span>
+<span class="sd">            Which hdet confocal model to use. Set to True to include the</span>
+<span class="sd">            J1 term corresponding to a large-NA focusing lens, False to</span>
+<span class="sd">            exclude it. Default is True</span>
+
+<span class="sd">        cutbyval : boolean</span>
+<span class="sd">            If True, cuts the PSF based on the actual value instead of the</span>
+<span class="sd">            position associated with the nearest value.</span>
+
+<span class="sd">        cutfallrate : float</span>
+<span class="sd">            The relative value of the cutoffval over which to damp the</span>
+<span class="sd">            remaining values of the psf. 0.3 seems a good fit now.</span>
+
+<span class="sd">        cutedgeval : float</span>
+<span class="sd">            The value with which to determine the edge of the psf, typically</span>
+<span class="sd">            taken around floating point, 1e-12</span>
+
+<span class="sd">        pinhole_width : Float</span>
+<span class="sd">            The width of the line illumination, in 1/k units. Default is 1.0.</span>
+
+<span class="sd">        do_pinhole : Bool</span>
+<span class="sd">            Whether or not to include pinhole line width in the sampling.</span>
+<span class="sd">            Default is False.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            a = ExactLineScanConfocalPSF((64,)*3)</span>
+<span class="sd">            psf, (z,y,x) = a.psf_slice(1., size=51)</span>
+<span class="sd">            imshow((psf*r**4)[:,:,25], cmap=&#39;bone&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ExactLineScanConfocalPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span>
+                <span class="n">zrange</span><span class="o">=</span><span class="n">zrange</span><span class="p">,</span> <span class="n">laser_wavelength</span><span class="o">=</span><span class="n">laser_wavelength</span><span class="p">,</span> <span class="n">zslab</span><span class="o">=</span><span class="n">zslab</span><span class="p">,</span>
+                <span class="n">zscale</span><span class="o">=</span><span class="n">zscale</span><span class="p">,</span> <span class="n">kfki</span><span class="o">=</span><span class="n">kfki</span><span class="p">,</span> <span class="n">n2n1</span><span class="o">=</span><span class="n">n2n1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">pxsize</span><span class="o">=</span>
+                <span class="n">pxsize</span><span class="p">,</span> <span class="n">polar_angle</span><span class="o">=</span><span class="n">polar_angle</span><span class="p">,</span> <span class="n">support_factor</span><span class="o">=</span><span class="n">support_factor</span><span class="p">,</span>
+                <span class="n">normalize</span><span class="o">=</span><span class="n">normalize</span><span class="p">,</span> <span class="n">sigkf</span><span class="o">=</span><span class="n">sigkf</span><span class="p">,</span> <span class="n">nkpts</span><span class="o">=</span><span class="n">nkpts</span><span class="p">,</span> <span class="n">cutoffval</span><span class="o">=</span>
+                <span class="n">cutoffval</span><span class="p">,</span> <span class="n">measurement_iterations</span><span class="o">=</span> <span class="n">measurement_iterations</span><span class="p">,</span>
+                <span class="n">k_dist</span><span class="o">=</span><span class="n">k_dist</span><span class="p">,</span> <span class="n">use_J1</span><span class="o">=</span><span class="n">use_J1</span><span class="p">,</span> <span class="n">sph6_ab</span><span class="o">=</span><span class="n">sph6_ab</span><span class="p">,</span> <span class="n">global_zscale</span><span class="o">=</span>
+                <span class="n">global_zscale</span><span class="p">,</span> <span class="n">cutbyval</span><span class="o">=</span><span class="n">cutbyval</span><span class="p">,</span> <span class="n">cutfallrate</span><span class="o">=</span><span class="n">cutfallrate</span><span class="p">,</span>
+                <span class="n">cutedgeval</span><span class="o">=</span><span class="n">cutedgeval</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_pinhole</span> <span class="o">=</span> <span class="n">do_pinhole</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">pinhole_width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">do_pinhole</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_line_pts</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_line_pts</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">pinhole_width</span> <span class="o">=</span> <span class="n">pinhole_width</span> <span class="k">if</span> <span class="p">(</span><span class="n">pinhole_width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="mf">1.0</span>
+
+        <span class="c1"># the next statements must occur in the correct order so that</span>
+        <span class="c1"># other parameters are not deleted by mistake</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_pinhole</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="s1">&#39;psf-pinhole-width&#39;</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="c1">#FIXME this is not correct!!!! should be done intelligently thru</span>
+            <span class="c1">#the superclass&#39;s init, but..</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span><span class="n">pinhole_width</span><span class="p">})</span>
+
+<div class="viewcode-block" id="ExactLineScanConfocalPSF.pack_args"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ExactLineScanConfocalPSF.pack_args">[docs]</a>    <span class="k">def</span> <span class="nf">pack_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pack the parameters into the form necessary for the integration</span>
+<span class="sd">        routines above.  For example, packs for calculate_linescan_psf</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mapper</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;psf-kfki&#39;</span><span class="p">:</span> <span class="s1">&#39;kfki&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;psf-alpha&#39;</span><span class="p">:</span> <span class="s1">&#39;alpha&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;psf-n2n1&#39;</span><span class="p">:</span> <span class="s1">&#39;n2n1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;psf-sigkf&#39;</span><span class="p">:</span> <span class="s1">&#39;sigkf&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;psf-sph6-ab&#39;</span><span class="p">:</span> <span class="s1">&#39;sph6_ab&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;psf-laser-wavelength&#39;</span><span class="p">:</span> <span class="s1">&#39;laser_wavelength&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;psf-pinhole-width&#39;</span><span class="p">:</span> <span class="s1">&#39;pinhole_width&#39;</span>
+        <span class="p">}</span>
+        <span class="n">bads</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">zscale</span><span class="p">,</span> <span class="s1">&#39;psf-zslab&#39;</span><span class="p">]</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">mapper</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+        <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s1">&#39;polar_angle&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">polar_angle</span><span class="p">,</span>
+            <span class="s1">&#39;normalize&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">,</span>
+            <span class="s1">&#39;include_K3_det&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">use_J1</span>
+        <span class="p">})</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">polychromatic</span><span class="p">:</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;nkpts&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nkpts</span><span class="p">})</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;k_dist&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_dist</span><span class="p">})</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_pinhole</span><span class="p">:</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;nlpts&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_line_pts</span><span class="p">})</span>
+
+        <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;use_laggauss&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="ExactLineScanConfocalPSF.psffunc"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ExactLineScanConfocalPSF.psffunc">[docs]</a>    <span class="k">def</span> <span class="nf">psffunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates a linescan psf&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">polychromatic</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">psfcalc</span><span class="o">.</span><span class="n">calculate_polychrome_linescan_psf</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">psfcalc</span><span class="o">.</span><span class="n">calculate_linescan_psf</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="ExactPinholeConfocalPSF"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ExactPinholeConfocalPSF">[docs]</a><span class="k">class</span> <span class="nc">ExactPinholeConfocalPSF</span><span class="p">(</span><span class="n">ExactPSF</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">zrange</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">laser_wavelength</span><span class="o">=</span><span class="mf">0.488</span><span class="p">,</span> <span class="n">zslab</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+            <span class="n">zscale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">kfki</span><span class="o">=</span><span class="mf">0.889</span><span class="p">,</span> <span class="n">n2n1</span><span class="o">=</span><span class="mf">1.44</span><span class="o">/</span><span class="mf">1.518</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.173</span><span class="p">,</span> <span class="n">polar_angle</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+            <span class="n">pxsize</span><span class="o">=</span><span class="mf">0.125</span><span class="p">,</span> <span class="n">support_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sigkf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">nkpts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cutoffval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">measurement_iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">k_dist</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">use_J1</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sph6_ab</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">global_zscale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">cutbyval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cutfallrate</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">cutedgeval</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        PSF for a pinhole confocal microscopes that can be used with the</span>
+<span class="sd">        peri framework.  Calculates the spatially varying point spread</span>
+<span class="sd">        function for confocal microscopes and allows them to be applied to</span>
+<span class="sd">        images as a convolution.</span>
+
+<span class="sd">        This PSF assumes that the z extent is large compared to the image size</span>
+<span class="sd">        and so calculates the local PSF for every z layer in the image.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        shape : tuple</span>
+<span class="sd">            Shape of the image in (z,y,x) pixel numbers (to be deprecated)</span>
+
+<span class="sd">        zrange : tuple</span>
+<span class="sd">            range of z pixels over which we should calculate the psf, good pixels</span>
+<span class="sd">            being zrange[0] &lt;= z &lt;= zrange[1]. currently must be set to the interior</span>
+<span class="sd">            of the image, so [state.pad, state.image.shape[0] - state.pad]</span>
+
+<span class="sd">        laser_wavelength : float</span>
+<span class="sd">            wavelength of light in um of the incoming laser light</span>
+
+<span class="sd">        zslab : float</span>
+<span class="sd">            Pixel position of the optical interface where 0 is the edge of the</span>
+<span class="sd">            image in the z direction</span>
+
+<span class="sd">        zscale : float</span>
+<span class="sd">            Scaling of the z pixel size, so that each pixel is located at</span>
+<span class="sd">            zscale*(z - zint), such that the interface does not move with zscale</span>
+
+<span class="sd">        kfki : float</span>
+<span class="sd">            Ratio of outgoing to incoming light wavevectors, 2\pi/\lambda</span>
+
+<span class="sd">        n2n1 : float</span>
+<span class="sd">            Ratio of the index mismatch across the optical interface. For typical</span>
+<span class="sd">            glass with glycerol/water 80/20 mixture this is 1.4/1.518</span>
+
+<span class="sd">        alpha : float</span>
+<span class="sd">            Aperture of the lens in radians, set by arcsin(n2n1)?</span>
+
+<span class="sd">        polar_angle : float</span>
+<span class="sd">            the angle of the light polarization with respect to the scanning axis</span>
+
+<span class="sd">        pxsize : float</span>
+<span class="sd">            the size of a xy pixel in um, defaults to cohen group size 0.125 um</span>
+
+<span class="sd">        support_factor : integer</span>
+<span class="sd">            size of the support</span>
+
+<span class="sd">        normalize : boolean</span>
+<span class="sd">            if True, use the normalization as calculated by the PSF instead of</span>
+<span class="sd">            unit normalization</span>
+
+<span class="sd">        sigkf : float</span>
+<span class="sd">            Width of wavelengths to use in the polychromatic psf, None is</span>
+<span class="sd">            monochromatic. Values for kfki = kfki +- sigkf, unitless</span>
+
+<span class="sd">        nkpts : integer</span>
+<span class="sd">            number of integration points to use for the polychromatic psf</span>
+
+<span class="sd">        cutoffval : float</span>
+<span class="sd">            Percentage of peak psf value to cutoff using a 3-axis</span>
+<span class="sd">            exp(-(r-r0)**4) function where r0 is determined by cutoffval. A</span>
+<span class="sd">            good value for this is the bit depth of the camera, or possibly the</span>
+<span class="sd">            SNR, so 1/2**8 or 1/50.</span>
+
+<span class="sd">        measurement_iterations : int</span>
+<span class="sd">            number of interations used when trying to find the center of mass</span>
+<span class="sd">            of the psf in a certain slice</span>
+
+<span class="sd">        k_dist : str</span>
+<span class="sd">            Eithe [&#39;gaussian&#39;, &#39;gamma&#39;] which control the wavevector</span>
+<span class="sd">            distribution for the polychromatic detection psf. Default</span>
+<span class="sd">            is Gaussian.</span>
+
+<span class="sd">        use_J1 : boolean</span>
+<span class="sd">            Which hdet confocal model to use. Set to True to include the</span>
+<span class="sd">            J1 term corresponding to a large-NA focusing lens, False to</span>
+<span class="sd">            exclude it. Default is True</span>
+
+<span class="sd">        cutbyval : boolean</span>
+<span class="sd">            If True, cuts the PSF based on the actual value instead of the</span>
+<span class="sd">            position associated with the nearest value.</span>
+
+<span class="sd">        cutfallrate : float</span>
+<span class="sd">            The relative value of the cutoffval over which to damp the</span>
+<span class="sd">            remaining values of the psf. 0.3 seems a good fit now.</span>
+
+<span class="sd">        cutedgeval : float</span>
+<span class="sd">            The value with which to determine the edge of the psf, typically</span>
+<span class="sd">            taken around floating point, 1e-12</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            a = ExactLineScanConfocalPSF((64,)*3)</span>
+<span class="sd">            psf, (z,y,x) = a.psf_slice(1., size=51)</span>
+<span class="sd">            imshow((psf*r**4)[:,:,25], cmap=&#39;bone&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ExactPinholeConfocalPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span>
+                <span class="n">zrange</span><span class="o">=</span><span class="n">zrange</span><span class="p">,</span> <span class="n">laser_wavelength</span><span class="o">=</span><span class="n">laser_wavelength</span><span class="p">,</span> <span class="n">zslab</span><span class="o">=</span><span class="n">zslab</span><span class="p">,</span>
+                <span class="n">zscale</span><span class="o">=</span><span class="n">zscale</span><span class="p">,</span> <span class="n">kfki</span><span class="o">=</span><span class="n">kfki</span><span class="p">,</span> <span class="n">n2n1</span><span class="o">=</span><span class="n">n2n1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">pxsize</span><span class="o">=</span>
+                <span class="n">pxsize</span><span class="p">,</span> <span class="n">polar_angle</span><span class="o">=</span><span class="n">polar_angle</span><span class="p">,</span> <span class="n">support_factor</span><span class="o">=</span><span class="n">support_factor</span><span class="p">,</span>
+                <span class="n">normalize</span><span class="o">=</span><span class="n">normalize</span><span class="p">,</span> <span class="n">sigkf</span><span class="o">=</span><span class="n">sigkf</span><span class="p">,</span> <span class="n">nkpts</span><span class="o">=</span><span class="n">nkpts</span><span class="p">,</span> <span class="n">cutoffval</span><span class="o">=</span>
+                <span class="n">cutoffval</span><span class="p">,</span> <span class="n">measurement_iterations</span><span class="o">=</span> <span class="n">measurement_iterations</span><span class="p">,</span>
+                <span class="n">k_dist</span><span class="o">=</span><span class="n">k_dist</span><span class="p">,</span> <span class="n">use_J1</span><span class="o">=</span><span class="n">use_J1</span><span class="p">,</span> <span class="n">sph6_ab</span><span class="o">=</span><span class="n">sph6_ab</span><span class="p">,</span> <span class="n">global_zscale</span><span class="o">=</span>
+                <span class="n">global_zscale</span><span class="p">,</span> <span class="n">cutbyval</span><span class="o">=</span><span class="n">cutbyval</span><span class="p">,</span> <span class="n">cutfallrate</span><span class="o">=</span><span class="n">cutfallrate</span><span class="p">,</span>
+                <span class="n">cutedgeval</span><span class="o">=</span><span class="n">cutedgeval</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExactPinholeConfocalPSF.pack_args"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ExactPinholeConfocalPSF.pack_args">[docs]</a>    <span class="k">def</span> <span class="nf">pack_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pack the parameters into the form necessary for the integration</span>
+<span class="sd">        routines above.  For example, packs for calculate_linescan_psf</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mapper</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;psf-kfki&#39;</span><span class="p">:</span> <span class="s1">&#39;kfki&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;psf-alpha&#39;</span><span class="p">:</span> <span class="s1">&#39;alpha&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;psf-n2n1&#39;</span><span class="p">:</span> <span class="s1">&#39;n2n1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;psf-sigkf&#39;</span><span class="p">:</span> <span class="s1">&#39;sigkf&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;psf-sph6-ab&#39;</span><span class="p">:</span> <span class="s1">&#39;sph6_ab&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;psf-laser-wavelength&#39;</span><span class="p">:</span> <span class="s1">&#39;laser_wavelength&#39;</span>
+        <span class="p">}</span>
+        <span class="n">bads</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">zscale</span><span class="p">,</span> <span class="s1">&#39;psf-zslab&#39;</span><span class="p">]</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">mapper</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+        <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s1">&#39;polar_angle&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">polar_angle</span><span class="p">,</span>
+            <span class="s1">&#39;normalize&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">,</span>
+            <span class="s1">&#39;include_K3_det&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">use_J1</span>
+        <span class="p">})</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">polychromatic</span><span class="p">:</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;nkpts&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nkpts</span><span class="p">})</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;k_dist&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_dist</span><span class="p">})</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_pinhole</span><span class="p">:</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;nlpts&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_line_pts</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="ExactPinholeConfocalPSF.psffunc"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ExactPinholeConfocalPSF.psffunc">[docs]</a>    <span class="k">def</span> <span class="nf">psffunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates a pinhole psf&quot;&quot;&quot;</span>
+        <span class="c1">#do_pinhole?? FIXME</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">polychromatic</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">psfcalc</span><span class="o">.</span><span class="n">calculate_polychrome_pinhole_psf</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">psfcalc</span><span class="o">.</span><span class="n">calculate_pinhole_psf</span>
+        <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span> <span class="o">=</span> <span class="p">[</span><span class="n">psfcalc</span><span class="o">.</span><span class="n">vec_to_halfvec</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]]</span>
+        <span class="n">vls</span> <span class="o">=</span> <span class="n">psfcalc</span><span class="o">.</span><span class="n">wrap_and_calc_psf</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vls</span> <span class="o">/</span> <span class="n">vls</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span></div></div>
+
+<div class="viewcode-block" id="ChebyshevPSF"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ChebyshevPSF">[docs]</a><span class="k">class</span> <span class="nc">ChebyshevPSF</span><span class="p">(</span><span class="n">ExactPSF</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cheb_degree</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">cheb_evals</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Same as ExactPSF, except that the convolution is performed in</span>
+<span class="sd">        the 4th dimension by employing fast Chebyshev approximates to</span>
+<span class="sd">        how the PSF varies with depth into the sample. For help, see</span>
+<span class="sd">        ExactPSF.</span>
+
+<span class="sd">        Other parameters</span>
+<span class="sd">        ----------------</span>
+<span class="sd">        cheb_degree : integer</span>
+<span class="sd">            degree of the Chebyshev approximant</span>
+
+<span class="sd">        cheb_evals : integer</span>
+<span class="sd">            number of interpolation points used to create the coefficient matrix</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :class:`peri.comp.exactpsf.ExactPSF`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cheb_degree</span> <span class="o">=</span> <span class="n">cheb_degree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cheb_evals</span> <span class="o">=</span> <span class="n">cheb_evals</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">ChebyshevPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_values</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">characterize_psf</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cheb</span> <span class="o">=</span> <span class="n">interpolation</span><span class="o">.</span><span class="n">ChebyshevInterpolation1D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psf</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">,</span>
+                        <span class="n">degree</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cheb_degree</span><span class="p">,</span> <span class="n">evalpts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cheb_evals</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">psf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+        <span class="n">psf</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">z</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psf_slice</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">,</span> <span class="n">zoffset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">drift</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+            <span class="n">psf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">rollaxis</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">psf</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Field passed to PSF incorrect shape&quot;</span><span class="p">)</span>
+
+        <span class="n">outfield</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+        <span class="n">zc</span><span class="p">,</span><span class="n">yc</span><span class="p">,</span><span class="n">xc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">coords</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="s1">&#39;flat&#39;</span><span class="p">)</span>
+
+        <span class="n">kshape</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">kfield</span> <span class="o">=</span> <span class="n">fft</span><span class="o">.</span><span class="n">rfftn</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="o">**</span><span class="n">fftkwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cheb</span><span class="o">.</span><span class="n">coefficients</span><span class="p">):</span>
+            <span class="n">pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpad</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">finalshape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">zpad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fft</span><span class="o">.</span><span class="n">irfftn</span><span class="p">(</span><span class="n">kfield</span> <span class="o">*</span> <span class="n">pad</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">kshape</span><span class="p">,</span> <span class="o">**</span><span class="n">fftkwargs</span><span class="p">))</span>
+
+            <span class="n">outfield</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cheb</span><span class="o">.</span><span class="n">tk</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">zc</span><span class="p">)[:,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">cov</span>
+
+        <span class="k">return</span> <span class="n">outfield</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cheb_degree</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cheb_evals</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="FixedSSChebPSF"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.FixedSSChebPSF">[docs]</a><span class="k">class</span> <span class="nc">FixedSSChebPSF</span><span class="p">(</span><span class="n">ChebyshevPSF</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">support_size</span><span class="o">=</span><span class="p">[</span><span class="mi">35</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">25</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ChebyshevPSF with a fixed support size</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :class:`peri.comp.exactpsf.ChebyshevPSF`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutoffval</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">support</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">support_size</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FixedSSChebPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FixedSSChebPSF.characterize_psf"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.FixedSSChebPSF.characterize_psf">[docs]</a>    <span class="k">def</span> <span class="nf">characterize_psf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get support size and drift polynomial for current set of params &quot;&quot;&quot;</span>
+        <span class="n">l</span><span class="p">,</span><span class="n">u</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;psf-zslab&#39;</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">size_l</span><span class="p">,</span> <span class="n">drift_l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measure_size_drift</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">)</span>
+        <span class="n">size_u</span><span class="p">,</span> <span class="n">drift_u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measure_size_drift</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">drift_poly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">([</span><span class="n">l</span><span class="p">,</span> <span class="n">u</span><span class="p">],</span> <span class="p">[</span><span class="n">drift_l</span><span class="p">,</span> <span class="n">drift_u</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">)</span></div>
+
+<span class="c1">##Multiple-inheritance-defined classes, see individual docs for details</span>
+<span class="k">class</span> <span class="nc">ChebyshevLineScanConfocalPSF</span><span class="p">(</span><span class="n">ChebyshevPSF</span><span class="p">,</span> <span class="n">ExactLineScanConfocalPSF</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;See ChebyshevPSF, ExactLineScanConfocalPSF for docs.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">FixedSSChebLinePSF</span><span class="p">(</span><span class="n">FixedSSChebPSF</span><span class="p">,</span> <span class="n">ExactLineScanConfocalPSF</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;See FixedSSChebPSF, ExactLineScanConfocalPSF for docs.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">ChebyshevPinholeConfocalPSF</span><span class="p">(</span><span class="n">ChebyshevPSF</span><span class="p">,</span> <span class="n">ExactPinholeConfocalPSF</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;See ChebyshevPSF, ExactPinholeConfocalPSF for docs.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">FixedSSChebPinholePSF</span><span class="p">(</span><span class="n">FixedSSChebPSF</span><span class="p">,</span> <span class="n">ExactPinholeConfocalPSF</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;See FixedSSChebPSF, ExactPinholeConfocalPSF for docs.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>peri.viz.interaction &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="peri.interpolation" href="interpolation.html" />
+    <link rel="prev" title="peri.fft" href="fft.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="interpolation.html" title="peri.interpolation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fft.html" title="peri.fft"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="peri-viz-interaction">
+<h1>peri.viz.interaction<a class="headerlink" href="#peri-viz-interaction" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="peri.viz.interaction.OrthoViewer">
+<em class="property">class </em><code class="descclassname">peri.viz.interaction.</code><code class="descname">OrthoViewer</code><span class="sig-paren">(</span><em>field</em>, <em>onesided=True</em>, <em>vmin=None</em>, <em>vmax=None</em>, <em>cmap='bone'</em>, <em>dohist=False</em>, <em>fourier=False</em>, <em>tooltips=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/viz/interaction.html#OrthoViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.viz.interaction.OrthoViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Easy interactive viewing of 3D ndarray with view selection. Navigate in
+3D by clicking on the three panels which are slices through the array
+at a given position.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="peri.viz.interaction.OrthoPrefeature">
+<em class="property">class </em><code class="descclassname">peri.viz.interaction.</code><code class="descname">OrthoPrefeature</code><span class="sig-paren">(</span><em>image, pos, viewrad=None, cmap='Greys_r', part_col=[0.0, 1.0, 1.0, 1.0], **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/viz/interaction.html#OrthoPrefeature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.viz.interaction.OrthoPrefeature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interactive viewing of a 3D featured image, to examine the quality of
+initial featuring.</p>
+<dl class="docutils">
+<dt>There are 3 modes of the viewer, accessed by pressing these keys:</dt>
+<dd><ul class="first last simple">
+<li>&#8216;V&#8217; : switch to view mode (click window to move view)</li>
+<li>&#8216;A&#8217; : add particle mode (click position to add)</li>
+<li>&#8216;R&#8217; : remove particle mode (click position to remove)</li>
+</ul>
+</dd>
+</dl>
+<p>The viewer starts in view mode.
+The complete list of particle positions is stored in <code class="docutils literal"><span class="pre">self.pos</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>im</strong> (<em>numpy.ndarray</em>) &#8211; The image to check pre-featuring on.</li>
+<li><strong>pos</strong> (<em></em><em>[</em><em>N</em><em>,</em><em>3</em><em>] </em><em>numpy.ndarray</em>) &#8211; The initial guess for the particle positions, in pixel units</li>
+<li><strong>viewrad</strong> (<em>Float</em><em> or </em><em>None</em><em>, </em><em>optional.</em>) &#8211; The width of the particles to plot. Default is 2.</li>
+<li><strong>cmap</strong> (<em>String</em><em>, </em><em>optional</em>) &#8211; A valid matplotlib colormap. Default is <cite>&#8216;Greys_r&#8217;</cite>.s</li>
+<li><strong>part_col</strong> (<em>list-like</em><em>, </em><em>optional</em>) &#8211; Color of the particles.... RGBA. Default is cyan.</li>
+<li><strong>**kwargs</strong> (<em>All keyword args to OrthoViewer....</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="peri.viz.interaction.OrthoManipulator">
+<em class="property">class </em><code class="descclassname">peri.viz.interaction.</code><code class="descname">OrthoManipulator</code><span class="sig-paren">(</span><em>state</em>, <em>size=8</em>, <em>cmap_abs='bone'</em>, <em>cmap_diff='RdBu'</em>, <em>incsize=18.0</em>, <em>orientation=None</em>, <em>vrange_img=1.0</em>, <em>vrange_diff=0.1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/viz/interaction.html#OrthoManipulator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.viz.interaction.OrthoManipulator" title="Permalink to this definition">¶</a></dt>
+<dd><p>An interactive viewer for states for a model in 3D. Can work with
+any 3D state with a set of components. This viewer relies heavily on
+hotkeys. The various modes that can be accessed are by pressing
+these keys:</p>
+<blockquote>
+<div>&#8216;Q&#8217; : switch between &#8216;model&#8217;, &#8216;residual&#8217;, and &#8216;component&#8217; views
+&#8216;A&#8217; : add particle mode (click position to add)
+&#8216;R&#8217; : remove particle mode (click position to remove)
+&#8216;E&#8217; : optimize particle (click particle to optimize)
+&#8216;W&#8217; : switch to fourier views
+&#8216;V&#8217; : switch to view mode (click window to move view)
+&#8216;C&#8217; : If in &#8216;component&#8217; views, cycles through components</div></blockquote>
+<dl class="docutils">
+<dt>state <span class="classifier-delimiter">:</span> <span class="classifier"><cite>peri.states.State</cite> object</span></dt>
+<dd>The state object to look at</dd>
+<dt>size <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>Relative window size, this is based on matplotlib.figure(figsize)
+and has some units which I don&#8217;t understand.</dd>
+<dt>cmap_abs <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Colormap to use for the one sided scales such as data and model</dd>
+<dt>cmap_dff <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Colormap to use for difference images, such as residuals</dd>
+<dt>orientation <span class="classifier-delimiter">:</span> <span class="classifier">one of [&#8216;h&#8217;, &#8216;v&#8217;, &#8216;horizontal&#8217;, &#8216;vertical&#8217;]</span></dt>
+<dd>The orientation of the two views</dd>
+<dt>vrange_img <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>vmax for imshow for absolute images</dd>
+<dt>vrange_diff <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>vmax - vmin for imshow for difference images</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fft.html"
+                        title="previous chapter">peri.fft</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="interpolation.html"
+                        title="next chapter">peri.interpolation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/reference/interaction.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="interpolation.html" title="peri.interpolation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fft.html" title="peri.fft"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

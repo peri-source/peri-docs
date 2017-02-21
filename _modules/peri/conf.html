@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>peri.conf &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for peri.conf</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">The default values for the global package configuration are provided in ``peri.conf.default_conf``.</span>
+<span class="sd">The configuration variables are described here:</span>
+
+<span class="sd">========================= ====================== =============================================================</span>
+<span class="sd">Variable name             Default value          Description</span>
+<span class="sd">========================= ====================== =============================================================</span>
+<span class="sd">``fftw-threads``          -1                     Number of threads for fftw to use, -1 indicates all available</span>
+<span class="sd">``fftw-planning-effort``  ``FFTW_MEASURE``       One of (``FFTW_ESTIMATE``, ``FFTW_MEASURE``, ``FFTW_PATIENT``)</span>
+<span class="sd">                                                 where options to the right take longer the first time but</span>
+<span class="sd">                                                 are faster in subsequent evaluations.</span>
+<span class="sd">``fftw-wisdom``           ``~/.peri-wisdom.pkl`` Location of file in which to store wisdom. Wisdom is the results</span>
+<span class="sd">                                                 of fftw benchmarking itself, allowing it to run as fast as possible.</span>
+<span class="sd">``log-filename``          ``~/.peri.log``        Name of file for logging.</span>
+<span class="sd">``log-to-file``           False                  Whether or not to actually save logs to a file as well</span>
+<span class="sd">``log-colors``            False                  Display logs in color (supported by xterm256)</span>
+<span class="sd">``verbosity``             vvv                    Level of verbosity for logs, the more v&#39;s the more verbose</span>
+<span class="sd">========================= ====================== =============================================================</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="n">default_conf</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;fftw-threads&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;fftw-planning-effort&quot;</span><span class="p">:</span> <span class="s2">&quot;FFTW_MEASURE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;fftw-wisdom&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;.peri-wisdom.pkl&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;log-filename&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s1">&#39;.peri.log&#39;</span><span class="p">),</span>
+    <span class="s2">&quot;log-to-file&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;log-colors&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;verbosity&quot;</span><span class="p">:</span> <span class="s1">&#39;vvv&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<div class="viewcode-block" id="get_conf_filename"><a class="viewcode-back" href="../../reference/conf.html#peri.conf.get_conf_filename">[docs]</a><span class="k">def</span> <span class="nf">get_conf_filename</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The configuration file either lives in ~/.peri.json or is specified on the</span>
+<span class="sd">    command line via the environment variables PERI_CONF_FILE</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">default</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;.peri.json&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PERI_CONF_FILE&#39;</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="transform"><a class="viewcode-back" href="../../reference/conf.html#peri.conf.transform">[docs]</a><span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Translate environment variables to ones corresponding to keys in the</span>
+<span class="sd">    configuration.  In particular, env variables may be made with</span>
+<span class="sd">    &quot;PERI_&quot;+key_name: fftw-threads = PERI_FFTW_THREADS. Each env var</span>
+<span class="sd">    is later checked to see if it has to do with PERI</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;peri-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="read_environment"><a class="viewcode-back" href="../../reference/conf.html#peri.conf.read_environment">[docs]</a><span class="k">def</span> <span class="nf">read_environment</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Read all environment variables to see if they contain PERI &quot;&quot;&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">transform</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">default_conf</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">transform</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="create_default_conf"><a class="viewcode-back" href="../../reference/conf.html#peri.conf.create_default_conf">[docs]</a><span class="k">def</span> <span class="nf">create_default_conf</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Dump the default_conf to the configuration file &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">get_conf_filename</span><span class="p">(),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">default_conf</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="load_conf"><a class="viewcode-back" href="../../reference/conf.html#peri.conf.load_conf">[docs]</a><span class="k">def</span> <span class="nf">load_conf</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load the configuration with the priority:</span>
+<span class="sd">        1. environment variables</span>
+<span class="sd">        2. configuration file</span>
+<span class="sd">        3. defaults here (default_conf)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">default_conf</span><span class="p">)</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">get_conf_filename</span><span class="p">())))</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">read_environment</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">conf</span>
+    <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">create_default_conf</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">load_conf</span><span class="p">()</span></div>
+
+<span class="k">def</span> <span class="nf">get_wisdom</span><span class="p">():</span>
+    <span class="n">conf</span> <span class="o">=</span> <span class="n">load_conf</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;fftw-wisdom&#39;</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">get_logfile</span><span class="p">():</span>
+    <span class="n">conf</span> <span class="o">=</span> <span class="n">load_conf</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;logfile&#39;</span><span class="p">]</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

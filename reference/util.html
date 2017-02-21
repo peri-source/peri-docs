@@ -1,0 +1,808 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>peri.util &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="peri.states" href="states.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="states.html" title="peri.states"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="peri-util">
+<h1>peri.util<a class="headerlink" href="#peri-util" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Important classes<ul>
+<li><a class="reference internal" href="#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">peri.util.Tile</span></code></a></li>
+<li><a class="reference internal" href="#peri.util.Image" title="peri.util.Image"><code class="xref py py-class docutils literal"><span class="pre">peri.util.Image</span></code></a></li>
+<li><a class="reference internal" href="#peri.util.RawImage" title="peri.util.RawImage"><code class="xref py py-class docutils literal"><span class="pre">peri.util.RawImage</span></code></a></li>
+<li><a class="reference internal" href="#peri.util.NullImage" title="peri.util.NullImage"><code class="xref py py-class docutils literal"><span class="pre">peri.util.NullImage</span></code></a></li>
+<li><a class="reference internal" href="#peri.util.Image" title="peri.util.Image"><code class="xref py py-class docutils literal"><span class="pre">peri.util.Image</span></code></a></li>
+</ul>
+</li>
+<li>Miscellaneous<ul>
+<li><a class="reference internal" href="#peri.util.ProgressBar" title="peri.util.ProgressBar"><code class="xref py py-class docutils literal"><span class="pre">peri.util.ProgressBar</span></code></a></li>
+<li><a class="reference internal" href="#peri.util.oddify" title="peri.util.oddify"><code class="xref py py-func docutils literal"><span class="pre">peri.util.oddify()</span></code></a></li>
+<li><a class="reference internal" href="#peri.util.listify" title="peri.util.listify"><code class="xref py py-func docutils literal"><span class="pre">peri.util.listify()</span></code></a></li>
+<li><a class="reference internal" href="#peri.util.delistify" title="peri.util.delistify"><code class="xref py py-func docutils literal"><span class="pre">peri.util.delistify()</span></code></a></li>
+<li><a class="reference internal" href="#peri.util.aN" title="peri.util.aN"><code class="xref py py-func docutils literal"><span class="pre">peri.util.aN()</span></code></a></li>
+<li><a class="reference internal" href="#peri.util.patch_docs" title="peri.util.patch_docs"><code class="xref py py-func docutils literal"><span class="pre">peri.util.patch_docs()</span></code></a></li>
+<li><a class="reference internal" href="#peri.util.indir" title="peri.util.indir"><code class="xref py py-func docutils literal"><span class="pre">peri.util.indir()</span></code></a></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="peri-util-tile">
+<h2>peri.util.Tile<a class="headerlink" href="#peri-util-tile" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="peri.util.Tile">
+<em class="property">class </em><code class="descclassname">peri.util.</code><code class="descname">Tile</code><span class="sig-paren">(</span><em>left</em>, <em>right=None</em>, <em>mins=None</em>, <em>maxs=None</em>, <em>size=None</em>, <em>centered=False</em>, <em>dim=None</em>, <em>dtype='int'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Tile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Tile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a tile element which represents a hyperrectangle in D
+dimensions. These hyperrectangles may be operated upon to find
+intersections, bounding tiles, calculate interior coordinates
+and other common operations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>left</strong> (<em>number</em><em> or </em><em>array-like</em>) &#8211; Left side of the tile</li>
+<li><strong>right</strong> (<em></em><em>(</em><em>optional</em><em>) </em><em>number</em><em> or </em><em>array-like</em>) &#8211; If provided along with left, gives the right side of the tile</li>
+<li><strong>mins</strong> (<em></em><em>(</em><em>optional</em><em>) </em><em>number</em><em> or </em><em>array-like</em>) &#8211; Can be provided to clip the sides of the Tile to certain minimum</li>
+<li><strong>maxs</strong> (<em></em><em>(</em><em>optional</em><em>) </em><em>number</em><em> or </em><em>array-like</em>) &#8211; Can be provided to clip the sides of the Tile to certain maximum</li>
+<li><strong>size</strong> (<em></em><em>(</em><em>optional</em><em>) </em><em>number</em><em> or </em><em>array-like</em>) &#8211; If provided along with left gives the size of the tile</li>
+<li><strong>centered</strong> (<em>boolean</em>) &#8211; <ul>
+<li>If true:   <code class="docutils literal"><span class="pre">[left]</span> <span class="pre">-</span> <span class="pre">[size]/2</span> <span class="pre">-&gt;</span> <span class="pre">[left]</span> <span class="pre">+</span> <span class="pre">[size]/2</span></code></li>
+<li>If false:  <code class="docutils literal"><span class="pre">[left]</span> <span class="pre">-&gt;</span> <span class="pre">[left]</span> <span class="pre">+</span> <span class="pre">[size]</span></code></li>
+</ul>
+</li>
+<li><strong>dim</strong> (<em>integer</em>) &#8211; Number of dimensions for the Tile</li>
+<li><strong>dtype</strong> (<em>string</em><em>, </em><em>np.dtype</em>) &#8211; Resulting type of number for the Tile coordinates</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>These parameters can be combined into many different combinations
+(where [] indicates an array created from either a single number or any
+iterable):</p>
+<blockquote>
+<div><ul class="simple">
+<li>left : <code class="docutils literal"><span class="pre">[0,0,0]</span> <span class="pre">-&gt;</span> <span class="pre">[left]</span></code></li>
+<li>left, right : <code class="docutils literal"><span class="pre">[left]</span> <span class="pre">-&gt;</span> <span class="pre">[right]</span></code></li>
+<li>left, size (not centered) : <code class="docutils literal"><span class="pre">[left]</span> <span class="pre">-&gt;</span> <span class="pre">[left]</span> <span class="pre">+</span> <span class="pre">[size]</span></code></li>
+<li>left, size (yes centered) : <code class="docutils literal"><span class="pre">[left]</span> <span class="pre">-</span> <span class="pre">[size]/2</span> <span class="pre">-&gt;</span> <span class="pre">[left]</span> <span class="pre">+</span> <span class="pre">[size]/2</span></code></li>
+</ul>
+</div></blockquote>
+<p>Each of these can be limited by using (mins, maxs) which are applied
+after calculating left, right for each element:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">left</span> <span class="pre">=</span> <span class="pre">max(left,</span> <span class="pre">[mins])</span></code></li>
+<li><code class="docutils literal"><span class="pre">right</span> <span class="pre">=</span> <span class="pre">min(right,</span> <span class="pre">[maxs])</span></code></li>
+</ul>
+</div></blockquote>
+<p>Since tiles are used for array slicing, they only allow integer values,
+which can truncated without warning from float.</p>
+<p>Notes on dimension. The dimensionality is determined first by the shape
+of left, right, size if provided not as an integer. If it not provided there
+then it is assumed to be 3D. This can be overridden by setting dim in the
+arguments. For example:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Tile(3)         : <code class="docutils literal"><span class="pre">[0,0,0]</span> <span class="pre">-&gt;</span> <span class="pre">[3,3,3]</span></code></li>
+<li>Tile(3, dim=2)  : <code class="docutils literal"><span class="pre">[0,0]</span> <span class="pre">-&gt;</span> <span class="pre">[3,3]</span></code></li>
+<li>Tile([3])       : <code class="docutils literal"><span class="pre">[0]</span> <span class="pre">-&gt;</span> <span class="pre">[3]</span></code></li>
+</ul>
+</div></blockquote>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">Tile [0, 0, 0] -&gt; [10, 10, 10] ([10, 10, 10])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<span class="go">Tile [0, 0] -&gt; [1, 2] ([1, 2])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">centered</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">Tile [-2, -2, -2] -&gt; [2, 2, 2] ([4, 4, 4])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">right</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">mins</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">Tile [0, 0, 1] -&gt; [10, 10, 10] ([10, 10, 9])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+<span class="go">Tile [0.0, 0.0, 0.0] -&gt; [10.0, 10.0, 10.0] ([10.0, 10.0, 10.0])</span>
+</pre></div>
+</div>
+<dl class="staticmethod">
+<dt id="peri.util.Tile.boundingtile">
+<em class="property">static </em><code class="descname">boundingtile</code><span class="sig-paren">(</span><em>tiles</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Tile.boundingtile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Tile.boundingtile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convex bounding box of a group of tiles</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="o">.</span><span class="n">boundingtile</span><span class="p">(</span><span class="n">Tile</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">]),</span> <span class="n">Tile</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]))</span>
+<span class="go">Tile [0, 0] -&gt; [5, 5] ([5, 5])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="peri.util.Tile.center">
+<code class="descname">center</code><a class="headerlink" href="#peri.util.Tile.center" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the center of the tile</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">center</span>
+<span class="go">array([ 2.5,  2.5,  2.5])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.util.Tile.contains">
+<code class="descname">contains</code><span class="sig-paren">(</span><em>items</em>, <em>pad=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Tile.contains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Tile.contains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test whether coordinates are contained within this tile.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>items</strong> (<em>ndarray</em><em> [</em><em>3</em><em>] or </em><em></em><em>[</em><em>N</em><em>, </em><em>3</em><em>]</em><em></em>) &#8211; N coordinates to check are within the bounds of the tile</li>
+<li><strong>pad</strong> (<em>integer</em><em> or </em><em>ndarray</em><em> [</em><em>3</em><em>]</em><em></em>) &#8211; anisotropic padding to apply in the contain test</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">contains</span><span class="p">([[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+<span class="go">array([False,  True, False], dtype=bool)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.util.Tile.coords">
+<code class="descname">coords</code><span class="sig-paren">(</span><em>norm=False</em>, <em>form='broadcast'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Tile.coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Tile.coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the coordinate vectors associated with the tile.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>norm</strong> (<em>boolean</em>) &#8211; can rescale the coordinates for you. False is no rescaling, True is
+rescaling so that all coordinates are from 0 -&gt; 1.  If a scalar,
+the same norm is applied uniformally while if an iterable, each
+scale is applied to each dimension.</li>
+<li><strong>form</strong> (<em>string</em>) &#8211; <dl class="docutils">
+<dt>In what form to return the vector array. Can be one of:</dt>
+<dd>&#8216;broadcast&#8217; &#8211; return 1D arrays that are broadcasted to be 3D<dl class="last docutils">
+<dt>&#8216;flat&#8217; &#8211; return array without broadcasting so each component</dt>
+<dd>is 1D and the appropriate length as the tile</dd>
+<dt>&#8216;meshed&#8217; &#8211; arrays are explicitly broadcasted and so all have</dt>
+<dd>a 3D shape, each the size of the tile.</dd>
+<dt>&#8216;vector&#8217; &#8211; array is meshed and combined into one array with</dt>
+<dd>the vector components along last dimension [Nz, Ny, Nx, 3]</dd>
+</dl>
+</dd>
+</dl>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">coords</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="s1">&#39;meshed&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">array([[ 0.,  0.,  0.],</span>
+<span class="go">       [ 1.,  1.,  1.],</span>
+<span class="go">       [ 2.,  2.,  2.]])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">coords</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="s1">&#39;meshed&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">array([[ 0.,  1.,  2.],</span>
+<span class="go">       [ 0.,  1.,  2.],</span>
+<span class="go">       [ 0.,  1.,  2.]])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">coords</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="s1">&#39;vector&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(4, 5, 2)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">shape</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">Tile</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">coords</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="s1">&#39;broadcast&#39;</span><span class="p">)]</span>
+<span class="go">[(4, 1), (1, 5)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="peri.util.Tile.corners">
+<code class="descname">corners</code><a class="headerlink" href="#peri.util.Tile.corners" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate the vector of all corners of the hyperrectangles</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">corners</span>
+<span class="go">array([[0, 0],</span>
+<span class="go">       [0, 3],</span>
+<span class="go">       [3, 0],</span>
+<span class="go">       [3, 3]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="peri.util.Tile.intersection">
+<em class="property">static </em><code class="descname">intersection</code><span class="sig-paren">(</span><em>tiles</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Tile.intersection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Tile.intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intersection of tiles, returned as a tile</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">Tile</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">]),</span> <span class="n">Tile</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]))</span>
+<span class="go">Tile [1, 1] -&gt; [4, 4] ([3, 3])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="peri.util.Tile.kcenter">
+<code class="descname">kcenter</code><a class="headerlink" href="#peri.util.Tile.kcenter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the frequency center of the tile (says fftshift)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.util.Tile.kvectors">
+<code class="descname">kvectors</code><span class="sig-paren">(</span><em>norm=False</em>, <em>form='broadcast'</em>, <em>real=False</em>, <em>shift=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Tile.kvectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Tile.kvectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the kvectors associated with this tile, given the standard form
+of -0.5 to 0.5. <cite>norm</cite> and <cite>form</cite> arguments arethe same as that passed to
+<cite>Tile.coords</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>real</strong> (<em>boolean</em>) &#8211; whether to return kvectors associated with the real fft instead</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.util.Tile.oslicer">
+<code class="descname">oslicer</code><span class="sig-paren">(</span><em>tile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Tile.oslicer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Tile.oslicer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opposite slicer, the outer part wrt to a field</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.util.Tile.overhang">
+<code class="descname">overhang</code><span class="sig-paren">(</span><em>tile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Tile.overhang"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Tile.overhang" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the left and right absolute overflow &#8211; the amount of box
+overhanging <cite>tile</cite>, can be viewed as self tile (set theory relative
+complement, but in a bounding sense)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.util.Tile.pad">
+<code class="descname">pad</code><span class="sig-paren">(</span><em>pad</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Tile.pad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Tile.pad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pad this tile by an equal amount on each side as specified by pad</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">Tile [-2, -2, -2] -&gt; [12, 12, 12] ([14, 14, 14])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">pad</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="go">Tile [-1, -2, -3] -&gt; [11, 12, 13] ([12, 14, 16])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.util.Tile.reflect_overhang">
+<code class="descname">reflect_overhang</code><span class="sig-paren">(</span><em>clip</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Tile.reflect_overhang"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Tile.reflect_overhang" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the overhang and reflect it internally so respect periodic
+padding rules (see states._tile_from_particle_change). Returns both
+the inner tile and the inner tile with necessary pad.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="peri.util.Tile.slicer">
+<code class="descname">slicer</code><a class="headerlink" href="#peri.util.Tile.slicer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array slicer object for this tile</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">slicer</span>
+<span class="go">(slice(0, 2, None), slice(0, 3, None))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">)[</span><span class="n">Tile</span><span class="p">((</span><span class="mi">4</span><span class="p">,))</span><span class="o">.</span><span class="n">slicer</span><span class="p">]</span>
+<span class="go">array([0, 1, 2, 3])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.util.Tile.translate">
+<code class="descname">translate</code><span class="sig-paren">(</span><em>dr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Tile.translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Tile.translate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate a tile by an amount dr</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">Tile [1, 1, 1] -&gt; [6, 6, 6] ([5, 5, 5])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="peri.util.Tile.volume">
+<code class="descname">volume</code><a class="headerlink" href="#peri.util.Tile.volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Volume of the tile</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">volume</span>
+<span class="go">1000</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">volume</span> 
+<span class="go">2.0000000000...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="peri-util-image">
+<h2>peri.util.Image<a class="headerlink" href="#peri-util-image" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="peri.util.Image">
+<em class="property">class </em><code class="descclassname">peri.util.</code><code class="descname">Image</code><span class="sig-paren">(</span><em>image</em>, <em>tile=None</em>, <em>filters=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an image object from a raw np.ndarray.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>image</strong> (<em>ndarray</em>) &#8211; The image in float format with dimensions arranged as [z,y,x]</li>
+<li><strong>tile</strong> (<cite>peri.util.Tile</cite>) &#8211; The region of the image to crop out to use for the actual
+featuring, etc. Coordinates are in pixel-space.</li>
+<li><strong>filters</strong> (<em>list of tuples</em>) &#8211; A list of (slice, value) pairs which are Fourier-space domain
+filters that are to be applied to an image. In Fourier-space,
+each filter is a numpy slice object and the Fourier values
+to be subtracted from those slices.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="peri.util.Image.filtered_image">
+<code class="descname">filtered_image</code><span class="sig-paren">(</span><em>im</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Image.filtered_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Image.filtered_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a filtered image after applying the Fourier-space filters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.util.Image.set_filter">
+<code class="descname">set_filter</code><span class="sig-paren">(</span><em>slices</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Image.set_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Image.set_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets Fourier-space filters for the image. The image is filtered by
+subtracting values from the image at slices.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>slices</strong> (<em>List of indices</em><em> or </em><em>slice objects.</em>) &#8211; The q-values in Fourier space to filter.</li>
+<li><strong>values</strong> (<em>np.ndarray</em>) &#8211; The complete array of Fourier space peaks to subtract off.  values
+should be the same size as the FFT of the image; only the portions
+of values at slices will be removed.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>To remove a two Fourier peaks in the data at q=(10, 10, 10) &amp;
+(245, 245, 245), where im is the residuals of a model:</p>
+<blockquote>
+<div><ul class="simple">
+<li>slices = [(10,10,10), (245, 245, 245)]</li>
+<li>values = np.fft.fftn(im)</li>
+<li>im.set_filter(slices, values)</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.util.Image.set_tile">
+<code class="descname">set_tile</code><span class="sig-paren">(</span><em>tile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#Image.set_tile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.Image.set_tile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the current tile of the image to a <cite>peri.util.Tile</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="peri-util-rawimage">
+<h2>peri.util.RawImage<a class="headerlink" href="#peri-util-rawimage" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="peri.util.RawImage">
+<em class="property">class </em><code class="descclassname">peri.util.</code><code class="descname">RawImage</code><span class="sig-paren">(</span><em>filename</em>, <em>tile=None</em>, <em>invert=False</em>, <em>exposure=None</em>, <em>float_precision=&lt;type 'numpy.float64'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#RawImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.RawImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>An image object which stores information about desired region, exposure
+compensation, color inversion, and filters to remove certain fourier
+peaks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> (<em>str</em>) &#8211; Path of the image file. Recommended that you supply a relative path
+so that transfer between computers is possible, i.e. if the file is located
+at <code class="docutils literal"><span class="pre">/home/user/data/1.tif</span></code> then work in the directory <code class="docutils literal"><span class="pre">/home/user/data</span></code>
+and supply the filename <code class="docutils literal"><span class="pre">1.tif</span></code>.</li>
+<li><strong>tile</strong> (<a class="reference internal" href="#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">peri.util.Tile</span></code></a>) &#8211; the region of the image to crop out to use for the actual featuring, etc</li>
+<li><strong>invert</strong> (<em>boolean</em>) &#8211; Whether to invert the image.</li>
+<li><strong>exposure</strong> (<em>tuple of numbers</em><em> (</em><em>min</em><em>, </em><em>max</em><em>) </em><em>| None</em>) &#8211; If set, it is the values used to normalize the image. It is the
+values which map to 0 and 1 in the loaded version of the image, the
+default being for 8-bit images, mapping raw values (0, 255) to
+loaded values (0, 1). This functionality is provided since the
+noise and exposure may change between images where a common scaling
+is desired for proper comparison.  Setting this values allows a
+series of images to be initialized with the same ILM, PSF etc.
+Should be the bit value of the camera.</li>
+<li><strong>float_precision</strong> (<em>numpy float datatype</em>) &#8211; One of numpy.float16, numpy.float32, numpy.float64; precision
+for precomputed arrays. Default is np.float64; make it 16 or 32
+to save memory.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="peri.util.RawImage.get_scale">
+<code class="descname">get_scale</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#RawImage.get_scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.RawImage.get_scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>If exposure was not set in the __init__, get the exposure associated
+with this RawImage so that it may be used in other
+<a class="reference internal" href="#peri.util.RawImage" title="peri.util.RawImage"><code class="xref py py-class docutils literal"><span class="pre">RawImage</span></code></a>. This is useful for transferring exposure
+parameters to a series of images.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>exposure</strong> &#8211; The (emin, emax) which get mapped to (0, 1)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tuple of floats</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="peri.util.RawImage.get_scale_from_raw">
+<em class="property">static </em><code class="descname">get_scale_from_raw</code><span class="sig-paren">(</span><em>raw</em>, <em>scaled</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#RawImage.get_scale_from_raw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.RawImage.get_scale_from_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>When given a raw image and the scaled version of the same image, it
+extracts the <code class="docutils literal"><span class="pre">exposure</span></code> parameters associated with those images.
+This is useful when</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>raw</strong> (<em>array_like</em>) &#8211; The image loaded fresh from a file</li>
+<li><strong>scaled</strong> (<em>array_like</em>) &#8211; Image scaled using <code class="xref py py-func docutils literal"><span class="pre">peri.initializers.normalize()</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>exposure</strong> &#8211; Returns the exposure parameters (emin, emax) which get mapped to
+(0, 1) in the scaled image. Can be passed to
+<code class="xref py py-func docutils literal"><span class="pre">__init__()</span></code></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple of numbers</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.util.RawImage.load_image">
+<code class="descname">load_image</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#RawImage.load_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.RawImage.load_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the file and perform any transforms to get a loaded image</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.util.RawImage.set_scale">
+<code class="descname">set_scale</code><span class="sig-paren">(</span><em>exposure</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#RawImage.set_scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.RawImage.set_scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the exposure parameter for this image, which determines the
+values which get mapped to (0,1) in the output image.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#peri.util.RawImage" title="peri.util.RawImage"><code class="xref py py-class docutils literal"><span class="pre">peri.util.RawImage</span></code></a></p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="peri.util.NullImage">
+<em class="property">class </em><code class="descclassname">peri.util.</code><code class="descname">NullImage</code><span class="sig-paren">(</span><em>image=None</em>, <em>shape=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#NullImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.NullImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>An image object that doesn&#8217;t actual store any information so that small
+save states can be created for pure model states</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>shape</strong> (<em>tuple</em>) &#8211; Size of the image which will be mocked</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="id1">
+<h2>peri.util.{*}<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="peri.util.ProgressBar">
+<em class="property">class </em><code class="descclassname">peri.util.</code><code class="descname">ProgressBar</code><span class="sig-paren">(</span><em>num</em>, <em>label='Progress'</em>, <em>value=0</em>, <em>screen=79</em>, <em>time_remaining=True</em>, <em>bar=True</em>, <em>bar_symbol='='</em>, <em>bar_caps='[]'</em>, <em>bar_decimals=2</em>, <em>display=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#ProgressBar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.ProgressBar" title="Permalink to this definition">¶</a></dt>
+<dd><p>ProgressBar class which creates a dynamic ASCII progress bar of two
+different varieties:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><dl class="first docutils">
+<dt>A bar chart that looks like the following:</dt>
+<dd><p class="first last"><code class="docutils literal"><span class="pre">Progress</span> <span class="pre">[================</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">]</span>&#160; <span class="pre">63.00%</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>A simple number completed look:</dt>
+<dd><p class="first last"><code class="docutils literal"><span class="pre">Progress</span> <span class="pre">:</span>&#160;&#160; <span class="pre">17</span> <span class="pre">/</span> <span class="pre">289</span></code></p>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>num</strong> (<em>integer</em>) &#8211; The number of tasks that need to be completed</li>
+<li><strong>label</strong> (<em>string</em><em> [</em><em>default: 'Progress'</em><em>]</em><em></em>) &#8211; The label for this particular progress indicator,</li>
+<li><strong>value</strong> (<em>integer</em><em> [</em><em>default: 0</em><em>]</em><em></em>) &#8211; Starting value</li>
+<li><strong>screen</strong> (<em>integer</em><em> [</em><em>default: 79</em><em>]</em><em></em>) &#8211; Size the screen to use for the progress bar</li>
+<li><strong>time_remaining</strong> (<em>boolean</em><em> [</em><em>default: True</em><em>]</em><em></em>) &#8211; Display estimated time remaining</li>
+<li><strong>bar</strong> (<em>boolean</em><em> [</em><em>default: True</em><em>]</em><em></em>) &#8211; Whether or not to display the bar chart</li>
+<li><strong>bar_symbol</strong> (<em>char</em><em> [</em><em>default: '='</em><em>]</em><em></em>) &#8211; The character to use to fill in the bar chart</li>
+<li><strong>bar_caps</strong> (<em>string</em><em> [</em><em>default: '</em><em>[</em><em></em><em>]</em><em>'</em><em>]</em><em></em>) &#8211; Characters to use as the end caps of the.  The string will be split in
+half and each half put on a side of the chart</li>
+<li><strong>bar_decimals</strong> (<em>integer</em><em> [</em><em>default: 2</em><em>]</em><em></em>) &#8211; Number of decimal places to include in the percentage</li>
+<li><strong>display</strong> (<em>boolean</em><em> [</em><em>default: True</em><em>]</em><em></em>) &#8211; a crutch so that we don&#8217;t have a lot of <a href="#id2"><span class="problematic" id="id3">``</span></a>if``s later.  display
+or don&#8217;t display the progress bar</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.util.oddify">
+<code class="descclassname">peri.util.</code><code class="descname">oddify</code><span class="sig-paren">(</span><em>num</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#oddify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.oddify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the next odd number if <code class="docutils literal"><span class="pre">num</span></code> is even.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">oddify</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">oddify</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="go">5</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.util.listify">
+<code class="descclassname">peri.util.</code><code class="descname">listify</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#listify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.listify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a scalar <code class="docutils literal"><span class="pre">a</span></code> to a list and all iterables to list as well.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">listify</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">[0]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">listify</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="go">[1, 2, 3]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">listify</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+<span class="go">[&#39;a&#39;]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">listify</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]))</span>
+<span class="go">[1, 2, 3]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">listify</span><span class="p">(</span><span class="s1">&#39;string&#39;</span><span class="p">)</span>
+<span class="go">[&#39;string&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.util.delistify">
+<code class="descclassname">peri.util.</code><code class="descname">delistify</code><span class="sig-paren">(</span><em>a</em>, <em>b=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#delistify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.delistify" title="Permalink to this definition">¶</a></dt>
+<dd><p>If a single element list, extract the element as an object, otherwise
+leave as it is.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">delistify</span><span class="p">(</span><span class="s1">&#39;string&#39;</span><span class="p">)</span>
+<span class="go">&#39;string&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">delistify</span><span class="p">([</span><span class="s1">&#39;string&#39;</span><span class="p">])</span>
+<span class="go">&#39;string&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">delistify</span><span class="p">([</span><span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;other&#39;</span><span class="p">])</span>
+<span class="go">[&#39;string&#39;, &#39;other&#39;]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">delistify</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]))</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">delistify</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="go">[1, 2, 3]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.util.aN">
+<code class="descclassname">peri.util.</code><code class="descname">aN</code><span class="sig-paren">(</span><em>a</em>, <em>dim=3</em>, <em>dtype='int'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#aN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.aN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an integer or iterable list to numpy array of length dim. This func
+is used to allow other methods to take both scalars non-numpy arrays with
+flexibility.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>a</strong> (<em>number</em><em>, </em><em>iterable</em><em>, </em><em>array-like</em>) &#8211; The object to convert to numpy array</li>
+<li><strong>dim</strong> (<em>integer</em>) &#8211; The length of the resulting array</li>
+<li><strong>dtype</strong> (<em>string</em><em> or </em><em>np.dtype</em>) &#8211; Type which the resulting array should be, e.g. &#8216;float&#8217;, np.int8</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>arr</strong> &#8211; Resulting numpy array of length <code class="docutils literal"><span class="pre">dim</span></code> and type <code class="docutils literal"><span class="pre">dtype</span></code></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy array</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">aN</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+<span class="go">array([ 1.,  1.])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">aN</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+<span class="go">array([1, 1, 1])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">aN</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+<span class="go">array([ 1.,  2.,  3.])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.util.patch_docs">
+<code class="descclassname">peri.util.</code><code class="descname">patch_docs</code><span class="sig-paren">(</span><em>subclass</em>, <em>superclass</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#patch_docs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.patch_docs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the documentation from <code class="docutils literal"><span class="pre">superclass</span></code> to <code class="docutils literal"><span class="pre">subclass</span></code> by filling
+in all overridden member function docstrings with those from the
+parent class</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.util.indir">
+<code class="descclassname">peri.util.</code><code class="descname">indir</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwds</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/util.html#indir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.util.indir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Context manager for switching the current path of the process. Can be used:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>with indir(&#8216;/tmp&#8217;):</dt>
+<dd>&lt;do something in tmp&gt;</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">peri.util</a><ul>
+<li><a class="reference internal" href="#peri-util-tile">peri.util.Tile</a></li>
+<li><a class="reference internal" href="#peri-util-image">peri.util.Image</a></li>
+<li><a class="reference internal" href="#peri-util-rawimage">peri.util.RawImage</a></li>
+<li><a class="reference internal" href="#id1">peri.util.{*}</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="states.html"
+                        title="previous chapter">peri.states</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/reference/util.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="states.html" title="peri.states"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

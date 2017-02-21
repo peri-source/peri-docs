@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to PERI’s documentation! &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-peri-s-documentation">
+<h1>Welcome to PERI&#8217;s documentation!<a class="headerlink" href="#welcome-to-peri-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="topic">
+<p class="topic-title first">Getting Started</p>
+<p>For an introduction to how <code class="docutils literal"><span class="pre">peri</span></code> works and how to use it, see the
+<a class="reference internal" href="walkthrough.html"><span class="doc">walkthrough</span></a>.</p>
+</div>
+<p>Parameter Extraction from Reconstruction of Images (PERI) is a package that
+extracts features from microscope images by fitting a physics-based model to
+data. It is a set of models and components that are used to recreate the
+physics of image formation in order to extract desired quantities such as
+particle sizes and positions at the information theoretic limit.  While a very
+general software package, right now the primary model currently implemented is
+that of 3D confocal microscopes, particularly of the line and point scan
+varieties.</p>
+<p>In these documents you will find information about:</p>
+<ul class="simple">
+<li><a class="reference internal" href="installation.html"><span class="doc">Installation</span></a></li>
+<li><a class="reference internal" href="walkthrough.html"><span class="doc">Walkthrough</span></a></li>
+<li><a class="reference internal" href="architecture.html"><span class="doc">Package overview</span></a></li>
+</ul>
+</div>
+<div class="section" id="documentation">
+<h1>Documentation:<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#id1">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="installation.html#quick-install">Quick install</a></li>
+<li class="toctree-l3"><a class="reference internal" href="installation.html#source-code">Source code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#contributing">Contributing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="installation.html#bugs-and-issues">Bugs and issues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="installation.html#id3">Contributing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="walkthrough.html">PERI Walkthrough</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="walkthrough.html#what-is-peri">What is PERI?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="walkthrough.html#take-a-microscope-image">Take a microscope image.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="walkthrough.html#create-a-mathematical-model-of-the-image-formation-process">Create a mathematical model of the image formation process.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="walkthrough.html#fit-that-mathematical-model-to-the-image">Fit that mathematical model to the image.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="walkthrough.html#if-the-fit-is-not-good-improve-the-mathematical-model">If the fit is not good, improve the mathematical model.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="walkthrough.html#if-the-fit-is-good-use-the-extracted-information-from-the-fit">If the fit is good, use the extracted information from the fit.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="walkthrough.html#making-this-faster">Making this faster</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="walkthrough.html#using-the-microscope-parameters-from-another-state">...using the microscope parameters from another state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="walkthrough.html#using-the-microscope-parameters-and-positions-from-another-state">...using the microscope parameters and positions from another state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="walkthrough.html#from-scratch">...from scratch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="walkthrough.html#from-a-guess-of-positions-and-radii">...from a guess of positions and radii</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="walkthrough.html#checking-your-model-even-more">Checking your model even more</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Package architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#states-example-polyfitstate">States (Example: PolyFitState)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="architecture.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="architecture.html#state-class">State class</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#image-states-example-gaussiandiscmodel">Image states (Example: GaussianDiscModel)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="architecture.html#model">Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="architecture.html#components">Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="architecture.html#imagestate-fitting-and-properties">ImageState, fitting, and properties</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optimization.html">Optimization and sampling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#initial-optimization">Initial Optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#add-subtract">Add-subtract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#main-optimization">Main Optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#achieving-the-best-possible-state">Achieving the best-possible state</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimization.html#adding-tough-missing-particles">Adding tough missing particles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimization.html#additional-optimizations">Additional Optimizations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#when-is-the-state-optimized">When is the state optimized?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimization.html#checking-optimization-with-the-orthomanipulator">Checking optimization with the OrthoManipulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimization.html#checking-optimization-by-running-more-optimization">Checking optimization by running more optimization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimization.html#seeing-if-the-fitted-values-are-reasonable">Seeing if the fitted values are reasonable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimization.html#comparing-across-images">Comparing across Images</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimization.html#speeding-this-process-up">Speeding this process up</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimization.html#using-a-good-initial-guess-the-runner-functions">Using a Good Initial Guess; The Runner Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimization.html#fitting-a-small-image">Fitting a small image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimization.html#sacrificing-precision-for-speed">Sacrificing Precision for Speed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimization.html#inventing-a-new-algorithm-for-fitting-in-high-dimensional-spaces">Inventing a new algorithm for fitting in high-dimensional spaces</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="reference">
+<h1>Reference:<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/comp.html">peri.comp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/comp.html#peri-comp-comp">peri.comp.comp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/comp.html#peri-comp-objs">peri.comp.objs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/comp.html#peri-comp-ilms">peri.comp.ilms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/comp.html#peri-comp-psfs">peri.comp.psfs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/comp.html#peri-comp-exactpsf">peri.comp.exactpsf</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/conf.html">peri.conf</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/fft.html">peri.fft</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/interaction.html">peri.viz.interaction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/interpolation.html">peri.interpolation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/interpolation.html#peri-interpolation-barnesinterpolation1d">peri.interpolation.BarnesInterpolation1D</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/interpolation.html#peri-interpolation-chebyshevinterpolation1d">peri.interpolation.ChebyshevInterpolation1D</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/logger.html">peri.logger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/models.html">peri.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/opt.html">peri.opt</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/opt.html#peri-opt-optimize-burn">peri.opt.optimize.burn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/opt.html#peri-opt-optimize-finish">peri.opt.optimize.finish</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/opt.html#peri-opt-optimize">peri.opt.optimize</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/opt.html#peri-opt-optimize-functions">peri.opt.optimize functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/opt.html#peri-opt-optimize-classes">peri.opt.optimize classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/opt.html#peri-opt-addsubtract">peri.opt.addsubtract</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/runner.html">peri.runner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/states.html">peri.states</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/states.html#peri-states-state">peri.states.State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/states.html#peri-states-imagestate">peri.states.ImageState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/states.html#peri-states-save-load">peri.states.{save,load}</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/util.html">peri.util</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/util.html#peri-util-tile">peri.util.Tile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/util.html#peri-util-image">peri.util.Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/util.html#peri-util-rawimage">peri.util.RawImage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/util.html#id1">peri.util.{*}</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to PERI&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#documentation">Documentation:</a></li>
+<li><a class="reference internal" href="#reference">Reference:</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="next chapter">Installation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

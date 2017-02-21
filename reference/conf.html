@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>peri.conf &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="peri.fft" href="fft.html" />
+    <link rel="prev" title="peri.comp" href="comp.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fft.html" title="peri.fft"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="comp.html" title="peri.comp"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-peri.conf">
+<span id="peri-conf"></span><h1>peri.conf<a class="headerlink" href="#module-peri.conf" title="Permalink to this headline">¶</a></h1>
+<p>The default values for the global package configuration are provided in <code class="docutils literal"><span class="pre">peri.conf.default_conf</span></code>.
+The configuration variables are described here:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="19%" />
+<col width="59%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Variable name</th>
+<th class="head">Default value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">fftw-threads</span></code></td>
+<td>-1</td>
+<td>Number of threads for fftw to use, -1 indicates all available</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">fftw-planning-effort</span></code></td>
+<td><code class="docutils literal"><span class="pre">FFTW_MEASURE</span></code></td>
+<td>One of (<code class="docutils literal"><span class="pre">FFTW_ESTIMATE</span></code>, <code class="docutils literal"><span class="pre">FFTW_MEASURE</span></code>, <code class="docutils literal"><span class="pre">FFTW_PATIENT</span></code>)
+where options to the right take longer the first time but
+are faster in subsequent evaluations.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">fftw-wisdom</span></code></td>
+<td><code class="docutils literal"><span class="pre">~/.peri-wisdom.pkl</span></code></td>
+<td>Location of file in which to store wisdom. Wisdom is the results
+of fftw benchmarking itself, allowing it to run as fast as possible.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">log-filename</span></code></td>
+<td><code class="docutils literal"><span class="pre">~/.peri.log</span></code></td>
+<td>Name of file for logging.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">log-to-file</span></code></td>
+<td>False</td>
+<td>Whether or not to actually save logs to a file as well</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">log-colors</span></code></td>
+<td>False</td>
+<td>Display logs in color (supported by xterm256)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">verbosity</span></code></td>
+<td>vvv</td>
+<td>Level of verbosity for logs, the more v&#8217;s the more verbose</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="peri.conf.get_conf_filename">
+<code class="descclassname">peri.conf.</code><code class="descname">get_conf_filename</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/conf.html#get_conf_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.conf.get_conf_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>The configuration file either lives in ~/.peri.json or is specified on the
+command line via the environment variables PERI_CONF_FILE</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.conf.transform">
+<code class="descclassname">peri.conf.</code><code class="descname">transform</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/conf.html#transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.conf.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate environment variables to ones corresponding to keys in the
+configuration.  In particular, env variables may be made with
+&#8220;<a href="#id1"><span class="problematic" id="id2">PERI_</span></a>&#8220;+key_name: fftw-threads = PERI_FFTW_THREADS. Each env var
+is later checked to see if it has to do with PERI</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.conf.read_environment">
+<code class="descclassname">peri.conf.</code><code class="descname">read_environment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/conf.html#read_environment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.conf.read_environment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read all environment variables to see if they contain PERI</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.conf.create_default_conf">
+<code class="descclassname">peri.conf.</code><code class="descname">create_default_conf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/conf.html#create_default_conf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.conf.create_default_conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dump the default_conf to the configuration file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.conf.load_conf">
+<code class="descclassname">peri.conf.</code><code class="descname">load_conf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/conf.html#load_conf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.conf.load_conf" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Load the configuration with the priority:</dt>
+<dd><ol class="first last arabic simple">
+<li>environment variables</li>
+<li>configuration file</li>
+<li>defaults here (default_conf)</li>
+</ol>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="comp.html"
+                        title="previous chapter">peri.comp</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fft.html"
+                        title="next chapter">peri.fft</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/reference/conf.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fft.html" title="peri.fft"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="comp.html" title="peri.comp"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

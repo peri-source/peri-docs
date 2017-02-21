@@ -1,0 +1,998 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>peri.states &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for peri.states</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">contextmanager</span>
+
+<span class="kn">from</span> <span class="nn">peri</span> <span class="k">import</span> <span class="n">util</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">peri.logger</span> <span class="k">import</span> <span class="n">log</span> <span class="k">as</span> <span class="n">baselog</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">baselog</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;states&#39;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">UpdateError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">inds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slicer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Take a sample from a field given flat indices or a shaped slice</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    inds : list of indices</span>
+<span class="sd">        One dimensional (raveled) indices to return from the field</span>
+
+<span class="sd">    slicer : slice object</span>
+<span class="sd">        A shaped (3D) slicer that returns a section of image</span>
+
+<span class="sd">    flat : boolean</span>
+<span class="sd">        Whether to flatten the sampled item before returning</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">inds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">inds</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">slicer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">field</span><span class="p">[</span><span class="n">slicer</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">field</span>
+
+    <span class="k">if</span> <span class="n">flat</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+<span class="n">_graddoc</span> <span class="o">=</span> \
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Parameters</span>
+<span class="sd">-----------</span>
+<span class="sd">func : callable</span>
+<span class="sd">    Function wrt to take a derivative, should return a nparray that is</span>
+<span class="sd">    the same shape for all params and values</span>
+
+<span class="sd">params : string or list of strings</span>
+<span class="sd">    Paramter(s) to take the derivative wrt</span>
+
+<span class="sd">dl : float</span>
+<span class="sd">    Derivative step size for numerical deriv</span>
+
+<span class="sd">rts : boolean</span>
+<span class="sd">    Return To Start. Return the state to how you found it when done,</span>
+<span class="sd">    needs another update call, so can be ommitted sometimes (small dl).</span>
+<span class="sd">    If True, functions return the final answer along with the final func</span>
+<span class="sd">    evaluation so that it may be passed onto other calls.</span>
+
+<span class="sd">nout : Int, optional</span>
+<span class="sd">    How many objects the function returns. Allows for gradient of multiple</span>
+<span class="sd">    things (e.g. residuals + error) at the same time in a nice, contiguous</span>
+<span class="sd">    way. Default is 1</span>
+
+<span class="sd">out : ndarray or None, optional</span>
+<span class="sd">    If set, the return array for the output. Performance feature. Does not</span>
+<span class="sd">    check for shape internally; will just raise an error. Default is None,</span>
+<span class="sd">    i.e. initialize the output internally.</span>
+
+<span class="sd">**kwargs :</span>
+<span class="sd">    Arguments to `func`</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">_sampledoc</span> <span class="o">=</span> \
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">kwargs (supply only one):</span>
+<span class="sd">-----------------------------</span>
+<span class="sd">inds : list of indices</span>
+<span class="sd">    One dimensional (raveled) indices to return from the field</span>
+
+<span class="sd">slicer : slice object</span>
+<span class="sd">    A shaped (3D) slicer that returns a section of image</span>
+
+<span class="sd">flat : boolean</span>
+<span class="sd">    Whether to flatten the sampled item before returning</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="c1">#=============================================================================</span>
+<span class="c1"># Super class of State, has all basic components and structure</span>
+<span class="c1">#=============================================================================</span>
+<div class="viewcode-block" id="State"><a class="viewcode-back" href="../../reference/states.html#peri.states.State">[docs]</a><span class="k">class</span> <span class="nc">State</span><span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">ParameterGroup</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">logpriors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hyper_params</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">],</span>
+                <span class="n">hyper_values</span><span class="o">=</span><span class="p">[</span><span class="mf">0.04</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A model and corresponding functions to perform a fit to data using a</span>
+<span class="sd">        variety of optimization routines. A model takes parameters and values</span>
+<span class="sd">        (names and values) which determine the output of a model, which is then</span>
+<span class="sd">        compared with data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        params : list of strings</span>
+<span class="sd">            The names of the parameters (should be a unique set)</span>
+
+<span class="sd">        values : list of numbers</span>
+<span class="sd">            The corresponding values of the parameters</span>
+
+<span class="sd">        logpriors : list of `peri.prior.Prior`</span>
+<span class="sd">            Priors (constraints) to apply to parameters</span>
+
+<span class="sd">        hyper_params : list of strings, optional</span>
+<span class="sd">            The names of any hyper-parameters (should be a unique set).</span>
+<span class="sd">            Stored as a `peri.comp.ParameterGroup`. Default is `[&#39;sigma&#39;]`,</span>
+<span class="sd">            the standard-deviation of the noise distribution.</span>
+
+<span class="sd">        hyper_values : list of numbers, optional</span>
+<span class="sd">            The corresponding values of the hyper-parameters. Stored as a</span>
+<span class="sd">            `peri.comp.ParameterGroup`. Default is `[0.04]`</span>
+
+<span class="sd">        kwargs :</span>
+<span class="sd">            Arguments to pass to super class :class:`peri.comp.ParameterGroup`</span>
+<span class="sd">            including `ordered` and `category`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logpriors</span> <span class="o">=</span> <span class="n">logpriors</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">State</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hyper_parameters</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">ParameterGroup</span><span class="p">(</span><span class="n">hyper_params</span><span class="p">,</span> <span class="n">hyper_values</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_funcs</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class property: the raw data of the model fit. Should return a number</span>
+<span class="sd">        (preferrably float) or an ndarray (essentially any object which as</span>
+<span class="sd">        operands +-/...). This object is constant since it is data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class property: the current model fit to the data. Should return a</span>
+<span class="sd">        number or ndarray. Ideally this object should be an object updated by</span>
+<span class="sd">        the :func:`peri.states.State.update` function and simply returned in</span>
+<span class="sd">        this property</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class property: the model residuals wrt data, residuals = data - model,</span>
+<span class="sd">        :math:`R_i = D_i - M_i(\\theta)`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class property: Sum of the squared errors,</span>
+<span class="sd">        :math:`E = \sum_i (D_i - M_i(\\theta))^2`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">r</span><span class="p">)</span>  <span class="c1">#faster than flatiter</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">loglikelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class property: loglikelihood calculated by the model error,</span>
+<span class="sd">        :math:`\\mathcal{L} = - \\frac{1}{2} \\sum\\left[</span>
+<span class="sd">        \\left(\\frac{D_i - M_i(\\theta)}{\sigma}\\right)^2</span>
+<span class="sd">        + \\log{(2\pi \sigma^2)} \\right]`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hyper_parameters</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">err</span><span class="o">/</span><span class="n">sig</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">*</span><span class="n">sig</span><span class="p">)</span><span class="o">*</span><span class="n">N</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">logposterior</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class property: log of posterior prob (including likelihood</span>
+<span class="sd">        calculated by the model error and priors):</span>
+
+<span class="sd">        self.logprior + self.loglikelihood</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">logprior</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">loglikelihood</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">logprior</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class property: logprior calculated from the sum of all prior objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">0</span>  <span class="c1"># FIXME should return the sum of the log priors</span>
+
+<div class="viewcode-block" id="State.update"><a class="viewcode-back" href="../../reference/states.html#peri.states.State.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update a single parameter or group of parameters ``params``</span>
+<span class="sd">        with ``values``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        params : string or list of strings</span>
+<span class="sd">            Parameter names which to update</span>
+
+<span class="sd">        value : number or list of numbers</span>
+<span class="sd">            Values of those parameters which to update</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">State</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="State.update_hyper"><a class="viewcode-back" href="../../reference/states.html#peri.states.State.update_hyper">[docs]</a>    <span class="k">def</span> <span class="nf">update_hyper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update any single hyper parameter or group of parameters ``params``</span>
+<span class="sd">        with ``values``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        params : string or list of strings</span>
+<span class="sd">            Parameter names which to update</span>
+
+<span class="sd">        value : number or list of numbers</span>
+<span class="sd">            Values of those parameters which to update</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hyper_parameters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="State.update_sigma"><a class="viewcode-back" href="../../reference/states.html#peri.states.State.update_sigma">[docs]</a>    <span class="k">def</span> <span class="nf">update_sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Updates the expected sigma of the noise distribution&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_hyper</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="State.push_update"><a class="viewcode-back" href="../../reference/states.html#peri.states.State.push_update">[docs]</a>    <span class="k">def</span> <span class="nf">push_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform a parameter update and keep track of the change on the state.</span>
+<span class="sd">        Same call structure as :func:`peri.states.States.update`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">curr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">params</span><span class="p">,</span> <span class="n">curr</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="State.pop_update"><a class="viewcode-back" href="../../reference/states.html#peri.states.State.pop_update">[docs]</a>    <span class="k">def</span> <span class="nf">pop_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pop the last update from the stack push by</span>
+<span class="sd">        :func:`peri.states.States.push_update` by undoing the chnage last</span>
+<span class="sd">        performed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></div>
+
+    <span class="nd">@contextmanager</span>
+<div class="viewcode-block" id="State.temp_update"><a class="viewcode-back" href="../../reference/states.html#peri.states.State.temp_update">[docs]</a>    <span class="k">def</span> <span class="nf">temp_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Context manager to temporarily perform a parameter update (by using the</span>
+<span class="sd">        stack structure). To use:</span>
+
+<span class="sd">            with state.temp_update(params, values):</span>
+<span class="sd">                # measure the cost or something</span>
+<span class="sd">                state.error</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">push_update</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+        <span class="k">yield</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pop_update</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">param_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
+
+    <span class="k">def</span> <span class="nf">_grad_one_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funct</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="mi">2</span><span class="n">e</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">rts</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gradient of `func` wrt a single parameter `p`. (see _graddoc)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">f0</span> <span class="o">=</span> <span class="n">funct</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">vals</span><span class="o">+</span><span class="n">dl</span><span class="p">)</span>
+        <span class="n">f1</span> <span class="o">=</span> <span class="n">funct</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rts</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nout</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">f1</span> <span class="o">-</span> <span class="n">f0</span><span class="p">)</span> <span class="o">/</span> <span class="n">dl</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[(</span><span class="n">f1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">f0</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="n">dl</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">nout</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">_hess_two_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funct</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="mi">2</span><span class="n">e</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">rts</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Hessian of `func` wrt two parameters `p0` and `p1`. (see _graddoc)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vals0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="n">p0</span><span class="p">)</span>
+        <span class="n">vals1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
+
+        <span class="n">f00</span> <span class="o">=</span> <span class="n">funct</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">vals0</span><span class="o">+</span><span class="n">dl</span><span class="p">)</span>
+        <span class="n">f10</span> <span class="o">=</span> <span class="n">funct</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">vals1</span><span class="o">+</span><span class="n">dl</span><span class="p">)</span>
+        <span class="n">f11</span> <span class="o">=</span> <span class="n">funct</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">vals0</span><span class="p">)</span>
+        <span class="n">f01</span> <span class="o">=</span> <span class="n">funct</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rts</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">vals0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">vals1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">f11</span> <span class="o">-</span> <span class="n">f10</span> <span class="o">-</span> <span class="n">f01</span> <span class="o">+</span> <span class="n">f00</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">dl</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funct</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="mi">2</span><span class="n">e</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">rts</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gradient of `func` wrt a set of parameters params. (see _graddoc)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_all</span><span class="p">()</span>
+
+        <span class="n">ps</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">listify</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">f0</span> <span class="o">=</span> <span class="n">funct</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># get the shape of the entire gradient to return and make an array</span>
+        <span class="n">calc_shape</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">ar</span><span class="p">:</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ps</span><span class="p">),)</span> <span class="o">+</span> <span class="p">(</span><span class="n">ar</span><span class="o">.</span><span class="n">shape</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">ar</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)))</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">grad</span> <span class="o">=</span> <span class="n">out</span>  <span class="c1"># reference</span>
+        <span class="k">elif</span> <span class="n">nout</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="n">calc_shape</span><span class="p">(</span><span class="n">f0</span><span class="p">)</span>
+            <span class="n">grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>  <span class="c1"># must be preallocated for mem reasons</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="p">[</span><span class="n">calc_shape</span><span class="p">(</span><span class="n">f0</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">nout</span><span class="p">)]</span>
+            <span class="n">grad</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shp</span><span class="p">)</span> <span class="k">for</span> <span class="n">shp</span> <span class="ow">in</span> <span class="n">shape</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ps</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">nout</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">grad</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grad_one_param</span><span class="p">(</span><span class="n">funct</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="n">dl</span><span class="p">,</span> <span class="n">rts</span><span class="o">=</span><span class="n">rts</span><span class="p">,</span>
+                        <span class="n">nout</span><span class="o">=</span><span class="n">nout</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stuff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grad_one_param</span><span class="p">(</span><span class="n">funct</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="n">dl</span><span class="p">,</span> <span class="n">rts</span><span class="o">=</span><span class="n">rts</span><span class="p">,</span>
+                        <span class="n">nout</span><span class="o">=</span><span class="n">nout</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">nout</span><span class="p">):</span> <span class="n">grad</span><span class="p">[</span><span class="n">a</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">stuff</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">grad</span>  <span class="c1"># was np.squeeze(grad)</span>
+
+
+    <span class="k">def</span> <span class="nf">_jtj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funct</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="mi">2</span><span class="n">e</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">rts</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        jTj of a `func` wrt to parmaeters `params`. (see _graddoc)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">grad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grad</span><span class="p">(</span><span class="n">funct</span><span class="o">=</span><span class="n">funct</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="n">dl</span><span class="p">,</span> <span class="n">rts</span><span class="o">=</span><span class="n">rts</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="n">grad</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_hess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funct</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="mi">2</span><span class="n">e</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">rts</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Hessian of a `func` wrt to parmaeters `params`. (see _graddoc)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_all</span><span class="p">()</span>
+
+        <span class="n">ps</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">listify</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">f0</span> <span class="o">=</span> <span class="n">funct</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># get the shape of the entire hessian, allocate an array</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">f0</span><span class="o">.</span><span class="n">shape</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ps</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">ps</span><span class="p">))</span> <span class="o">+</span> <span class="n">shape</span>
+        <span class="n">hess</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ps</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">pj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ps</span><span class="p">[</span><span class="n">i</span><span class="p">:]):</span>
+                <span class="n">J</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="n">i</span>
+                <span class="n">thess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hess_two_param</span><span class="p">(</span><span class="n">funct</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">pj</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="n">dl</span><span class="p">,</span> <span class="n">rts</span><span class="o">=</span><span class="n">rts</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">hess</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">J</span><span class="p">]</span> <span class="o">=</span> <span class="n">thess</span>
+                <span class="n">hess</span><span class="p">[</span><span class="n">J</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">thess</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">hess</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_dograddoc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">im_func</span><span class="o">.</span><span class="n">func_doc</span> <span class="o">+=</span> <span class="n">_graddoc</span>
+
+<div class="viewcode-block" id="State.build_funcs"><a class="viewcode-back" href="../../reference/states.html#peri.states.State.build_funcs">[docs]</a>    <span class="k">def</span> <span class="nf">build_funcs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Here, we build gradient and hessian functions based on the properties</span>
+<span class="sd">        of a state that are generally wanted. For each one, we fill in _grad or</span>
+<span class="sd">        _hess with a function that takes care of various options such as</span>
+<span class="sd">        slicing and flattening. For example, `m` below takes the model, selects</span>
+<span class="sd">        different indices from it, maybe flattens it and copies it. This is</span>
+<span class="sd">        then used in the fisherinformation, gradmodel, and hessmodel functions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># create essentially lambda functions, but with a nice signature</span>
+        <span class="k">def</span> <span class="nf">m</span><span class="p">(</span><span class="n">inds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slicer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">sample</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">inds</span><span class="o">=</span><span class="n">inds</span><span class="p">,</span> <span class="n">slicer</span><span class="o">=</span><span class="n">slicer</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="n">flat</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">r</span><span class="p">(</span><span class="n">inds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slicer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">sample</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="p">,</span> <span class="n">inds</span><span class="o">=</span><span class="n">inds</span><span class="p">,</span> <span class="n">slicer</span><span class="o">=</span><span class="n">slicer</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="n">flat</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">l</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">loglikelihood</span>
+
+        <span class="k">def</span> <span class="nf">r_e</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;sliced etc residuals, with state.error appended on&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">r</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">m_e</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;sliced etc residuals, with state.error appended on&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">m</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+
+        <span class="c1"># set the member functions using partial</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fisherinformation</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_jtj</span><span class="p">,</span> <span class="n">funct</span><span class="o">=</span><span class="n">m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gradloglikelihood</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grad</span><span class="p">,</span> <span class="n">funct</span><span class="o">=</span><span class="n">l</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hessloglikelihood</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hess</span><span class="p">,</span> <span class="n">funct</span><span class="o">=</span><span class="n">l</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gradmodel</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grad</span><span class="p">,</span> <span class="n">funct</span><span class="o">=</span><span class="n">m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hessmodel</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hess</span><span class="p">,</span> <span class="n">funct</span><span class="o">=</span><span class="n">m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">JTJ</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_jtj</span><span class="p">,</span> <span class="n">funct</span><span class="o">=</span><span class="n">r</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">J</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grad</span><span class="p">,</span> <span class="n">funct</span><span class="o">=</span><span class="n">r</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">J_e</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grad</span><span class="p">,</span> <span class="n">funct</span><span class="o">=</span><span class="n">r_e</span><span class="p">,</span> <span class="n">nout</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gradmodel_e</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grad</span><span class="p">,</span> <span class="n">funct</span><span class="o">=</span><span class="n">m_e</span><span class="p">,</span> <span class="n">nout</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># add the appropriate documentation to the following functions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fisherinformation</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">_graddoc</span> <span class="o">+</span> <span class="n">_sampledoc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gradloglikelihood</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">_graddoc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hessloglikelihood</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">_graddoc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gradmodel</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">_graddoc</span> <span class="o">+</span> <span class="n">_sampledoc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hessmodel</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">_graddoc</span> <span class="o">+</span> <span class="n">_sampledoc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">JTJ</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">_graddoc</span> <span class="o">+</span> <span class="n">_sampledoc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">_graddoc</span> <span class="o">+</span> <span class="n">_sampledoc</span>
+
+        <span class="c1"># add documentation to the private functions as well. this is done</span>
+        <span class="c1"># slightly differently, hence the function call</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dograddoc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grad_one_param</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dograddoc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hess_two_param</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dograddoc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_grad</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dograddoc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hess</span><span class="p">)</span>
+
+        <span class="c1"># the state object is a workaround so that other interfaces still</span>
+        <span class="c1"># work. this should probably be removed in the long run</span>
+        <span class="k">class</span> <span class="nc">_Statewrap</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
+            <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">params</span>
+                <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">delistify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">d</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">_Statewrap</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="State.crb"><a class="viewcode-back" href="../../reference/states.html#peri.states.State.crb">[docs]</a>    <span class="k">def</span> <span class="nf">crb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the diagonal elements of the minimum covariance of the model</span>
+<span class="sd">        with respect to parameters params. ``*args`` and ``**kwargs`` go to</span>
+<span class="sd">        ``fisherinformation``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fish</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fisherinformation</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">fish</span><span class="p">)))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span></div>
+
+
+<span class="k">class</span> <span class="nc">PolyFitState</span><span class="p">(</span><span class="n">State</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">coeffs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="c1"># FIXME -- add prior for sigma &gt; 0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_xpts</span> <span class="o">=</span> <span class="n">x</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c-</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">order</span><span class="p">)]</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">coeffs</span> <span class="k">if</span> <span class="n">coeffs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span><span class="o">*</span><span class="n">order</span>
+
+        <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">)</span>
+        <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">PolyFitState</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PolyFitState</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xpts</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the raw data of the model fit &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the current model fit to the data &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span>
+
+
+<span class="c1">#=============================================================================</span>
+<span class="c1"># Image state which specializes to components with regions, etc.</span>
+<span class="c1">#=============================================================================</span>
+<div class="viewcode-block" id="ImageState"><a class="viewcode-back" href="../../reference/states.html#peri.states.ImageState">[docs]</a><span class="k">class</span> <span class="nc">ImageState</span><span class="p">(</span><span class="n">State</span><span class="p">,</span> <span class="n">comp</span><span class="o">.</span><span class="n">ComponentCollection</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">comps</span><span class="p">,</span> <span class="n">mdl</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">ConfocalImageModel</span><span class="p">(),</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.04</span><span class="p">,</span>
+            <span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">model_as_data</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The state object to create a confocal image.  The model is that of</span>
+<span class="sd">        a spatially varying illumination field, from which platonic particle</span>
+<span class="sd">        shapes are subtracted.  This is then spread with a point spread function</span>
+<span class="sd">        (PSF).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        image : :class:`peri.util.Image` object</span>
+<span class="sd">            The raw image with which to compare the model image from this</span>
+<span class="sd">            class.  This image should have been prepared through</span>
+<span class="sd">            prepare_for_state, which does things such as padding necessary for</span>
+<span class="sd">            this class. In the case of the RawImage, paths are used to keep</span>
+<span class="sd">            track of the image object to save on pickle size.</span>
+
+<span class="sd">        comp : list of :class:`peri.comp.comp.Component` or :class:`peri.comp.comp.ComponentCollection`</span>
+<span class="sd">            Components used to make up the model image. Each separate component</span>
+<span class="sd">            must be of a different category, otherwise combining them would be</span>
+<span class="sd">            ambiguous. If you desire multiple Components of one category,</span>
+<span class="sd">            combine them using a ComponentCollection (which has functions for</span>
+<span class="sd">            combining) and supply that to the comps list.</span>
+
+<span class="sd">            The component types must match the list of categories in the</span>
+<span class="sd">            ``ImageState.catmap`` which tells how components are matched to</span>
+<span class="sd">            parts of the model equation.</span>
+
+<span class="sd">        mdl : :class:`peri.models.Model` object</span>
+<span class="sd">            Model defining how to combine different Components into a single</span>
+<span class="sd">            model.</span>
+
+<span class="sd">        priors: list of ``peri.priors`` [default: ()]</span>
+<span class="sd">            Whether or not to turn on overlap priors using neighborlists</span>
+
+<span class="sd">        pad : integer or tuple of integers (optional)</span>
+<span class="sd">            No recommended to set by hand.  The padding level of the raw image</span>
+<span class="sd">            needed by the PSF support.</span>
+
+<span class="sd">        model_as_data : boolean</span>
+<span class="sd">            Whether to use the model image as the true image after initializing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">get_image</span><span class="p">()</span><span class="o">.</span><span class="n">ndim</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">priors</span> <span class="o">=</span> <span class="n">priors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">aN</span><span class="p">(</span><span class="n">pad</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_as_data</span> <span class="o">=</span> <span class="n">model_as_data</span>
+
+        <span class="n">comp</span><span class="o">.</span><span class="n">ComponentCollection</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comps</span><span class="o">=</span><span class="n">comps</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="n">mdl</span><span class="o">=</span><span class="n">mdl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_funcs</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_as_data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_to_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ImageState.set_model"><a class="viewcode-back" href="../../reference/states.html#peri.states.ImageState.set_model">[docs]</a>    <span class="k">def</span> <span class="nf">set_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mdl</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setup the image model formation equation and corresponding objects into</span>
+<span class="sd">        their various objects. `mdl` is a `peri.models.Model` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mdl</span> <span class="o">=</span> <span class="n">mdl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mdl</span><span class="o">.</span><span class="n">check_inputs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_comp_&#39;</span><span class="o">+</span><span class="n">c</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageState.set_image"><a class="viewcode-back" href="../../reference/states.html#peri.states.ImageState.set_image">[docs]</a>    <span class="k">def</span> <span class="nf">set_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the current comparison (real) image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">util</span><span class="o">.</span><span class="n">NullImage</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_as_data</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_as_data</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">get_padded_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">)</span>
+
+        <span class="c1"># set up various slicers and Tiles associated with the image and pad</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">oshape</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">Tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ishape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">oshape</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ishape</span><span class="o">.</span><span class="n">slicer</span>
+
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">:</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">set_shape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">oshape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ishape</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_residuals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calculate_model</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">set_tile_full</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">oshape</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ImageState.model_to_data"><a class="viewcode-back" href="../../reference/states.html#peri.states.ImageState.model_to_data">[docs]</a>    <span class="k">def</span> <span class="nf">model_to_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Switch out the data for the model&#39;s recreation of the data. &quot;&quot;&quot;</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">im</span> <span class="o">+=</span> <span class="n">sigma</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">im</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">NullImage</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">im</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">:</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calculate_model</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">calculate_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_model</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_residuals</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_residuals</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loglikelihood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_loglikelihood</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logprior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_logprior</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the raw data of the model fit &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inner</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the current model fit to the data &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inner</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_residuals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inner</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">loglikelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loglikelihood</span>
+
+<div class="viewcode-block" id="ImageState.get_update_io_tiles"><a class="viewcode-back" href="../../reference/states.html#peri.states.ImageState.get_update_io_tiles">[docs]</a>    <span class="k">def</span> <span class="nf">get_update_io_tiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the tiles corresponding to a particular section of image needed to</span>
+<span class="sd">        be updated. Inputs are the parameters and values. Returned is the</span>
+<span class="sd">        padded tile, inner tile, and slicer to go between, but accounting for</span>
+<span class="sd">        wrap with the edge of the image as necessary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get the affected area of the model image</span>
+        <span class="n">otile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_update_tile</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">otile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span>
+        <span class="n">ptile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_padding_size</span><span class="p">(</span><span class="n">otile</span><span class="p">)</span> <span class="ow">or</span> <span class="n">util</span><span class="o">.</span><span class="n">Tile</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">otile</span><span class="o">.</span><span class="n">dim</span><span class="p">)</span>
+
+        <span class="n">otile</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">Tile</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">otile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">oshape</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">otile</span><span class="o">.</span><span class="n">shape</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">UpdateError</span><span class="p">(</span><span class="s2">&quot;update triggered invalid tile size&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">ptile</span><span class="o">.</span><span class="n">shape</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="p">(</span><span class="n">ptile</span><span class="o">.</span><span class="n">shape</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">oshape</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">UpdateError</span><span class="p">(</span><span class="s2">&quot;update triggered invalid padding tile size&quot;</span><span class="p">)</span>
+
+        <span class="c1"># now remove the part of the tile that is outside the image and pad the</span>
+        <span class="c1"># interior part with that overhang. reflect the necessary padding back</span>
+        <span class="c1"># into the image itself for the outer slice which we will call outer</span>
+        <span class="n">outer</span> <span class="o">=</span> <span class="n">otile</span><span class="o">.</span><span class="n">pad</span><span class="p">((</span><span class="n">ptile</span><span class="o">.</span><span class="n">shape</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">inner</span><span class="p">,</span> <span class="n">outer</span> <span class="o">=</span> <span class="n">outer</span><span class="o">.</span><span class="n">reflect_overhang</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">oshape</span><span class="p">)</span>
+        <span class="n">iotile</span> <span class="o">=</span> <span class="n">inner</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="o">-</span><span class="n">outer</span><span class="o">.</span><span class="n">l</span><span class="p">)</span>
+
+        <span class="n">outer</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">Tile</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">outer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">oshape</span><span class="p">)</span>
+        <span class="n">inner</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">Tile</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">inner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">oshape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">outer</span><span class="p">,</span> <span class="n">inner</span><span class="p">,</span> <span class="n">iotile</span></div>
+
+<div class="viewcode-block" id="ImageState.update"><a class="viewcode-back" href="../../reference/states.html#peri.states.ImageState.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Actually perform an image (etc) update based on a set of params and</span>
+<span class="sd">        values. These parameter can be any present in the components in any</span>
+<span class="sd">        number. If there is only one component affected then difference image</span>
+<span class="sd">        updates will be employed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># FIXME needs to update priors</span>
+        <span class="n">comps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">affected_components</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># get the affected area of the model image</span>
+        <span class="n">otile</span><span class="p">,</span> <span class="n">itile</span><span class="p">,</span> <span class="n">iotile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_update_io_tiles</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">otile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># have all components update their tiles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_tile</span><span class="p">(</span><span class="n">otile</span><span class="p">)</span>
+
+        <span class="n">oldmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">[</span><span class="n">itile</span><span class="o">.</span><span class="n">slicer</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># here we diverge depending if there is only one component update</span>
+        <span class="c1"># (so that we may calculate a variation / difference image) or if many</span>
+        <span class="c1"># parameters are being update (should just update the whole model).</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdl</span><span class="o">.</span><span class="n">get_difference_model</span><span class="p">(</span><span class="n">comps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">category</span><span class="p">):</span>
+            <span class="n">comp</span> <span class="o">=</span> <span class="n">comps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">model0</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">ImageState</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+            <span class="n">model1</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+
+            <span class="n">diff</span> <span class="o">=</span> <span class="n">model1</span> <span class="o">-</span> <span class="n">model0</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdl</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">,</span> <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="n">diffmap</span><span class="o">=</span><span class="p">{</span><span class="n">comp</span><span class="o">.</span><span class="n">category</span><span class="p">:</span> <span class="n">diff</span><span class="p">}</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model0</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">[</span><span class="n">itile</span><span class="o">.</span><span class="n">slicer</span><span class="p">]</span> <span class="o">+=</span> <span class="n">diff</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">[</span><span class="n">itile</span><span class="o">.</span><span class="n">slicer</span><span class="p">]</span> <span class="o">+=</span> <span class="n">diff</span><span class="p">[</span><span class="n">iotile</span><span class="o">.</span><span class="n">slicer</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">ImageState</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+            <span class="c1"># allow the model to be evaluated using our components</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdl</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">,</span> <span class="s1">&#39;get&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">[</span><span class="n">itile</span><span class="o">.</span><span class="n">slicer</span><span class="p">]</span> <span class="o">=</span> <span class="n">diff</span><span class="p">[</span><span class="n">iotile</span><span class="o">.</span><span class="n">slicer</span><span class="p">]</span>
+
+        <span class="n">newmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">[</span><span class="n">itile</span><span class="o">.</span><span class="n">slicer</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># use the model image update to modify other class variables which</span>
+        <span class="c1"># are hard to compute globally for small local updates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_from_model_change</span><span class="p">(</span><span class="n">oldmodel</span><span class="p">,</span> <span class="n">newmodel</span><span class="p">,</span> <span class="n">itile</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="ImageState.get"><a class="viewcode-back" href="../../reference/states.html#peri.states.ImageState.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return component by category name &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">c</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="n">comp</span><span class="o">.</span><span class="n">ComponentCollection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">set_shape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">oshape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ishape</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calculate_model</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_calc_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_tile_full</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdl</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">,</span> <span class="s1">&#39;get&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_calc_residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span>
+
+    <span class="k">def</span> <span class="nf">_calc_logprior</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Allows for fast local updates of log-priors&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">0.</span> <span class="c1"># FIXME this should be incorporated somewhere</span>
+
+    <span class="k">def</span> <span class="nf">_calc_loglikelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Allows for fast local updates of log-likelihood&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">model</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">tile</span><span class="o">.</span><span class="n">slicer</span><span class="p">]</span>
+
+        <span class="n">sig</span><span class="p">,</span> <span class="n">isig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span>
+        <span class="n">nlogs</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">*</span><span class="n">sig</span><span class="p">)</span><span class="o">*</span><span class="n">res</span><span class="o">.</span><span class="n">size</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">isig</span><span class="o">*</span><span class="n">isig</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">flat</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span> <span class="o">+</span> <span class="n">nlogs</span>
+
+    <span class="k">def</span> <span class="nf">update_sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+        <span class="c1"># FIXME hyperparameters....</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loglikelihood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_loglikelihood</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ImageState.update_from_model_change"><a class="viewcode-back" href="../../reference/states.html#peri.states.ImageState.update_from_model_change">[docs]</a>    <span class="k">def</span> <span class="nf">update_from_model_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oldmodel</span><span class="p">,</span> <span class="n">newmodel</span><span class="p">,</span> <span class="n">tile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update various internal variables from a model update from oldmodel to</span>
+<span class="sd">        newmodel for the tile `tile`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loglikelihood</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_loglikelihood</span><span class="p">(</span><span class="n">oldmodel</span><span class="p">,</span> <span class="n">tile</span><span class="o">=</span><span class="n">tile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loglikelihood</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_loglikelihood</span><span class="p">(</span><span class="n">newmodel</span><span class="p">,</span> <span class="n">tile</span><span class="o">=</span><span class="n">tile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_residuals</span><span class="p">[</span><span class="n">tile</span><span class="o">.</span><span class="n">slicer</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">tile</span><span class="o">.</span><span class="n">slicer</span><span class="p">]</span> <span class="o">-</span> <span class="n">newmodel</span></div>
+
+    <span class="k">def</span> <span class="nf">exports</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;inherited but not relevant&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;inherited but not relevant&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">_pad</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">subn</span><span class="p">(</span><span class="s1">&#39;(</span><span class="se">\n</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">    &#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">_pad</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">stats: E=</span><span class="si">{}</span><span class="s1"> LL=</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loglikelihood</span><span class="p">))</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">_pad</span><span class="p">(</span><span class="s1">&#39;model: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdl</span><span class="p">)))</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">_pad</span><span class="p">(</span><span class="s1">&#39;image: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)))</span>
+        <span class="n">comps</span> <span class="o">=</span> <span class="n">_pad</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">category</span><span class="o">+</span><span class="s1">&#39;: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">]))</span>
+
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> [</span><span class="si">{}{}{}{}{}</span><span class="se">\n</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">_pad</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">70</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">),</span> <span class="n">comps</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="s1">&#39;comps&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">,</span> <span class="s1">&#39;mdl&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdl</span><span class="p">,</span>
+                <span class="s1">&#39;sigma&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="s1">&#39;priors&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">priors</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">,</span>
+                <span class="s1">&#39;model_as_data&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_as_data</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idct</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">idct</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ImageState.set_mem_level"><a class="viewcode-back" href="../../reference/states.html#peri.states.ImageState.set_mem_level">[docs]</a>    <span class="k">def</span> <span class="nf">set_mem_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mem_level</span><span class="o">=</span><span class="s1">&#39;hi&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the memory usage level of the state.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mem_level : string</span>
+<span class="sd">            Can be set to one of:</span>
+<span class="sd">                * hi      : all mem&#39;s are np.float64</span>
+<span class="sd">                * med-hi  : image, platonic are float32, rest are float64</span>
+<span class="sd">                * med     : all mem&#39;s are float32</span>
+<span class="sd">                * med-lo  : image, platonic are float16, rest float32</span>
+<span class="sd">                * lo      : all are float16, which is bad for accuracy.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Right now the PSF is not affected by the mem-level changes, which is</span>
+<span class="sd">        OK for mem but it means that self._model, self._residuals are always</span>
+<span class="sd">        float64, which can be a chunk of mem.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#A little thing to parse strings for convenience:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="s1">&#39;mlh&#39;</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">mem_level</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;h&#39;</span><span class="p">,</span><span class="s1">&#39;mh&#39;</span><span class="p">,</span><span class="s1">&#39;m&#39;</span><span class="p">,</span><span class="s1">&#39;ml&#39;</span><span class="p">,</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mem_level must be one of hi, med-hi, med, med-lo, lo.&#39;</span><span class="p">)</span>
+        <span class="n">mem_levels</span> <span class="o">=</span> <span class="p">{</span>  <span class="s1">&#39;h&#39;</span><span class="p">:</span>     <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+                        <span class="s1">&#39;mh&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">],</span>
+                        <span class="s1">&#39;m&#39;</span><span class="p">:</span>   <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">],</span>
+                        <span class="s1">&#39;ml&#39;</span><span class="p">:</span>  <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">],</span>
+                        <span class="s1">&#39;l&#39;</span><span class="p">:</span>      <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">]</span>
+                    <span class="p">}</span>
+        <span class="n">hi_lvl</span><span class="p">,</span> <span class="n">lo_lvl</span> <span class="o">=</span> <span class="n">mem_levels</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">cat_lvls</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;obj&#39;</span><span class="p">:</span><span class="n">lo_lvl</span><span class="p">,</span>
+                    <span class="s1">&#39;ilm&#39;</span><span class="p">:</span><span class="n">hi_lvl</span><span class="p">,</span>
+                    <span class="s1">&#39;bkg&#39;</span><span class="p">:</span><span class="n">lo_lvl</span>
+                    <span class="p">}</span>  <span class="c1">#no psf...</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">float_precision</span> <span class="o">=</span> <span class="n">hi_lvl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">lo_lvl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">cat_lvls</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cat</span><span class="p">)</span>
+            <span class="c1">#check if it&#39;s a component collection</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;comps&#39;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">comps</span><span class="p">:</span>
+                    <span class="n">c</span><span class="o">.</span><span class="n">float_precision</span> <span class="o">=</span> <span class="n">lo_lvl</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">float_precision</span> <span class="o">=</span> <span class="n">lo_lvl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">hi_lvl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_residuals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">hi_lvl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../reference/states.html#peri.states.save">[docs]</a><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save the current state with extra information (for example samples and LL</span>
+<span class="sd">    from the optimization procedure).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    state : peri.states.ImageState</span>
+<span class="sd">        the state object which to save</span>
+
+<span class="sd">    filename : string</span>
+<span class="sd">        if provided, will override the default that is constructed based on</span>
+<span class="sd">        the state&#39;s raw image file.  If there is no filename and the state has</span>
+<span class="sd">        a RawImage, the it is saved to RawImage.filename + &quot;-peri-save.pkl&quot;</span>
+
+<span class="sd">    desc : string</span>
+<span class="sd">        if provided, will augment the default filename to be</span>
+<span class="sd">        RawImage.filename + &#39;-peri-&#39; + desc + &#39;.pkl&#39;</span>
+
+<span class="sd">    extra : list of pickleable objects</span>
+<span class="sd">        if provided, will be saved with the state</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="n">util</span><span class="o">.</span><span class="n">RawImage</span><span class="p">):</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span> <span class="ow">or</span> <span class="s1">&#39;save&#39;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span> <span class="ow">or</span> <span class="n">state</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">filename</span> <span class="o">+</span> <span class="s1">&#39;-peri-&#39;</span> <span class="o">+</span> <span class="n">desc</span> <span class="o">+</span> <span class="s1">&#39;.pkl&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Must provide filename since RawImage is not used&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">extra</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">save</span> <span class="o">=</span> <span class="n">state</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">save</span> <span class="o">=</span> <span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">+</span> <span class="n">extra</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="n">ff</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">-tmp-for-copy&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ff</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">ff</span><span class="p">)</span>
+
+        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">ff</span><span class="p">)</span>
+
+    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">save</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../reference/states.html#peri.states.load">[docs]</a><span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load the state from the given file, moving to the file&#39;s directory during</span>
+<span class="sd">    load (temporarily, moving back after loaded)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : string</span>
+<span class="sd">        name of the file to open, should be a .pkl file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">path</span> <span class="ow">or</span> <span class="s1">&#39;.&#39;</span>
+
+    <span class="k">with</span> <span class="n">util</span><span class="o">.</span><span class="n">indir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

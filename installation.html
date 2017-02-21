@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="PERI Walkthrough" href="walkthrough.html" />
+    <link rel="prev" title="Welcome to PERI’s documentation!" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="walkthrough.html" title="PERI Walkthrough"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to PERI’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2>Installation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>The Python package <code class="docutils literal"><span class="pre">peri</span></code> is compatible with most platforms including Linux,
+Mac, and Windows. Currently we are only compatible with Python 2.7.x but very
+close to Python 3.x compatibility. In order to run <code class="docutils literal"><span class="pre">peri</span></code> you must have a
+modern installation of Python. On all platforms, we recommend using the new
+<a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a>.  However, any modern
+distribution of Python will work. For example, on Linux, you can you the system
+Python installed by default (via <code class="docutils literal"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">python</span></code>). On Mac, you can
+use the system Python or one installed from macports / brew.</p>
+<div class="section" id="quick-install">
+<h3>Quick install<a class="headerlink" href="#quick-install" title="Permalink to this headline">¶</a></h3>
+<p>Official releases of <code class="docutils literal"><span class="pre">peri</span></code> are provided on <a class="reference external" href="http://pypi.python.org">PyPI.org</a>, a.k.a. the <a class="reference external" href="https://wiki.python.org/moin/CheeseShop">&#8216;cheeseshop&#8217;</a>. You can access the source
+distribution files there at <a class="reference external" href="https://pypi.python.org/pypi/peri/">peri</a> or
+using the common packaging tools provided with Python. The quickest way is to
+run:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">peri</span>
+</pre></div>
+</div>
+<p>This will install <code class="docutils literal"><span class="pre">peri</span></code> onto your <code class="code docutils literal"><span class="pre">PYTHONPATH</span></code>. Make sure that the
+appropriate path is also added to your path so the <code class="docutils literal"><span class="pre">peri</span></code> executable is
+available. It can be found in <code class="code docutils literal"><span class="pre">$PYTHONPATH/bin</span></code>.</p>
+<p>If you don&#8217;t have Python, you&#8217;ll first need to install 64-bit Python,
+version 2.7. Download <a class="reference external" href="https://www.python.org/downloads/">Python</a>.</p>
+<dl class="docutils">
+<dt>In addition, you&#8217;ll want 64-bit versions of the following packages</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">numpy</span></code> (required)</li>
+<li><code class="docutils literal"><span class="pre">scipy</span></code> (required)</li>
+<li><code class="docutils literal"><span class="pre">matplotlib</span></code> (required)</li>
+<li><code class="docutils literal"><span class="pre">pillow</span></code> (required)</li>
+<li><code class="docutils literal"><span class="pre">pyfftw</span></code> (makes calculations <em>much</em> faster; all-but-required)</li>
+<li><code class="docutils literal"><span class="pre">trackpy</span></code> (useful for analyzing the results and getting initial guesses;
+not required)</li>
+</ul>
+</dd>
+</dl>
+<p>Running <code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">peri</span></code> should install <code class="docutils literal"><span class="pre">peri</span></code> and its dependencies
+automatically. Sometimes I have trouble with dependencies on Windows machines.
+To get around this, try downloading the <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a> Python distribution,
+which includes nearly all of the <code class="docutils literal"><span class="pre">peri</span></code> dependencies. Alternatively, you can
+download the dependencies in 64-bit from Christopher Gohlke&#8217;s helpful website
+<a class="reference external" href="http://www.lfd.uci.edu/~gohlke/pythonlibs/">here</a>.</p>
+</div>
+<div class="section" id="source-code">
+<h3>Source code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h3>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Development builds of PERI may be unstable and not suitable for production
+use, install at your own risk.</p>
+</div>
+<p>Alternatively, you may install the development version from source. Currently,
+the repository is hosted on <a class="reference external" href="https://github.com/peri-source/peri">GitHub</a>.
+To download and install from source you can clone and install:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">peri</span><span class="o">-</span><span class="n">source</span><span class="o">/</span><span class="n">peri</span><span class="o">.</span><span class="n">git</span>
+<span class="n">cd</span> <span class="n">peri</span><span class="o">/</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
+</pre></div>
+</div>
+<p>After that, given you have properly set your <code class="code docutils literal"><span class="pre">PATH</span></code> variables (see
+above), you should have <code class="code docutils literal"><span class="pre">peri</span></code> on the command line.</p>
+<p>Source releases are also tagged on GitHub and can be accessed from the cloned
+repository. To install a particular release, go to the cloned repo and
+checkout the desired tags. These tags can be listed from command line:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">tag</span> <span class="o">-</span><span class="n">l</span>
+<span class="n">git</span> <span class="n">checkout</span> <span class="o">&lt;</span><span class="n">tag</span> <span class="n">name</span><span class="o">&gt;</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
+<p>If you find that featuring performance is poor for a particular image or you
+encounter a bug / issue, please reach out to the developers.</p>
+<div class="section" id="bugs-and-issues">
+<h3>Bugs and issues<a class="headerlink" href="#bugs-and-issues" title="Permalink to this headline">¶</a></h3>
+<p>Bugs and issues are currently reported through GitHub <a class="reference external" href="https://github.com/peri-source/peri/issues">issues</a>. In order to help us as much as
+possible to resolve the issue, please enable the highest verbosity in the
+<code class="docutils literal"><span class="pre">peri</span></code> logging system (<a class="reference internal" href="reference/logger.html#module-peri.logger" title="peri.logger"><code class="xref py py-class docutils literal"><span class="pre">logger</span></code></a>) and upload your logs along with a
+link to the image and run script / command line to the issue tracker.</p>
+</div>
+<div class="section" id="id3">
+<h3>Contributing<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Create a contributing doc which describes how to become a developer</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#id1">Installation</a><ul>
+<li><a class="reference internal" href="#quick-install">Quick install</a></li>
+<li><a class="reference internal" href="#source-code">Source code</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#contributing">Contributing</a><ul>
+<li><a class="reference internal" href="#bugs-and-issues">Bugs and issues</a></li>
+<li><a class="reference internal" href="#id3">Contributing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to PERI&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="walkthrough.html"
+                        title="next chapter">PERI Walkthrough</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/installation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="walkthrough.html" title="PERI Walkthrough"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to PERI’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

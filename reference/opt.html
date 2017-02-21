@@ -1,0 +1,1467 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>peri.opt &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="peri.runner" href="runner.html" />
+    <link rel="prev" title="peri.models" href="models.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="runner.html" title="peri.runner"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="peri.models"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="peri-opt">
+<h1>peri.opt<a class="headerlink" href="#peri-opt" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="#peri-opt-optimize"><span class="std std-ref">peri.opt.optimize</span></a><ul>
+<li>Functions:<ul>
+<li><a class="reference internal" href="#peri.opt.optimize.burn" title="peri.opt.optimize.burn"><code class="xref py py-func docutils literal"><span class="pre">peri.opt.optimize.burn()</span></code></a></li>
+<li><a class="reference internal" href="#peri.opt.optimize.finish" title="peri.opt.optimize.finish"><code class="xref py py-func docutils literal"><span class="pre">peri.opt.optimize.finish()</span></code></a></li>
+<li><a class="reference internal" href="#peri.opt.optimize.do_levmarq" title="peri.opt.optimize.do_levmarq"><code class="xref py py-func docutils literal"><span class="pre">peri.opt.optimize.do_levmarq()</span></code></a></li>
+<li><a class="reference internal" href="#peri.opt.optimize.do_levmarq_particles" title="peri.opt.optimize.do_levmarq_particles"><code class="xref py py-func docutils literal"><span class="pre">peri.opt.optimize.do_levmarq_particles()</span></code></a></li>
+<li><a class="reference internal" href="#peri.opt.optimize.do_levmarq_all_particle_groups" title="peri.opt.optimize.do_levmarq_all_particle_groups"><code class="xref py py-func docutils literal"><span class="pre">peri.opt.optimize.do_levmarq_all_particle_groups()</span></code></a></li>
+</ul>
+</li>
+<li>Classes:<ul>
+<li><a class="reference internal" href="#peri.opt.optimize.LMEngine" title="peri.opt.optimize.LMEngine"><code class="xref py py-class docutils literal"><span class="pre">peri.opt.optimize.LMEngine</span></code></a></li>
+<li><a class="reference internal" href="#peri.opt.optimize.LMGlobals" title="peri.opt.optimize.LMGlobals"><code class="xref py py-class docutils literal"><span class="pre">peri.opt.optimize.LMGlobals</span></code></a></li>
+<li><a class="reference internal" href="#peri.opt.optimize.LMParticles" title="peri.opt.optimize.LMParticles"><code class="xref py py-class docutils literal"><span class="pre">peri.opt.optimize.LMParticles</span></code></a></li>
+<li><a class="reference internal" href="#peri.opt.optimize.LMParticleGroupCollection" title="peri.opt.optimize.LMParticleGroupCollection"><code class="xref py py-class docutils literal"><span class="pre">peri.opt.optimize.LMParticleGroupCollection</span></code></a></li>
+<li><a class="reference internal" href="#peri.opt.optimize.LMAugmentedState" title="peri.opt.optimize.LMAugmentedState"><code class="xref py py-class docutils literal"><span class="pre">peri.opt.optimize.LMAugmentedState</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#peri-opt-addsubtract"><span class="std std-ref">peri.opt.addsubtract</span></a><ul>
+<li><a class="reference internal" href="#peri.opt.addsubtract.add_subtract" title="peri.opt.addsubtract.add_subtract"><code class="xref py py-func docutils literal"><span class="pre">peri.opt.addsubtract.add_subtract()</span></code></a></li>
+<li><a class="reference internal" href="#peri.opt.addsubtract.add_subtract_locally" title="peri.opt.addsubtract.add_subtract_locally"><code class="xref py py-func docutils literal"><span class="pre">peri.opt.addsubtract.add_subtract_locally()</span></code></a></li>
+<li><a class="reference internal" href="#peri.opt.addsubtract.feature_guess" title="peri.opt.addsubtract.feature_guess"><code class="xref py py-func docutils literal"><span class="pre">peri.opt.addsubtract.feature_guess()</span></code></a></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="peri-opt-optimize-burn">
+<h2>peri.opt.optimize.burn<a class="headerlink" href="#peri-opt-optimize-burn" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="peri.opt.optimize.burn">
+<code class="descclassname">peri.opt.optimize.</code><code class="descname">burn</code><span class="sig-paren">(</span><em>s</em>, <em>n_loop=6</em>, <em>collect_stats=False</em>, <em>desc=''</em>, <em>rz_order=0</em>, <em>fractol=0.0001</em>, <em>errtol=0.01</em>, <em>mode='burn'</em>, <em>max_mem=1000000000.0</em>, <em>include_rad=True</em>, <em>do_line_min='default'</em>, <em>partial_log=False</em>, <em>dowarn=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#burn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.burn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimizes all the parameters of a state.</p>
+<p>Burns a state through calling LMParticleGroupCollection and LMGlobals/
+LMAugmentedState.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>s</strong> (<a class="reference internal" href="states.html#peri.states.ImageState" title="peri.states.ImageState"><code class="xref py py-class docutils literal"><span class="pre">peri.states.ImageState</span></code></a>) &#8211; The state to optimize</li>
+<li><strong>n_loop</strong> (<em>Int</em><em>, </em><em>optional</em>) &#8211; The number of times to loop over in the optimizer. Default is 6.</li>
+<li><strong>collect_stats</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Whether or not to collect information on the optimizer&#8217;s
+performance. Default is False.</li>
+<li><strong>desc</strong> (<em>string</em><em>, </em><em>optional</em>) &#8211; Description to append to the states.save() call every loop.
+Set to None to avoid saving. Default is &#8216;&#8217;, which selects
+one of &#8216;burning&#8217;, &#8216;polishing&#8217;, &#8216;doing_positions&#8217;</li>
+<li><strong>rz_order</strong> (<em>Int</em><em>, </em><em>optional</em>) &#8211; Set to an int &gt; 0 to optimize with an augmented state (R(z) as
+a global parameter) vs. with the normal global parameters;
+rz_order is the order of the polynomial approximate for R(z).
+Default is 0 (no augmented state).</li>
+<li><strong>fractol</strong> (<em>Float</em><em>, </em><em>optional</em>) &#8211; Fractional change in error at which to terminate. Default 1e-4</li>
+<li><strong>errtol</strong> (<em>Float</em><em>, </em><em>optional</em>) &#8211; Absolute change in error at which to terminate. Default 1e-2</li>
+<li><strong>mode</strong> (<em>{'burn'</em><em>, </em><em>'do-particles'</em><em>, or </em><em>'polish'}</em><em>, </em><em>optional</em>) &#8211; What mode to optimize with.
+* &#8216;burn&#8217;          : Your state is far from the minimum.
+* &#8216;do-particles&#8217;  : Positions far from minimum, globals well-fit.
+* &#8216;polish&#8217;        : The state is close to the minimum.
+&#8216;burn&#8217; is the default. Only <cite>polish</cite> will get to the global
+minimum.</li>
+<li><strong>max_mem</strong> (<em>Numeric</em><em>, </em><em>optional</em>) &#8211; The maximum amount of memory allowed for the optimizers&#8217; J&#8217;s,
+for both particles &amp; globals. Default is 1e9, i.e. 1GB per
+optimizer.</li>
+<li><strong>do_line_min</strong> (<em>Bool</em><em> or </em><em>'default'</em><em>, </em><em>optional</em>) &#8211; Set to True to do an additional, third optimization per loop
+which optimizes along the subspace spanned by the last 3 steps
+of the burn()&#8217;s trajectory. In principle this should signifi-
+cantly speed up the convergence; in practice it sometimes does,
+sometimes doesn&#8217;t. Default is &#8216;default&#8217;, which picks by mode:
+* &#8216;burn&#8217;          : False
+* &#8216;do-particles&#8217;  : False
+* &#8216;polish&#8217;        : True</li>
+<li><strong>dowarn</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Whether to log a warning if termination results from finishing
+loops rather than from convergence. Default is True.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Dictionary of convergence information. Contains whether the
+optimization has converged (key <code class="docutils literal"><span class="pre">'converged'</span></code>), the values of the
+state after each loop (key <code class="docutils literal"><span class="pre">'all_loop_values'</span></code>).
+The values of the state&#8217;s parameters after each part of the
+loop: globals, particles, linemin. If <code class="docutils literal"><span class="pre">collect_stats</span></code> is set,
+then also contains lists of termination dicts from globals,
+particles, and line minimization (keys <code class="docutils literal"><span class="pre">'global_stats'</span></code>,
+<code class="docutils literal"><span class="pre">'particle_stats'</span></code>, and <code class="docutils literal"><span class="pre">'line_stats</span></code>&#8216;).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dictionary</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Proceeds by alternating between one Levenberg-Marquardt step
+optimizing the globals, one optimizing the particles, and repeating
+until termination.</p>
+<p>In addition, if <cite>do_line_min</cite> is True, at the end of each loop
+step an additional optimization is tried along the subspaced spanned
+by the steps taken during the last 3 loops. Ideally, this changes the
+convergence from linear to quadratic, but it doesn&#8217;t always do much.</p>
+<p>Each of the 3 options proceed by optimizing as follows:
+* burn            : lm.do_run_2(), lp.do_run_2(). No psf, 2 loops on lm.
+* do-particles    : lp.do_run_2(), scales for ilm, bkg&#8217;s
+* polish          : lm.do_run_2(), lp.do_run_2(). Everything, 1 loop each.
+where lm is a globals LMGlobals instance, and lp a
+LMParticleGroupCollection instance.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="peri-opt-optimize-finish">
+<h2>peri.opt.optimize.finish<a class="headerlink" href="#peri-opt-optimize-finish" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="peri.opt.optimize.finish">
+<code class="descclassname">peri.opt.optimize.</code><code class="descname">finish</code><span class="sig-paren">(</span><em>s</em>, <em>desc='finish'</em>, <em>n_loop=4</em>, <em>max_mem=1000000000.0</em>, <em>separate_psf=True</em>, <em>fractol=1e-07</em>, <em>errtol=0.001</em>, <em>dowarn=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#finish"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.finish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Crawls slowly to the minimum-cost state.</p>
+<p>Blocks the global parameters into small enough sections such that each
+can be optimized separately while including all the pixels (i.e. no
+decimation). Optimizes the globals, then the psf separately if desired,
+then particles, then a line minimization along the step direction to
+speed up convergence.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>s</strong> (<a class="reference internal" href="states.html#peri.states.ImageState" title="peri.states.ImageState"><code class="xref py py-class docutils literal"><span class="pre">peri.states.ImageState</span></code></a>) &#8211; The state to optimize</li>
+<li><strong>desc</strong> (<em>string</em><em>, </em><em>optional</em>) &#8211; Description to append to the states.save() call every loop.
+Set to <cite>None</cite> to avoid saving. Default is <cite>&#8216;finish&#8217;</cite>.</li>
+<li><strong>n_loop</strong> (<em>Int</em><em>, </em><em>optional</em>) &#8211; The number of times to loop over in the optimizer. Default is 4.</li>
+<li><strong>max_mem</strong> (<em>Numeric</em><em>, </em><em>optional</em>) &#8211; The maximum amount of memory allowed for the optimizers&#8217; J&#8217;s,
+for both particles &amp; globals. Default is 1e9.</li>
+<li><strong>separate_psf</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; If True, does the psf optimization separately from the rest of
+the globals, since the psf has a more tortuous fit landscape.
+Default is True.</li>
+<li><strong>fractol</strong> (<em>Float</em><em>, </em><em>optional</em>) &#8211; Fractional change in error at which to terminate. Default 1e-4</li>
+<li><strong>errtol</strong> (<em>Float</em><em>, </em><em>optional</em>) &#8211; Absolute change in error at which to terminate. Default 1e-2</li>
+<li><strong>dowarn</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Whether to log a warning if termination results from finishing
+loops rather than from convergence. Default is True.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Information about the optimization. Has two keys: <code class="docutils literal"><span class="pre">'converged'</span></code>,
+a Bool which of whether optimization stopped due to convergence
+(True) or due to max number of iterations (False), and
+<code class="docutils literal"><span class="pre">'loop_values'</span></code>, a [n_loop+1, N] <code class="docutils literal"><span class="pre">numpy.ndarray</span></code> of the
+state&#8217;s values, at the start of optimization and at the end of
+each loop, before the line minimization.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dictionary</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="section" id="peri-opt-optimize">
+<span id="id1"></span><h3>peri.opt.optimize<a class="headerlink" href="#peri-opt-optimize" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="peri-opt-optimize-functions">
+<h2>peri.opt.optimize functions<a class="headerlink" href="#peri-opt-optimize-functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="peri.opt.optimize.do_levmarq">
+<code class="descclassname">peri.opt.optimize.</code><code class="descname">do_levmarq</code><span class="sig-paren">(</span><em>s</em>, <em>param_names</em>, <em>damping=0.1</em>, <em>decrease_damp_factor=10.0</em>, <em>run_length=6</em>, <em>eig_update=True</em>, <em>collect_stats=False</em>, <em>rz_order=0</em>, <em>run_type=2</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#do_levmarq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.do_levmarq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs Levenberg-Marquardt optimization on a state.</p>
+<p>Convenience wrapper for LMGlobals. Same keyword args, but the defaults
+have been set to useful values for optimizing globals.
+See LMGlobals and LMEngine for documentation.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><code class="xref py py-func docutils literal"><span class="pre">do_levmarq_particles()</span></code></dt>
+<dd>Levenberg-Marquardt optimization of a specified set of particles.</dd>
+<dt><code class="xref py py-func docutils literal"><span class="pre">do_levmarq_all_particle_groups()</span></code></dt>
+<dd>Levenberg-Marquardt optimization of all the particles in the state.</dd>
+<dt><code class="xref py py-func docutils literal"><span class="pre">LMGlobals()</span></code></dt>
+<dd>Optimizer object; the workhorse of do_levmarq.</dd>
+<dt><code class="xref py py-func docutils literal"><span class="pre">LMEngine()</span></code></dt>
+<dd>Engine superclass for all the optimizers.</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.opt.optimize.do_levmarq_all_particle_groups">
+<code class="descclassname">peri.opt.optimize.</code><code class="descname">do_levmarq_all_particle_groups</code><span class="sig-paren">(</span><em>s</em>, <em>region_size=40</em>, <em>max_iter=2</em>, <em>damping=1.0</em>, <em>decrease_damp_factor=10.0</em>, <em>run_length=4</em>, <em>collect_stats=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#do_levmarq_all_particle_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.do_levmarq_all_particle_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Levenberg-Marquardt optimization for every particle in the state.</p>
+<p>Convenience wrapper for LMParticleGroupCollection. Same keyword args,
+but I&#8217;ve set the defaults to what I&#8217;ve found to be useful values for
+optimizing particles. See LMParticleGroupCollection for documentation.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><code class="xref py py-func docutils literal"><span class="pre">do_levmarq_particles()</span></code></dt>
+<dd>Levenberg-Marquardt optimization of a specified set of particles.</dd>
+<dt><code class="xref py py-func docutils literal"><span class="pre">do_levmarq()</span></code></dt>
+<dd>Levenberg-Marquardt optimization of the entire state; useful for optimizing global parameters.</dd>
+<dt><code class="xref py py-func docutils literal"><span class="pre">LMParticleGroupCollection()</span></code></dt>
+<dd>The workhorse of do_levmarq.</dd>
+<dt><code class="xref py py-func docutils literal"><span class="pre">LMEngine()</span></code></dt>
+<dd>Engine superclass for all the optimizers.</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.opt.optimize.do_levmarq_particles">
+<code class="descclassname">peri.opt.optimize.</code><code class="descname">do_levmarq_particles</code><span class="sig-paren">(</span><em>s</em>, <em>particles</em>, <em>damping=1.0</em>, <em>decrease_damp_factor=10.0</em>, <em>run_length=4</em>, <em>collect_stats=False</em>, <em>max_iter=2</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#do_levmarq_particles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.do_levmarq_particles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Levenberg-Marquardt optimization on a set of particles.</p>
+<p>Convenience wrapper for LMParticles. Same keyword args, but the
+defaults have been set to useful values for optimizing particles.
+See LMParticles and LMEngine for documentation.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><code class="xref py py-func docutils literal"><span class="pre">do_levmarq_all_particle_groups()</span></code></dt>
+<dd>Levenberg-Marquardt optimization of all the particles in the state.</dd>
+<dt><code class="xref py py-func docutils literal"><span class="pre">do_levmarq()</span></code></dt>
+<dd>Levenberg-Marquardt optimization of the entire state; useful for optimizing global parameters.</dd>
+<dt><code class="xref py py-func docutils literal"><span class="pre">LMParticles()</span></code></dt>
+<dd>Optimizer object; the workhorse of do_levmarq_particles.</dd>
+<dt><code class="xref py py-func docutils literal"><span class="pre">LMEngine()</span></code></dt>
+<dd>Engine superclass for all the optimizers.</dd>
+</dl>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="peri-opt-optimize-classes">
+<h2>peri.opt.optimize classes<a class="headerlink" href="#peri-opt-optimize-classes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="peri.opt.optimize.LMEngine">
+<em class="property">class </em><code class="descclassname">peri.opt.optimize.</code><code class="descname">LMEngine</code><span class="sig-paren">(</span><em>damping=1.0</em>, <em>increase_damp_factor=3.0</em>, <em>decrease_damp_factor=8.0</em>, <em>min_eigval=1e-13</em>, <em>marquardt_damping=False</em>, <em>transtrum_damping=None</em>, <em>use_accel=False</em>, <em>max_accel_correction=1.0</em>, <em>paramtol=1e-06</em>, <em>errtol=1e-05</em>, <em>exptol=0.001</em>, <em>fractol=1e-06</em>, <em>costol=None</em>, <em>max_iter=5</em>, <em>run_length=5</em>, <em>update_J_frequency=1</em>, <em>broyden_update=True</em>, <em>eig_update=False</em>, <em>eig_update_frequency=3</em>, <em>num_eig_dirs=8</em>, <em>eig_dl=1e-05</em>, <em>broyden_update_frequency=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Levenberg-Marquardt engine with all the options from the M. Transtrum
+J. Sethna 2012 ArXiV paper <a class="footnote-reference" href="#id3" id="id2">[1]</a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>damping</strong> (<em>Float</em><em>, </em><em>optional</em>) &#8211; The initial damping factor for Levenberg-Marquardt. Adjusted
+internally. Default is 1.</li>
+<li><strong>increase_damp_factor</strong> (<em>Float</em><em>, </em><em>optional</em>) &#8211; The amount to increase damping by when an attempted step
+has failed. Default is 3.</li>
+<li><strong>decrease_damp_factor</strong> (<em>Float</em><em>, </em><em>optional</em>) &#8211; The amount to decrease damping by after a successful step.
+Default is 8. increase_damp_factor and decrease_damp_factor
+must not have all the same factors.</li>
+<li><strong>min_eigval</strong> (<em>Float scalar</em><em>, </em><em>optional</em><em>, </em><em>&lt;&lt;1.</em>) &#8211; The minimum eigenvalue to use in inverting the JTJ matrix,
+to avoid degeneracies in the parameter space (i.e. &#8216;rcond&#8217;
+in np.linalg.lstsq). Default is 1e-12.</li>
+<li><strong>marquardt_damping</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Set to False to use Levenberg damping (damping matrix
+proportional to the identiy) instead of Marquardt damping
+(damping matrix proportional to the diagonal terms of JTJ).
+Default is False.</li>
+<li><strong>transtrum_damping</strong> (<em>Float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) &#8211; If not None, then clips the Marquardt damping diagonal
+entries to be at least transtrum_damping. Default is None.</li>
+<li><strong>use_accel</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Set to True to incorporate the geodesic acceleration term
+from M. Transtrum J. Sethna 2012. Default is False.</li>
+<li><strong>max_accel_correction</strong> (<em>Float</em><em>, </em><em>optional</em>) &#8211; Acceleration corrections bigger than max_accel_correction times
+the normal LM step are viewed as bad steps, causing a
+decrease in damping. Default is 1.0. Only applies to the
+do_run_1 method.</li>
+<li><strong>paramtol</strong> (<em>Float</em><em>, </em><em>optional</em>) &#8211; Algorithm has converged when the none of the parameters have
+changed by more than paramtol. Default is 1e-6.</li>
+<li><strong>errtol</strong> (<em>Float</em><em>, </em><em>optional</em>) &#8211; Algorithm has converged when the error has changed by less
+than errtol after 1 step. Default is 1e-6.</li>
+<li><strong>exptol</strong> (<em>Float</em><em>, </em><em>optional</em>) &#8211; Algorithm has converged when the expected change in error is
+less than exptol. Default is 1e-3.</li>
+<li><strong>fractol</strong> (<em>Float</em><em>, </em><em>optional</em>) &#8211; Algorithm has converged when the error has changed by a
+fractional amount less than fractol after 1 step.
+Default is 1e-6.</li>
+<li><strong>costol</strong> (<em>Float</em><em>, </em><em>optional</em>) &#8211; Algorithm has converged when the cosine of the angle between
+(residuals projected onto the model manifold) and (the
+residuals) is &lt; costol. Default is None, i.e. doesn&#8217;t check
+the cosine (since it takes a bit of time).</li>
+<li><strong>max_iter</strong> (<em>Int</em><em>, </em><em>optional</em>) &#8211; The maximum number of iterations before the algorithm
+stops iterating. Default is 5.</li>
+<li><strong>update_J_frequency</strong> (<em>Int</em><em>, </em><em>optional</em>) &#8211; The frequency to re-calculate the full Jacobian matrix.
+Default is 2, i.e. every other run.</li>
+<li><strong>broyden_update</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Set to True to do a Broyden partial update on J after
+each step, updating the projection of J along the
+parameter change direction. Cheap in time cost, but not
+always accurate. Default is False.</li>
+<li><strong>eig_update</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Set to True to update the projection of J along the most
+stiff eigendirections of JTJ. Slower than broyden but
+more accurate &amp; useful. Default is False.</li>
+<li><strong>num_eig_dirs</strong> (<em>Int</em><em>, </em><em>optional</em>) &#8211; If eig_update == True, the number of eigendirections to
+update when doing the eigen update. Default is 4.</li>
+<li><strong>eig_update_frequency</strong> (<em>Int</em><em>, </em><em>optional</em>) &#8211; If eig_update, the frequency to do this partial update.
+Default is 3.</li>
+<li><strong>broyden_update_frequency</strong> (<em>Int</em><em>, </em><em>optional</em>) &#8211; If broyden_update, the frequency to do this partial update.
+Default is 1.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="LMEngine.J">
+<code class="descname">J</code><a class="headerlink" href="#LMEngine.J" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> &#8211; The calculated J for Levenberg-Marquardt. Starts as <cite>None</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="LMEngine.JTJ">
+<code class="descname">JTJ</code><a class="headerlink" href="#LMEngine.JTJ" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> &#8211; The approximation to the fit Hessian; np.dot(J, J.T)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="LMEngine.damping">
+<code class="descname">damping</code><a class="headerlink" href="#LMEngine.damping" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy.ndarray</em> &#8211; The current damping vector for the parameters.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="LMEngine._num_iter">
+<code class="descname">_num_iter</code><a class="headerlink" href="#LMEngine._num_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Int</em> &#8211; The number of iterations ran in the current cycle. Don&#8217;t touch</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><em>new_damping=None</em><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets all counters etc so a new run can commence.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.do_run_1">
+<code class="descname">do_run_1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.do_run_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method 1 for optimization.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.do_run_2">
+<code class="descname">do_run_2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.do_run_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method 2 for optimization</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.do_internal_run">
+<code class="descname">do_internal_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.do_internal_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Additional, slight optimization once J has been calculated</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.find_LM_updates">
+<code class="descname">find_LM_updates</code><span class="sig-paren">(</span><em>grad</em>, <em>do_correct_damping=True</em>, <em>subblock=None</em><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.find_LM_updates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Levenberg-Marquardt step.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.increase_damping">
+<code class="descname">increase_damping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.increase_damping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increases damping</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.decrease_damping">
+<code class="descname">decrease_damping</code><span class="sig-paren">(</span><em>undo_decrease=False</em><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.decrease_damping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decreases damping or undoes a previous decrease.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.update_param_vals">
+<code class="descname">update_param_vals</code><span class="sig-paren">(</span><em>new_vals</em>, <em>incremental=False</em><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.update_param_vals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the current set of parameter values and previous
+values, sets a flag to re-calculate J.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.calc_model_cosine">
+<code class="descname">calc_model_cosine</code><span class="sig-paren">(</span><em>decimate=None</em><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.calc_model_cosine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the cosine of the residuals with the current
+model tangent space J</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.get_termination_stats">
+<code class="descname">get_termination_stats</code><span class="sig-paren">(</span><em>get_cos=True</em><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.get_termination_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict of termination statistics</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.check_completion">
+<code class="descname">check_completion</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.check_completion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the algorithm has found a satisfactory minimum</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.check_termination">
+<code class="descname">check_termination</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.check_termination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the algorithm should terminate</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.update_J">
+<code class="descname">update_J</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.update_J" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates J, JTJ</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.calc_grad">
+<code class="descname">calc_grad</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.calc_grad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the gradient of the cost w.r.t. the parameters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.update_Broyden_J">
+<code class="descname">update_Broyden_J</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.update_Broyden_J" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a Broyden update of J</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.update_eig_J">
+<code class="descname">update_eig_J</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.update_eig_J" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute an eigen update of J</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.calc_accel_correction">
+<code class="descname">calc_accel_correction</code><span class="sig-paren">(</span><em>damped_JTJ</em>, <em>delta0</em><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.calc_accel_correction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the geodesic acceleration correction to the
+standard Levenberg-Marquardt step.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMEngine.update_select_J">
+<code class="descname">update_select_J</code><span class="sig-paren">(</span><em>blk</em><span class="sig-paren">)</span><a class="headerlink" href="#LMEngine.update_select_J" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates J only for certain parameters, described by the
+boolean mask <cite>blk</cite>.</p>
+</dd></dl>
+
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMFunction</span></code></dt>
+<dd>Levenberg-Marquardt (LM) optimization for a user- supplied function.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMGlobals</span></code></dt>
+<dd>LM optimization designed for optimizing state globals.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMParticles</span></code></dt>
+<dd>LM optimization designed for optimizing state particles.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMParticleGroupCollection</span></code></dt>
+<dd>LM optimization on all particles in a state.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMAugmentedState</span></code></dt>
+<dd>LMGlobals with additional R(z) parameters.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMOptObj</span></code></dt>
+<dd>...</dd>
+</dl>
+</div>
+<p class="rubric">Notes</p>
+<p>There are 3 different options for optimizing:</p>
+<ul>
+<li><dl class="first docutils">
+<dt>do_run_1():</dt>
+<dd><p class="first last">Checks to calculate full, Broyden, and eigen J, then tries a step.
+If the step is accepted, decreases damping; if not, increases.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>do_run_2():</dt>
+<dd><p class="first last">Checks to calculate full, Broyden, and eigen J, then tries a
+step with the current damping and with a decreased damping,
+accepting whichever is lower. Decreases damping iff the lower
+damping is better. It then calls do_internal_run() (see below).
+Rejected steps result in increased damping until a step is
+accepted. Checks for full, Broyden, and eigen J updates.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>do_internal_run():</dt>
+<dd><p class="first last">Checks for Broyden and eigen J updates only, then uses
+pre-calculated J, JTJ, etc to evaluate LM steps. Does
+not change damping during the run. Does not check do update
+the full J, but does check for Broyden, eigen updates.
+Does not work if J has not been evaluated yet.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Whether to update the full J is controlled by update_J_frequency only,
+which only counts iterations of do_run_1() and do_run_2().
+Partial updates are controlled by <cite>*_update_frequency</cite>, which
+counts internal runs in do_internal_run and full runs in do_run_1.</p>
+<p>So, if you want a partial update every other run, full J the remaining,
+this would be:</p>
+<ul class="simple">
+<li>do_run_1(): update_J_frequency=2, partial_update_frequency=1</li>
+<li>do_run_2(): update_J_frequency=1, partial_update_frequency=1, run_length=2</li>
+</ul>
+<p>Partial Updates:</p>
+<ul>
+<li><dl class="first docutils">
+<dt>Broyden update <span class="classifier-delimiter">:</span> <span class="classifier">an update to J (and then JTJ) by approximating the</span></dt>
+<dd><p class="first last">derivative of the model as the finite difference of the last
+step. (rank-1)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Eigen update <span class="classifier-delimiter">:</span> <span class="classifier">a rank-num_eig_dirs update to J (and then JTJ) by</span></dt>
+<dd><p class="first last">finite-differencing with eig_dl along the highest num_eig_dirs
+eigendirections.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Damping:</p>
+<ul class="simple">
+<li>marquardt : Damp proportional to the diagonal elements of JTJ</li>
+<li>transtrum : Marquardt damping, clipped to be at least a certain number</li>
+<li>default   : (levenberg) Damp using something proportional to the identity</li>
+</ul>
+<p class="rubric">References</p>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>M. Transtrum and J. Sethna, &#8220;Improvements to the Levenberg-
+Marquardt algorithm for nonlinear least-squares minimization,&#8221;
+ArXiV preprint arXiv:1201.5885 (2012)</td></tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><em>new_damping=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keeps all user supplied options the same, but resets counters etc.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.calc_J">
+<code class="descname">calc_J</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.calc_J"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.calc_J" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates self.J, returns nothing</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.calc_residuals">
+<code class="descname">calc_residuals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.calc_residuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.calc_residuals" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns residuals = data - model.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.update_function">
+<code class="descname">update_function</code><span class="sig-paren">(</span><em>param_vals</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.update_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.update_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes an array param_vals, updates function, returns the new error</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.do_run_1">
+<code class="descname">do_run_1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.do_run_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.do_run_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>LM run, evaluating 1 step at a time.</p>
+<p>Broyden or eigendirection updates replace full-J updates until
+a full-J update occurs. Does not run with the calculated J (no
+internal run).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.do_run_2">
+<code class="descname">do_run_2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.do_run_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.do_run_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>LM run evaluating 2 steps (damped and not) and choosing the best.</p>
+<p>After finding the best of 2 steps, runs with that damping + Broyden
+or eigendirection updates, until deciding to do a full-J update.
+Only changes damping after full-J updates.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.do_internal_run">
+<code class="descname">do_internal_run</code><span class="sig-paren">(</span><em>initial_count=0</em>, <em>subblock=None</em>, <em>update_derr=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.do_internal_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.do_internal_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes more steps without calculating J again.</p>
+<p>Given a fixed damping, J, JTJ, iterates calculating steps, with
+optional Broyden or eigendirection updates. Iterates either until
+a bad step is taken or for self.run_length times.
+Called internally by do_run_2() but is also useful on its own.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>initial_count</strong> (<em>Int</em><em>, </em><em>optional</em>) &#8211; The initial count of the run. Default is 0. Increasing from
+0 effectively temporarily decreases run_length.</li>
+<li><strong>subblock</strong> (<em>None</em><em> or </em><em>np.ndarray of bools</em><em>, </em><em>optional</em>) &#8211; If not None, a boolean mask which determines which sub-
+block of parameters to run over. Default is None, i.e.
+all the parameters.</li>
+<li><strong>update_derr</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Set to False to not update the variable that determines
+delta_err, preventing premature termination through errtol.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>It might be good to do something similar to update_derr with the
+parameter values, but this is trickier because of Broyden updates
+and _fresh_J.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.find_LM_updates">
+<code class="descname">find_LM_updates</code><span class="sig-paren">(</span><em>grad</em>, <em>do_correct_damping=True</em>, <em>subblock=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.find_LM_updates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.find_LM_updates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates LM updates, with or without the acceleration correction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>grad</strong> (<em>numpy.ndarray</em>) &#8211; The gradient of the model cost.</li>
+<li><strong>do_correct_damping</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; If <cite>self.use_accel</cite>, then set to True to correct damping
+if the acceleration correction is too big. Default is True
+Does nothing is <cite>self.use_accel</cite> is False</li>
+<li><strong>subblock</strong> (<em>slice</em><em>, </em><em>numpy.ndarray</em><em>, or </em><em>None</em><em>, </em><em>optional</em>) &#8211; Set to a slice or a valide numpy.ndarray to use only a
+certain subset of the parameters. Default is None, i.e.
+use all the parameters.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>delta</strong> &#8211; The Levenberg-Marquadt step, relative to the old
+parameters. Size is always self.param_vals.size.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.update_param_vals">
+<code class="descname">update_param_vals</code><span class="sig-paren">(</span><em>new_vals</em>, <em>incremental=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.update_param_vals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.update_param_vals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the current set of parameter values and previous values,
+sets a flag to re-calculate J.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>new_vals</strong> (<em>numpy.ndarray</em>) &#8211; The new values to update to</li>
+<li><strong>incremental</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Set to True to make it an incremental update relative
+to the old parameters. Default is False</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.find_expected_error">
+<code class="descname">find_expected_error</code><span class="sig-paren">(</span><em>delta_params='calc'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.find_expected_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.find_expected_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the error expected after an update if the model were linear.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>delta_params</strong> (<em>{numpy.ndarray</em><em>, </em><em>'calc'</em><em>, or </em><em>'perfect'}</em><em>, </em><em>optional</em>) &#8211; The relative change in parameters. If &#8216;calc&#8217;, uses update
+calculated from the current damping, J, etc; if &#8216;perfect&#8217;,
+uses the update calculated with zero damping.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The expected error after the update with <cite>delta_params</cite></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.float64</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.calc_model_cosine">
+<code class="descname">calc_model_cosine</code><span class="sig-paren">(</span><em>decimate=None</em>, <em>mode='err'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.calc_model_cosine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.calc_model_cosine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the cosine of the residuals with the model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>decimate</strong> (<em>Int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) &#8211; Decimate the residuals by <cite>decimate</cite> pixels. If None, no
+decimation is used. Valid only with mode=&#8217;svd&#8217;. Default
+is None</li>
+<li><strong>mode</strong> (<em>{'svd'</em><em>, </em><em>'err'}</em>) &#8211; Which mode to use; see Notes section. Default is &#8216;err&#8217;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>abs_cos</strong> &#8211; The absolute value of the model cosine.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.float64</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The model cosine is defined in terms of the geometric view of
+curve-fitting, as a model manifold embedded in a high-dimensional
+space. The model cosine is the cosine of the residuals vector
+with its projection on the tangent space: <span class="math">\(cos(phi) = |P^T r|/|r|\)</span>
+where <span class="math">\(P^T\)</span> is the projection operator onto the model manifold
+and <span class="math">\(r\)</span> the residuals. This can be calculated two ways: By
+calculating the projection operator P directly with SVD (mode=`svd`),
+or by using the expected error if the model were linear to calculate
+a model sine first (mode=`err`). Since the SVD of a large matrix is
+slow, mode=`err` is faster.</p>
+<p><cite>decimate</cite> allows for every nth pixel only to be counted in the
+SVD matrix of J for speed. While this is n x faster, it is
+considerably less accurate, so the default is no decimation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.get_termination_stats">
+<code class="descname">get_termination_stats</code><span class="sig-paren">(</span><em>get_cos=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.get_termination_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.get_termination_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict of termination statistics</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>get_cos</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Whether or not to calcualte the cosine of the residuals
+with the tangent plane of the model using the current J.
+The calculation may take some time. Default is True</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Has keys</dt>
+<dd>delta_vals  : The last change in parameter values.
+delta_err   : The last change in the error.
+exp_err     : The expected (last) change in the error.
+frac_err    : The fractional change in the error.
+num_iter    : The number of iterations completed.
+error       : The current error.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.check_completion">
+<code class="descname">check_completion</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.check_completion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.check_completion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Bool of whether the algorithm has found a satisfactory minimum</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.check_terminate">
+<code class="descname">check_terminate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.check_terminate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.check_terminate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Bool of whether to terminate.</p>
+<p>Checks whether a satisfactory minimum has been found or whether
+too many iterations have occurred.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.check_update_J">
+<code class="descname">check_update_J</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.check_update_J"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.check_update_J" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the full J should be updated.</p>
+<p>Right now, just updates after update_J_frequency loops</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.update_J">
+<code class="descname">update_J</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.update_J"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.update_J" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates J, JTJ, and internal counters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.calc_grad">
+<code class="descname">calc_grad</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.calc_grad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.calc_grad" title="Permalink to this definition">¶</a></dt>
+<dd><p>The gradient of the cost w.r.t. the parameters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.update_Broyden_J">
+<code class="descname">update_Broyden_J</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.update_Broyden_J"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.update_Broyden_J" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a Broyden update of J</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.update_eig_J">
+<code class="descname">update_eig_J</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.update_eig_J"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.update_eig_J" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute an eigen update of J</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.calc_accel_correction">
+<code class="descname">calc_accel_correction</code><span class="sig-paren">(</span><em>damped_JTJ</em>, <em>delta0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.calc_accel_correction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.calc_accel_correction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Geodesic acceleration correction to the LM step.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>damped_JTJ</strong> (<em>numpy.ndarray</em>) &#8211; The damped JTJ used to calculate the initial step.</li>
+<li><strong>delta0</strong> (<em>numpy.ndarray</em>) &#8211; The initial LM step.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>corr</strong> &#8211; The correction to the original LM step.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.opt.optimize.LMEngine.update_select_J">
+<code class="descname">update_select_J</code><span class="sig-paren">(</span><em>blk</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMEngine.update_select_J"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMEngine.update_select_J" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates J only for certain parameters, described by the boolean
+mask <cite>blk</cite>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="peri.opt.optimize.LMGlobals">
+<em class="property">class </em><code class="descclassname">peri.opt.optimize.</code><code class="descname">LMGlobals</code><span class="sig-paren">(</span><em>state</em>, <em>param_names</em>, <em>max_mem=1000000000.0</em>, <em>opt_kwargs={}</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMGlobals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMGlobals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Levenberg-Marquardt, optimized for state globals.</p>
+<p>Contains alll the options from the M. Transtrum J. Sethna 2012 ArXiV
+paper. See LMEngine for further documentation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>state</strong> (<a class="reference internal" href="states.html#peri.states.State" title="peri.states.State"><code class="xref py py-class docutils literal"><span class="pre">peri.states.State</span></code></a>) &#8211; The state to optimize. Stored as self.state.</li>
+<li><strong>param_names</strong> (<em>List</em>) &#8211; List of the parameter names (strings) to optimize over. Stored
+as self.param_names.</li>
+<li><strong>max_mem</strong> (<em>Numeric</em><em>, </em><em>optional</em>) &#8211; The maximum memory to use for the optimization; controls pixel
+decimation. Default is 1e9. Stored as self.max_mem</li>
+<li><strong>opt_kwargs</strong> (<em>Dict</em><em>, </em><em>optional</em>) &#8211; Dict of <code class="docutils literal"><span class="pre">**kwargs</span></code> for opt implementation. Right now only for
+get_num_px_jtj, i.e. keys of &#8216;decimate&#8217;, &#8216;min_redundant&#8217;.
+Default is <cite>{}</cite>. Stored as self.opt_kwargs</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="LMGlobals.num_pix">
+<code class="descname">num_pix</code><a class="headerlink" href="#LMGlobals.num_pix" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Int</em> &#8211; The number of pixels of the residuals used to calculate J.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMGlobals.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>new_param_names</em>, <em>new_damping=None</em><span class="sig-paren">)</span><a class="headerlink" href="#LMGlobals.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the parameter names to optimize.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMGlobals.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><em>new_damping=None</em><span class="sig-paren">)</span><a class="headerlink" href="#LMGlobals.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets counters etc to zero, allowing more runs to commence.</p>
+</dd></dl>
+
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMEngine</span></code></dt>
+<dd>Parent class for all Levenberg-Marquardt (LM) optimization</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMParticles</span></code></dt>
+<dd>LM optimization designed for optimizing state particles.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMParticleGroupCollection</span></code></dt>
+<dd>LM optimization on all particles in a state.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMAugmentedState</span></code></dt>
+<dd>LMGlobals with additional R(z) parameters.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">do_levmarq</span></code></dt>
+<dd>Convenience function for LMGlobals</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">do_levmarq_particles</span></code></dt>
+<dd>Convenience function for optimizing particles</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="peri.opt.optimize.LMParticles">
+<em class="property">class </em><code class="descclassname">peri.opt.optimize.</code><code class="descname">LMParticles</code><span class="sig-paren">(</span><em>state</em>, <em>particles</em>, <em>include_rad=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMParticles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMParticles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Levenberg-Marquardt, optimized for state globals.</p>
+<p>Contains alll the options from the M. Transtrum J. Sethna 2012 ArXiV
+paper. See LMEngine for further documentation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>state</strong> (<a class="reference internal" href="states.html#peri.states.ImageState" title="peri.states.ImageState"><code class="xref py py-class docutils literal"><span class="pre">peri.states.ImageState</span></code></a>) &#8211; The state to optimize</li>
+<li><strong>particles</strong> (<em>numpy.ndarray</em>) &#8211; Array of the particle indices to optimize over.</li>
+<li><strong>include_rad</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Whether or not to include the particle radii in the
+optimization. Default is True</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="LMParticles.param_names">
+<code class="descname">param_names</code><a class="headerlink" href="#LMParticles.param_names" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>List</em> &#8211; The list of the parameter names being optimized.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMParticles.set_particles">
+<code class="descname">set_particles</code><span class="sig-paren">(</span><em>new_particles</em>, <em>new_damping=None</em><span class="sig-paren">)</span><a class="headerlink" href="#LMParticles.set_particles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the particle to optimize.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMParticles.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><em>new_damping=None</em><span class="sig-paren">)</span><a class="headerlink" href="#LMParticles.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets counters etc to zero, allowing more runs to commence.</p>
+</dd></dl>
+
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMEngine</span></code></dt>
+<dd>Parent class for all Levenberg-Marquardt (LM) optimization</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMGlobals</span></code></dt>
+<dd>LM optimization designed for optimizing state global parameters.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMParticleGroupCollection</span></code></dt>
+<dd>LM optimization on all particles in a state.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMAugmentedState</span></code></dt>
+<dd>LMGlobals with additional R(z) parameters.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">do_levmarq</span></code></dt>
+<dd>Convenience function for LMGlobals</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">do_levmarq_particles</span></code></dt>
+<dd>Convenience function for optimizing particles</dd>
+</dl>
+</div>
+<p class="rubric">Notes</p>
+<p>To prevent the state updates from breaking, this clips the particle
+rads to [self._MINRAD, self._MAXRAD] and the positions to at least
+self._MINDIST from the edge of the padded image. These are:
+* <code class="docutils literal"><span class="pre">_MINRAD</span></code>  : 1e-3
+* <code class="docutils literal"><span class="pre">_MAXRAD</span></code>  : 2e2
+* <code class="docutils literal"><span class="pre">_MINDIST</span></code> : 1e-3
+For extremely large particles (e.g. larger than _MAXRAD or larger than
+the pad and barely overlapping the image) these numbers might be
+insufficient.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="peri.opt.optimize.LMParticleGroupCollection">
+<em class="property">class </em><code class="descclassname">peri.opt.optimize.</code><code class="descname">LMParticleGroupCollection</code><span class="sig-paren">(</span><em>state</em>, <em>region_size=40</em>, <em>do_calc_size=True</em>, <em>max_mem=1000000000.0</em>, <em>get_cos=False</em>, <em>save_J=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMParticleGroupCollection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMParticleGroupCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Levenberg-Marquardt on all particles in a state.</p>
+<p>Convenience wrapper for LMParticles. Generates a separate instance
+for the particle groups each time and optimizes with that, since
+storing J for the particles is too large.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>state</strong> (<a class="reference internal" href="states.html#peri.states.ImageState" title="peri.states.ImageState"><code class="xref py py-class docutils literal"><span class="pre">peri.states.ImageState</span></code></a>) &#8211; The state to optimize</li>
+<li><strong>region_size</strong> (<em>Int</em><em> or </em><em>3-element list-like of ints</em><em>, </em><em>optional</em>) &#8211; The region size for sub-blocking particles. Default is 40</li>
+<li><strong>do_calc_size</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; If True, calculates the region size internally based on
+the maximum allowed memory. Default is True</li>
+<li><strong>max_mem</strong> (<em>Numeric</em><em>, </em><em>optional</em>) &#8211; The maximum allowed memory for J to occupy. Default is 1e9</li>
+<li><strong>get_cos</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Set to True to include the model cosine in the statistics
+on each individual group&#8217;s run, using <cite>LMEngine</cite>
+get_termination_stats(). Stored in self.stats. Default is
+False</li>
+<li><strong>save_J</strong> (<em>Bool</em>) &#8211; Set to True to create a series of temp files that save J
+for each group of particles. Needed for do_internal_run().
+Default is False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Other Parameters:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>Pass any kwargs that would be passed to LMParticles. Stored in</strong></li>
+<li><strong>self._kwargs for reference.</strong></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="LMParticleGroupCollection.stats">
+<code class="descname">stats</code><a class="headerlink" href="#LMParticleGroupCollection.stats" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>List</em> &#8211; A list of the termination stats for each sub-block of particles</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="LMParticleGroupCollection.particle_groups">
+<code class="descname">particle_groups</code><a class="headerlink" href="#LMParticleGroupCollection.particle_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>List</em> &#8211; A list of particle groups. Element [i] in the list is a
+numpy.ndarray of the indices in group [i].</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="LMParticleGroupCollection.region_size">
+<code class="descname">region_size</code><a class="headerlink" href="#LMParticleGroupCollection.region_size" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Int or 3-element list-like</em> &#8211; The region size of the tiles. If <cite>do_calc_size</cite> is True,
+region_size will be the calculated value, which may differ
+from the input value.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="LMParticleGroupCollection._kwargs">
+<code class="descname">_kwargs</code><a class="headerlink" href="#LMParticleGroupCollection._kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Dict</em> &#8211; The <code class="docutils literal"><span class="pre">**kwargs</span></code> passed to LMParticles.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMParticleGroupCollection.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#LMParticleGroupCollection.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Re-calculate all the groups</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMParticleGroupCollection.do_run_1">
+<code class="descname">do_run_1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#LMParticleGroupCollection.do_run_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run do_run_1 for every group of particles</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMParticleGroupCollection.do_run_2">
+<code class="descname">do_run_2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#LMParticleGroupCollection.do_run_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run do_run_2 for every group of particles</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMParticleGroupCollection.do_internal_run">
+<code class="descname">do_internal_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#LMParticleGroupCollection.do_internal_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run do_internal_run for every group of particles</p>
+</dd></dl>
+
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMParticles</span></code></dt>
+<dd>LM optimization designed for optimizing state particles.</dd>
+</dl>
+</div>
+<p class="rubric">Notes</p>
+<p>Since storing J for many particles can require a huge amount of
+memory, this object proceeds by re-initializing a separate LMParticles
+instance for each group of particles, calculating and then discarding
+J each time. The calculated J&#8217;s can be kept by setting <cite>save_J</cite> to
+True, which saves each J for each group in a separate tempfile,
+located in the current directory. The J&#8217;s can then be loaded again to
+attempt a second step without re-calculating J. However, for a big
+image this can attempt to store _a_lot_ of temp files, which might be
+more than the operating system limit (as temp files are always open),
+which will raise an error. So use with caution. Deleting any
+references to the temp files by deleting the LMParticleGroupCollection
+instance will close and remove the temporary files.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="peri.opt.optimize.LMAugmentedState">
+<em class="property">class </em><code class="descclassname">peri.opt.optimize.</code><code class="descname">LMAugmentedState</code><span class="sig-paren">(</span><em>aug_state</em>, <em>max_mem=1000000000.0</em>, <em>opt_kwargs={}</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/optimize.html#LMAugmentedState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.optimize.LMAugmentedState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Levenberg-Marquardt on an augmented state.</p>
+<p>Contains all the options from the M. Transtrum J. Sethna 2012 ArXiV
+paper. See LMEngine for further documentation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>aug_state</strong> (:class:<code class="docutils literal"><span class="pre">peri.optimize.opt.AugmentedState</span></code>) &#8211; The state to optimize. Stored as self.aug_state</li>
+<li><strong>max_mem</strong> (<em>Numeric</em><em>, </em><em>optional</em>) &#8211; The maximum memory to use for the optimization; controls pixel
+decimation. Default is 1e9. Stored as self.max_mem.</li>
+<li><strong>opt_kwargs</strong> (<em>Dict</em><em>, </em><em>optional</em>) &#8211; Dict of <code class="docutils literal"><span class="pre">**kwargs</span></code> for opt implementation. Right now only for
+get_num_px_jtj, i.e. keys of &#8216;decimate&#8217;, min_redundant&#8217;.
+Default is <cite>{}</cite>. Stored as self.opt_kwargs.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="LMAugmentedState.num_pix">
+<code class="descname">num_pix</code><a class="headerlink" href="#LMAugmentedState.num_pix" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Int</em> &#8211; The number of pixels of the residuals used to calculate J.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="LMAugmentedState.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><em>new_damping=None</em><span class="sig-paren">)</span><a class="headerlink" href="#LMAugmentedState.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the augmented state, counters, etc to zero, allowing
+more runs to commence.</p>
+</dd></dl>
+
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMEngine</span></code></dt>
+<dd>Parent class for all Levenberg-Marquardt (LM) optimization</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMGlobals</span></code></dt>
+<dd>LM optimization on globals without an <code class="docutils literal"><span class="pre">AugmentedState</span></code></dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">AugmentedState</span></code></dt>
+<dd>The class used by <code class="docutils literal"><span class="pre">LMAugmentedState</span></code>.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMParticles</span></code></dt>
+<dd>LM optimization designed for optimizing state particles.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMParticleGroupCollection</span></code></dt>
+<dd>LM optimization on all particles in a state.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">LMAugmentedState</span></code></dt>
+<dd>LMGlobals with additional R(z) parameters.</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">do_levmarq</span></code></dt>
+<dd>Convenience function for LMGlobals</dd>
+<dt><code class="xref py py-class docutils literal"><span class="pre">do_levmarq_particles</span></code></dt>
+<dd>Convenience function for optimizing particles</dd>
+</dl>
+</div>
+</dd></dl>
+
+<div class="section" id="peri-opt-addsubtract">
+<span id="id4"></span><h3>peri.opt.addsubtract<a class="headerlink" href="#peri-opt-addsubtract" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="peri.opt.addsubtract.add_subtract">
+<code class="descclassname">peri.opt.addsubtract.</code><code class="descname">add_subtract</code><span class="sig-paren">(</span><em>st</em>, <em>max_iter=7</em>, <em>max_npart='calc'</em>, <em>max_mem=200000000.0</em>, <em>always_check_remove=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/addsubtract.html#add_subtract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.addsubtract.add_subtract" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically adds and subtracts missing &amp; extra particles.</p>
+<p>Operates by removing bad particles then adding missing particles on
+repeat, until either no particles are added/removed or after <cite>max_iter</cite>
+attempts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>st</strong> (<a class="reference internal" href="states.html#peri.states.State" title="peri.states.State"><code class="xref py py-class docutils literal"><span class="pre">peri.states.State</span></code></a>) &#8211; The state to add and subtract particles to.</li>
+<li><strong>max_iter</strong> (<em>Int</em><em>, </em><em>optional</em>) &#8211; The maximum number of add-subtract loops to use. Default is 7.
+Terminates after either max_iter loops or when nothing has changed.</li>
+<li><strong>max_npart</strong> (<em>Int</em><em> or </em><em>'calc'</em><em>, </em><em>optional</em>) &#8211; The maximum number of particles to add before optimizing the non-psf
+globals. Default is <code class="docutils literal"><span class="pre">'calc'</span></code>, which uses 5% of the initial number
+of particles.</li>
+<li><strong>max_mem</strong> (<em>Int</em><em>, </em><em>optional</em>) &#8211; The maximum memory to use for optimization after adding max_npart
+particles. Default is 2e8.</li>
+<li><strong>always_check_remove</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Set to True to always check whether to remove particles. If <code class="docutils literal"><span class="pre">False</span></code>,
+only checks for removal while particles were removed on the previous
+attempt. Default is False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Other Parameters:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><ul class="first simple">
+<li><strong>invert</strong> (<em>Bool, optional</em>) &#8211; <code class="docutils literal"><span class="pre">True</span></code> if the particles are dark on a bright background, <code class="docutils literal"><span class="pre">False</span></code>
+if they are bright on a dark background. Default is <code class="docutils literal"><span class="pre">True</span></code>.</li>
+<li><strong>min_rad</strong> (<em>Float, optional</em>) &#8211; Particles with radius below <code class="docutils literal"><span class="pre">min_rad</span></code> are automatically deleted.
+Default is <code class="docutils literal"><span class="pre">'calc'</span></code> = median rad - 25* radius std.</li>
+<li><strong>max_rad</strong> (<em>Float, optional</em>) &#8211; Particles with radius above <code class="docutils literal"><span class="pre">max_rad</span></code> are automatically deleted.
+Default is <code class="docutils literal"><span class="pre">'calc'</span></code> = median rad + 15* radius std, but you should
+change this for your particle sizes.</li>
+<li><strong>min_edge_dist</strong> (<em>Float, optional</em>) &#8211; Particles closer to the edge of the padded image than this are
+automatically deleted. Default is 2.0.</li>
+<li><strong>check_rad_cutoff</strong> (<em>2-element float list.</em>) &#8211; Particles with <code class="docutils literal"><span class="pre">radii</span> <span class="pre">&lt;</span> <span class="pre">check_rad_cutoff[0]</span></code> or <code class="docutils literal"><span class="pre">&gt;</span> <span class="pre">check...[1]</span></code>
+are checked if they should be deleted (not automatic). Default is
+<code class="docutils literal"><span class="pre">[3.5,</span> <span class="pre">15]</span></code>.</li>
+<li><strong>check_outside_im</strong> (<em>Bool, optional</em>) &#8211; Set to True to check whether to delete particles whose positions are
+outside the un-padded image.</li>
+<li><strong>rad</strong> (<em>Float, optional</em>) &#8211; The initial radius for added particles; added particles radii are
+not fit until the end of <code class="docutils literal"><span class="pre">add_subtract</span></code>. Default is <code class="docutils literal"><span class="pre">'calc'</span></code>,
+which uses the median radii of active particles.</li>
+<li><strong>tries</strong> (<em>Int, optional</em>) &#8211; The number of particles to attempt to remove or add, per iteration.
+Default is 50.</li>
+<li><strong>im_change_frac</strong> (<em>Float, optional</em>) &#8211; How good the change in error needs to be relative to the change in
+the difference image. Default is 0.2; i.e. if the error does not
+decrease by 20% of the change in the difference image, do not add
+the particle.</li>
+<li><strong>min_derr</strong> (<em>Float, optional</em>) &#8211; The minimum change in the state&#8217;s error to keep a particle in the
+image. Default is <code class="docutils literal"><span class="pre">'3sig'</span></code> which uses <code class="docutils literal"><span class="pre">3*st.sigma</span></code>.</li>
+<li><strong>do_opt</strong> (<em>Bool, optional</em>) &#8211; Set to False to avoid optimizing particle positions after adding.</li>
+<li><strong>minmass</strong> (<em>Float, optional</em>) &#8211; The minimum mass for a particle to be identified as a feature,
+as used by trackpy. Defaults to a decent guess.</li>
+<li><strong>use_tp</strong> (<em>Bool, optional</em>) &#8211; Set to True to use trackpy to find missing particles inside the
+image. Not recommended since trackpy deliberately cuts out particles
+at the edge of the image. Default is <code class="docutils literal"><span class="pre">False</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>total_changed</strong> (<em>Int</em>) &#8211; The total number of adds and subtracts done on the data. Not the
+same as <code class="docutils literal"><span class="pre">changed_inds.size</span></code> since the same particle or particle
+index can be added/subtracted multiple times.</li>
+<li><strong>added_positions</strong> (<em>[N_added,3] numpy.ndarray</em>) &#8211; The positions of particles that have been added at any point in the
+add-subtract cycle.</li>
+<li><strong>removed_positions</strong> (<em>[N_added,3] numpy.ndarray</em>) &#8211; The positions of particles that have been removed at any point in
+the add-subtract cycle.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Occasionally after the intial featuring a cluster of particles is
+featured as 1 big particle. To fix these mistakes, it helps to set
+max_rad to a physical value. This removes the big particle and allows
+it to be re-featured by (several passes of) the adds.</p>
+<p>The added/removed positions returned are whether or not the position
+has been added or removed ever. It&#8217;s possible that a position is
+added, then removed during a later iteration.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.opt.addsubtract.add_subtract_locally">
+<code class="descclassname">peri.opt.addsubtract.</code><code class="descname">add_subtract_locally</code><span class="sig-paren">(</span><em>st</em>, <em>region_depth=3</em>, <em>filter_size=5</em>, <em>sigma_cutoff=8</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/addsubtract.html#add_subtract_locally"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.addsubtract.add_subtract_locally" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically adds and subtracts missing particles based on local
+regions of poor fit.</p>
+<p>Calls identify_misfeatured_regions to identify regions, then
+add_subtract_misfeatured_tile on the tiles in order of size until
+region_depth tiles have been checked without adding any particles.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>st</strong> (<a class="reference internal" href="states.html#peri.states.State" title="peri.states.State"><code class="xref py py-class docutils literal"><span class="pre">peri.states.State</span></code></a>) &#8211; The state to add and subtract particles to.</li>
+<li><strong>region_depth</strong> (<em>Int</em>) &#8211; The minimum amount of regions to try; the algorithm terminates if
+region_depth regions have been tried without adding particles.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Other Parameters:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><ul class="first simple">
+<li><strong>filter_size</strong> (<em>Int, optional</em>) &#8211; The size of the filter for calculating the local standard deviation;
+should approximately be the size of a poorly featured region in each
+dimension. Best if odd. Default is 5.</li>
+<li><strong>sigma_cutoff</strong> (<em>Float, optional</em>) &#8211; The max allowed deviation of the residuals from what is expected,
+in units of the residuals&#8217; standard deviation. Lower means more
+sensitive, higher = less sensitive. Default is 8.0, i.e. one pixel
+out of every <code class="docutils literal"><span class="pre">7*10^11</span></code> is mis-identified randomly. In practice the
+noise is not Gaussian so there are still some regions mis-
+identified as improperly featured.</li>
+<li><strong>rad</strong> (<em>Float or &#8216;calc&#8217;, optional</em>) &#8211; The initial radius for added particles; added particles radii are
+not fit until the end of add_subtract. Default is <code class="docutils literal"><span class="pre">'calc'</span></code>, which
+uses the median radii of active particles.</li>
+<li><strong>max_iter</strong> (<em>Int, optional</em>) &#8211; The maximum number of loops for attempted adds at one tile location.
+Default is 3.</li>
+<li><strong>invert</strong> (<em>Bool, optional</em>) &#8211; Whether to invert the image for feature_guess. Default is <code class="docutils literal"><span class="pre">True</span></code>,
+i.e. dark particles on bright background.</li>
+<li><strong>max_allowed_remove</strong> (<em>Int, optional</em>) &#8211; The maximum number of particles to remove. If the misfeatured tile
+contains more than this many particles, raises an error. If it
+contains more than half as many particles, throws a warning. If more
+than this many particles are added, they are optimized in blocks of
+<code class="docutils literal"><span class="pre">max_allowed_remove</span></code>. Default is 20.</li>
+<li><strong>im_change_frac</strong> (<em>Float, between 0 and 1.</em>) &#8211; If adding or removing a particle decreases the error less than
+<code class="docutils literal"><span class="pre">im_change_frac</span> <span class="pre">*</span></code> the change in the image, the particle is deleted.
+Default is 0.2.</li>
+<li><strong>min_derr</strong> (<em>Float</em>) &#8211; The minimum change in the state&#8217;s error to keep a particle in the
+image. Default is <code class="docutils literal"><span class="pre">'3sig'</span></code> which uses <code class="docutils literal"><span class="pre">3*st.sigma</span></code>.</li>
+<li><strong>do_opt</strong> (<em>Bool, optional</em>) &#8211; Set to False to avoid optimizing particle positions after adding
+them. Default is True</li>
+<li><strong>minmass</strong> (<em>Float, optional</em>) &#8211; The minimum mass for a particle to be identified as a feature, as
+used by trackpy. Defaults to a decent guess.</li>
+<li><strong>use_tp</strong> (<em>Bool, optional</em>) &#8211; Set to True to use trackpy to find missing particles inside the
+image. Not recommended since trackpy deliberately cuts out
+particles at the edge of the image. Default is False.</li>
+<li><strong>max_allowed_remove</strong> (<em>Int, optional</em>) &#8211; The maximum number of particles to remove. If the misfeatured tile
+contains more than this many particles, raises an error. If it
+contains more than half as many particles, throws a warning. If more
+than this many particles are added, they are optimized in blocks of
+<code class="docutils literal"><span class="pre">max_allowed_remove</span></code>. Default is 20.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>n_added</strong> (<em>Int</em>) &#8211; The change in the number of particles; i.e the number added - number
+removed.</li>
+<li><strong>new_poses</strong> (<em>List</em>) &#8211; [N,3] element list of the added particle positions.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Algorithm Description</p>
+<ol class="arabic simple">
+<li>Identify mis-featured regions by how much the local residuals
+deviate from the global residuals, as measured by the standard
+deviation of both.</li>
+<li>Loop over each of those regions, and:<ol class="loweralpha">
+<li>Remove every particle in the current region.</li>
+<li>Try to add particles in the current region until no more
+can be added while adequately decreasing the error.</li>
+<li>Terminate if at least region_depth regions have been
+checked without successfully adding a particle.</li>
+</ol>
+</li>
+</ol>
+<p>Because this algorithm is more judicious about chooosing regions to
+check, and more aggressive about removing particles in those regions,
+it runs faster and does a better job than the (global) add_subtract.
+However, this function usually does not work better as an initial add-
+subtract on an image, since (1) it doesn&#8217;t check for removing small/big
+particles per se, and (2) when the poorly-featured regions of the image
+are large or when the fit is bad, it will remove essentially all of the
+particles, taking a long time. As a result, it&#8217;s usually best to do a
+normal add_subtract first and using this function for tough missing or
+double-featured particles.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.opt.addsubtract.feature_guess">
+<code class="descclassname">peri.opt.addsubtract.</code><code class="descname">feature_guess</code><span class="sig-paren">(</span><em>st</em>, <em>rad</em>, <em>invert=True</em>, <em>minmass=None</em>, <em>use_tp=False</em>, <em>trim_edge=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/opt/addsubtract.html#feature_guess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.opt.addsubtract.feature_guess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a guess at particle positions using heuristic centroid methods.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>st</strong> (<a class="reference internal" href="states.html#peri.states.State" title="peri.states.State"><code class="xref py py-class docutils literal"><span class="pre">peri.states.State</span></code></a>) &#8211; The state to check adding particles to.</li>
+<li><strong>rad</strong> (<em>Float</em>) &#8211; The feature size for featuring.</li>
+<li><strong>invert</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Whether to invert the image. Default is <code class="docutils literal"><span class="pre">True</span></code>, i.e. dark particles</li>
+<li><strong>minmass</strong> (<em>Float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) &#8211; The minimum mass/masscut of a particle. Default is <code class="docutils literal"><span class="pre">None</span></code> =
+calculated internally.</li>
+<li><strong>use_tp</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Whether or not to use trackpy. Default is <code class="docutils literal"><span class="pre">False</span></code>, since trackpy
+cuts out particles at the edge.</li>
+<li><strong>trim_edge</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; Whether to trim particles at the edge pixels of the image. Can be
+useful for initial featuring but is bad for adding missing particles
+as they are frequently at the edge. Default is <code class="docutils literal"><span class="pre">False</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>guess</strong> (<em>[N,3] numpy.ndarray</em>) &#8211; The featured positions of the particles, sorted in order of decreasing
+feature mass.</li>
+<li><strong>npart</strong> (<em>Int</em>) &#8211; The number of added particles.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">peri.opt</a><ul>
+<li><a class="reference internal" href="#peri-opt-optimize-burn">peri.opt.optimize.burn</a></li>
+<li><a class="reference internal" href="#peri-opt-optimize-finish">peri.opt.optimize.finish</a><ul>
+<li><a class="reference internal" href="#peri-opt-optimize">peri.opt.optimize</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#peri-opt-optimize-functions">peri.opt.optimize functions</a></li>
+<li><a class="reference internal" href="#peri-opt-optimize-classes">peri.opt.optimize classes</a><ul>
+<li><a class="reference internal" href="#peri-opt-addsubtract">peri.opt.addsubtract</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="models.html"
+                        title="previous chapter">peri.models</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="runner.html"
+                        title="next chapter">peri.runner</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/reference/opt.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="runner.html" title="peri.runner"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="peri.models"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

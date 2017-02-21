@@ -1,0 +1,651 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PERI Walkthrough &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Package architecture" href="architecture.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="architecture.html" title="Package architecture"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="peri-walkthrough">
+<h1>PERI Walkthrough<a class="headerlink" href="#peri-walkthrough" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-peri">
+<h2>What is PERI?<a class="headerlink" href="#what-is-peri" title="Permalink to this headline">¶</a></h2>
+<p>PERI is a general, methodological framework to extract the maximum amount of
+information from a single microscope image. The idea of PERI is simple and
+short:</p>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#take-a-microscope-image">Take a microscope image.</a></li>
+<li><a class="reference internal" href="#create-a-mathematical-model-of-the-image-formation-process">Create a mathematical model of the image formation process.</a></li>
+<li><a class="reference internal" href="#fit-that-mathematical-model-to-the-image">Fit that mathematical model to the image.</a></li>
+<li><a class="reference internal" href="#if-the-fit-is-not-good-improve-the-mathematical-model">If the fit is not good, improve the mathematical model.</a></li>
+<li><a class="reference internal" href="#if-the-fit-is-good-use-the-extracted-information-from-the-fit">If the fit is good, use the extracted information from the fit.</a></li>
+</ol>
+<p>The Python package <code class="docutils literal"><span class="pre">peri</span></code> contains both a general implementation of this
+framework and a detailed implementation of it for confocal images. In this
+walkthrough, I&#8217;ll show you how to use the Python <code class="docutils literal"><span class="pre">peri</span></code> package to start from
+an image and extract the maximal possible information from it. I&#8217;ll demonstrate
+this process on a real image from a confocal microscope, explaining each step
+along the way but trying to avoid getting mired in details. Finally, I&#8217;ll show
+you some convenience functions implemented in <code class="docutils literal"><span class="pre">peri</span></code> that make this process
+faster, both for you and your computer.</p>
+<p>Before you begin, you&#8217;ll need to install <code class="docutils literal"><span class="pre">peri</span></code>. See the <a class="reference internal" href="installation.html"><span class="doc">Installation</span></a> section for how to do this.</p>
+</div>
+<div class="section" id="take-a-microscope-image">
+<h2>Take a microscope image.<a class="headerlink" href="#take-a-microscope-image" title="Permalink to this headline">¶</a></h2>
+<p>This is all you. A word to the wise though &#8211; analysis with <code class="docutils literal"><span class="pre">peri</span></code> takes time
+(step 3), and figuring out what the best mathematical model is (steps 2 and 4)
+takes even more time. You can save a lot of time by taking the cleanest
+possible data and avoiding as many imaging artifacts as possible.</p>
+<p>We&#8217;ll start by loading a small demo image with the package <code class="docutils literal"><span class="pre">peri</span></code>. First,
+<a class="reference download internal" href="_downloads/small_confocal_image.tif" download=""><code class="xref download docutils literal"><span class="pre">download</span> <span class="pre">my</span> <span class="pre">test</span> <span class="pre">image</span></code></a>.
+Then, open your Python interpreter and type:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">RawImage</span><span class="p">(</span><span class="s1">&#39;small_confocal_image.tif&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This creates an object which contains rescaled raw data and allows for small
+manipulations of the image by <code class="docutils literal"><span class="pre">peri</span></code>. If you&#8217;d like to look at the image
+interactively, you can use the <a class="reference internal" href="reference/interaction.html#peri.viz.interaction.OrthoViewer" title="peri.viz.interaction.OrthoViewer"><code class="xref py py-class docutils literal"><span class="pre">OrthoViewer</span></code></a>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri.viz.interaction</span> <span class="kn">import</span> <span class="n">OrthoViewer</span>
+<span class="n">OrthoViewer</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">get_image</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>This will pull up an image like the one below, showing three orthogonal views
+of the three-dimensional tiffstack. Clicking on one of these will recenter the
+views on the region you clicked.</p>
+<div class="figure">
+<img alt="``OrthoViewer(im.get_image())``" src="_images/OV-small-im.png" />
+</div>
+</div>
+<div class="section" id="create-a-mathematical-model-of-the-image-formation-process">
+<h2>Create a mathematical model of the image formation process.<a class="headerlink" href="#create-a-mathematical-model-of-the-image-formation-process" title="Permalink to this headline">¶</a></h2>
+<p>The method PERI needs a mathematical model to reconstruct the experimental
+image. At the grossest level, the model needs to create a model image.
+This model also needs to have parameters (e.g. the positions of the particles
+or the properties of the microscope) which are adjustable. PERI then fits
+those parameters to find the best-possible model of the experimental image.</p>
+<p>In the package <code class="docutils literal"><span class="pre">peri</span></code>, the mathematical model itself is split into two parts:
+the <em>components</em> of the model, and the <em>interaction</em> between those components
+to create a final image. A component of the model is a description of a
+physical property of the sample or microscope &#8211; for instance, the
+distribution <span class="math">\(\Pi\)</span> of fluorescent dye in the image or the intensity
+<span class="math">\(I\)</span> of the light source. In addition, we need to know how these
+components interact mathematically to form a model image &#8211; e.g. the dye gets
+illuminated by the light as <span class="math">\(I\times \Pi\)</span>.</p>
+<p>Let&#8217;s do a concrete example with our image above.</p>
+<p>First, we need to figure out what components form our model.</p>
+<p>Looking at the image, we see that the sample is composed of a coverslip slide
+and a lot of spheres. We can start by creating those objects with an initial
+guess for the <a class="reference download internal" href="_downloads/particle-positions.npy" download=""><code class="xref download docutils literal"><span class="pre">particle</span> <span class="pre">positions</span></code></a>
+and the following code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">peri.comp</span> <span class="kn">import</span> <span class="n">objs</span>
+<span class="n">coverslip</span> <span class="o">=</span> <span class="n">objs</span><span class="o">.</span><span class="n">Slab</span><span class="p">(</span><span class="n">zpos</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">particle_positions</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;particle-positions.npy&#39;</span><span class="p">)</span>
+<span class="n">particle_radii</span> <span class="o">=</span> <span class="mf">5.0</span>  <span class="c1"># a good guess for the particle radii, in pixels</span>
+<span class="n">particles</span> <span class="o">=</span> <span class="n">objs</span><span class="o">.</span><span class="n">PlatonicSpheresCollection</span><span class="p">(</span><span class="n">particle_positions</span><span class="p">,</span> <span class="n">particle_radii</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>All the model components in <code class="docutils literal"><span class="pre">peri</span></code> are stored in the module <code class="docutils literal"><span class="pre">peri.comp</span></code>.
+The components describing the microscope sample being imaged are stored in
+<code class="docutils literal"><span class="pre">peri.comp.objs</span></code>, which we import in the first line. In the next line, we
+create a coverslip, which is described by a <a class="reference internal" href="reference/comp.html#peri.comp.objs.Slab" title="peri.comp.objs.Slab"><code class="xref py py-class docutils literal"><span class="pre">peri.comp.objs.Slab</span></code></a>
+object. Finally, in the last line we create a collection of spheres, described
+by <a class="reference internal" href="reference/comp.html#peri.comp.objs.PlatonicSpheresCollection" title="peri.comp.objs.PlatonicSpheresCollection"><code class="xref py py-class docutils literal"><span class="pre">peri.comp.objs.PlatonicSpheresCollection</span></code></a>.</p>
+<p>To speed up <code class="docutils literal"><span class="pre">peri</span></code> &#8216;s fit of the model, I&#8217;ve created both of these objects
+with reasonable initial guesses for the objects&#8217; parameters. By looking at the
+raw image, I&#8217;ve seen that the coverslip is positioned at a height of roughly
+z=6 pixels above the bottom of the image. If I wanted, I could also pass a
+selection of Euler angles to describe the coverslip&#8217;s orientation. However, a
+flat coverslip is a good enough initial guess. Likewise, I&#8217;ve used a centroid
+algorithm (trackpy) to do a reasonable job finding most of the spheres in the
+image; the position guess for this is saved as <code class="docutils literal"><span class="pre">'particle-positions.npy'</span></code>
+<a class="footnote-reference" href="#id2" id="id1">[1]</a>. You can check the quality of this initial guess with the
+<a class="reference internal" href="reference/interaction.html#peri.viz.interaction.OrthoPrefeature" title="peri.viz.interaction.OrthoPrefeature"><code class="xref py py-class docutils literal"><span class="pre">OrthoPrefeature</span></code></a>, which overlays the image with
+the extracted particle positions:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri.viz.interaction</span> <span class="kn">import</span> <span class="n">OrthoPrefeature</span>
+<span class="n">OrthoPrefeature</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">get_image</span><span class="p">(),</span> <span class="n">particle_positions</span><span class="p">,</span> <span class="n">viewrad</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="figure" id="id11">
+<img alt="``OrthoPrefeature(im.get_image(), particle_positions, viewrad=3.0)``" src="_images/OrthoPrefeature.png" />
+<p class="caption"><span class="caption-text">Click around to look at particles! If you like, you can add or remove
+particles by hitting <code class="docutils literal"><span class="pre">A</span></code> or <code class="docutils literal"><span class="pre">R</span></code>.</span></p>
+</div>
+<p>Clicking around shows that we&#8217;ve gotten most of the particles with our initial
+featuring, which is really all that <code class="docutils literal"><span class="pre">peri</span></code> needs to start. Finally, by
+looking at the raw data I&#8217;ve noticed that the particle radii are all about 5
+pixels.</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>If and when you&#8217;re analyzing your own confocal images of spheres you can
+pass your initial guess for the positions as an [N,3] numpy.ndarray, which
+you can get however your heart desires, including through
+<a class="reference internal" href="reference/runner.html#peri.runner.locate_spheres" title="peri.runner.locate_spheres"><code class="xref py py-func docutils literal"><span class="pre">locate_spheres()</span></code></a>.</td></tr>
+</tbody>
+</table>
+<p>Looking at the image, we see that the coverslip and particles behave the same
+way &#8211; both exclude dye from regions of the image. Thus, it seems best to treat
+these two objects together when we make our mathematical model, rather then
+separately. We can do this by grouping these two objects together:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri.comp</span> <span class="kn">import</span> <span class="n">comp</span>
+<span class="n">objects</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">ComponentCollection</span><span class="p">([</span><span class="n">particles</span><span class="p">,</span> <span class="n">coverslip</span><span class="p">],</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;obj&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A group of any model components is described by a
+<code class="xref py py-class docutils literal"><span class="pre">peri.comp.ComponentCollection</span></code>. Since we&#8217;ve collected these components
+together, we describe them (<code class="docutils literal"><span class="pre">category='obj'</span></code>) so <code class="docutils literal"><span class="pre">peri</span></code> can identify to
+which part of the model they belong.</p>
+<p>Next, we see that the image is illuminated by a laser, with stripe-like
+imperfections. We can create this object with this snippet:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri.comp</span> <span class="kn">import</span> <span class="n">ilms</span>
+<span class="n">illumination</span> <span class="o">=</span> <span class="n">ilms</span><span class="o">.</span><span class="n">BarnesStreakLegPoly2P1D</span><span class="p">(</span><span class="n">npts</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Mathematically, we can describe the illumination as some sort of continuous
+field defined over the image. These field-like descriptions are stored in the
+module <code class="xref py py-mod docutils literal"><span class="pre">peri.comp.ilms</span></code>, which we import in the first line. A quick look at
+the module shows that there are a sizeable number of possible illumination
+field descriptions. All of these conceptually do the same thing, but they are
+each parameterized slightly differently. After a lot of experimentation, I&#8217;ve
+found that the streaky-structure in my image is well-described by the
+technical-sounding BarnesStreakLegPoly2P1D <a class="footnote-reference" href="#id5" id="id3">[2]</a>. In general, the different
+options in the ilms module are ways to parameterize the illumination, but they
+each need to know how many parameters to use. For my microscope, I&#8217;ve found
+that a good number of parameters for images of this size is what I&#8217;ve typed
+in &#8211; any less and the illumination isn&#8217;t described sufficiently, and more is
+overkill <a class="footnote-reference" href="#id6" id="id4">[3]</a>. You will <em>need</em> to figure out how many parameters to include for
+your microscope and image size. For now, don&#8217;t worry about this &#8211; we&#8217;ll go
+over this in step 4.</p>
+<table class="docutils footnote" frame="void" id="id5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>Briefly, this consists of a series of Barnes interpolants in the
+x-direction, each multiplied by a different Legendre polynomial in the
+y-direction, to create a 2D field in x &amp; y. The 2D field in x&amp;y is then
+multiplied by a second Legendre polynomial in z to create an illumination
+that varies in three-dimensions. If you have a stripey illumination in the
+x-direction then this is the illumination for you. If not, then no worries
+&#8211; we discuss other options in the illumination section.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id6" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[3]</a></td><td>If you want to know what these particular parameters mean &#8211; the tuple
+<code class="docutils literal"><span class="pre">npts</span></code> is the number of points for each Barnes interpolant in each
+direction; the size of the tuple sets the order of the Legendre polynomial
+in y. The int <code class="docutils literal"><span class="pre">zorder</span></code> is the order of the Legendre polynomial in z.
+You can see the documentation for details.</td></tr>
+</tbody>
+</table>
+<p>In addition, from knowing my microscope I know that (1) there is a background
+intensity always registered on the detector and (2) this background intensity
+actually varies with position. We can describe this spatially-varying
+background with the one-liner:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">background</span> <span class="o">=</span> <span class="n">ilms</span><span class="o">.</span><span class="n">LegendrePoly2P1D</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;bkg&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Since the background is just a spatially-varying field like the illumination,
+I&#8217;ve described it with another representation of a field from the ilms module.
+Here, the parameterization is as a 2D Legendre polynomial in x &amp; y, and an
+additional Legendre polynomial in z. However, to allow <code class="docutils literal"><span class="pre">peri</span></code> to distinguish
+between the background and illumination components of the model, I&#8217;ve changed
+the category of the background to &#8216;bkg&#8217; <a class="footnote-reference" href="#id9" id="id7">[4]</a>. Finally, I&#8217;ve set the order
+(number of parameters in the Legendre polynomials) to numbers that I&#8217;ve
+empirically found work for me <a class="footnote-reference" href="#id10" id="id8">[5]</a>. In addition, for numerical reasons we
+include an offset which takes into account high-frequency changes in the
+background. We do this with:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri.comp</span> <span class="kn">import</span> <span class="n">comp</span>
+<span class="n">offset</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">GlobalScalar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;offset&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils footnote" frame="void" id="id9" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id7">[4]</a></td><td>All the model components have categories; for most of the rest the
+default category is good enough for me.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id10" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id8">[5]</a></td><td>See the paper&#8217;s supplemental information for details on why the numbers
+are what they are, in particular why the z-order is so large.</td></tr>
+</tbody>
+</table>
+<p>Finally, I can see that the image is blurry, due to the wave-nature of light
+blurring out the image. We can describe this blurring with a point-spread
+function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri.comp</span> <span class="kn">import</span> <span class="n">exactpsf</span>
+<span class="n">point_spread_function</span> <span class="o">=</span> <span class="n">exactpsf</span><span class="o">.</span><span class="n">FixedSSChebLinePSF</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Representations of point-spread functions that use exact optical models are
+stored in the <code class="xref py py-mod docutils literal"><span class="pre">exactpsf</span></code> module. I&#8217;ve chosen to describe my
+image with an optical model of a line-scanning point-spread function (the
+LinePSF bit), with some special numerical implementations made for speed and
+reliability (the FixedSSCheb bit). If you don&#8217;t want or need an exact optical
+description of your point-spread function, then you can use one of the
+heuristic functions stored in the module <code class="xref py py-mod docutils literal"><span class="pre">peri.comp.psfs</span></code> (such as a
+Gaussian or a Gaussian that changes in z).</p>
+<p>Now that we have all the <em>components</em> of the mathematical model, we need to
+describe how they <em>interact</em>. We do this by using the relationship for a
+confocal image:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ConfocalImageModel</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The model tells <code class="docutils literal"><span class="pre">peri</span></code> how to combine all the objects together to create an
+image. Our <a class="reference internal" href="reference/models.html#peri.models.ConfocalImageModel" title="peri.models.ConfocalImageModel"><code class="xref py py-class docutils literal"><span class="pre">ConfocalImageModel</span></code></a> knows that the objects in
+the sample excludes dye from certain regions, the dye gets illuminated by a
+laser, blurred by the point-spread function with microscope optics, and imaged
+on a detector with a spatially-varying background. You can see what this model
+mathematically is by typing</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">model</span>
+</pre></div>
+</div>
+<p>Finally, we need to combine the mathematical model and its components together
+to create a model image. In <code class="docutils literal"><span class="pre">peri</span></code>, the image, the mathematical model, its
+parameters and values, and the model image are all stored in an object called a
+<a class="reference internal" href="reference/states.html#peri.states.State" title="peri.states.State"><code class="xref py py-class docutils literal"><span class="pre">State</span></code></a> or <a class="reference internal" href="reference/states.html#peri.states.ImageState" title="peri.states.ImageState"><code class="xref py py-class docutils literal"><span class="pre">ImageState</span></code></a>. We&#8217;re now
+ready to create our state:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri</span> <span class="kn">import</span> <span class="n">states</span>
+<span class="n">st</span> <span class="o">=</span> <span class="n">states</span><span class="o">.</span><span class="n">ImageState</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="p">[</span><span class="n">objects</span><span class="p">,</span> <span class="n">illumination</span><span class="p">,</span> <span class="n">background</span><span class="p">,</span>
+        <span class="n">point_spread_function</span><span class="p">,</span> <span class="n">offset</span><span class="p">],</span> <span class="n">mdl</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If we want to save our state or load a saved state, we can use
+<a class="reference internal" href="reference/states.html#peri.states.save" title="peri.states.save"><code class="xref py py-func docutils literal"><span class="pre">peri.states.save()</span></code></a> and <a class="reference internal" href="reference/states.html#peri.states.load" title="peri.states.load"><code class="xref py py-func docutils literal"><span class="pre">peri.states.load()</span></code></a>. Finally, <code class="docutils literal"><span class="pre">peri</span></code> allows
+the same parameter to describe multiple components of the model. For instance,
+physically we know that the ratio of the z-pixel to xy-pixel size is the same
+whether we&#8217;re calculating an optical model of the point-spread function or
+drawing the Platonic particles. We can link these parameters with</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri</span> <span class="kn">import</span> <span class="n">runner</span>
+<span class="n">runner</span><span class="o">.</span><span class="n">link_zscale</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>this is a lie for two reasons. One, peri has trouble with non-psf stuff. Two,
+is the zscale the same because of the difference between nominal and actual
+focal positions? FIXME</strong></p>
+</div>
+<div class="section" id="fit-that-mathematical-model-to-the-image">
+<h2>Fit that mathematical model to the image.<a class="headerlink" href="#fit-that-mathematical-model-to-the-image" title="Permalink to this headline">¶</a></h2>
+<p>Our state contains information about the quality of the fit through the
+difference between the model and the image through two main attributes:
+<code class="docutils literal"><span class="pre">st.residuals</span></code>, which returns the difference between the model image and the
+experimental image, and <code class="docutils literal"><span class="pre">st.error</span></code>, which returns the sum of the squares of
+the residuals. Look at the error by typing</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span>
+</pre></div>
+</div>
+<p>Right now the fit&#8217;s error is pretty bad. We can fit the state and improve the
+error significantly using the convenience functions in <code class="xref py py-mod docutils literal"><span class="pre">peri.runner</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri</span> <span class="kn">import</span> <span class="n">runner</span>
+<span class="n">runner</span><span class="o">.</span><span class="n">optimize_from_initial</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This fits the state, printing information to your screen and saving progress
+to your current directory along the way. If running this code doesn&#8217;t fit the
+state well enough, you can either re-run the code above again, or run:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">runner</span><span class="o">.</span><span class="n">finish_state</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For a typical image, <code class="docutils literal"><span class="pre">peri</span></code> needs to fit thousands of parameters in a complex
+landscape, which can take a lot of time. Be patient. Or better yet, leave your
+computer and come back after lunch or tomorrow. If the convenience functions
+don&#8217;t work well for you or you want to delve into more details of the
+optimization methods, you can read about them in the documentation&#8217;s
+<a class="reference internal" href="optimization.html"><span class="doc">Optimization</span></a> section, including how <code class="docutils literal"><span class="pre">peri</span></code> can
+automatically add missing particles and remove bad ones.</p>
+</div>
+<div class="section" id="if-the-fit-is-not-good-improve-the-mathematical-model">
+<h2>If the fit is not good, improve the mathematical model.<a class="headerlink" href="#if-the-fit-is-not-good-improve-the-mathematical-model" title="Permalink to this headline">¶</a></h2>
+<p>Now that we&#8217;ve fit our data, we need to check if the fit is good. <code class="docutils literal"><span class="pre">peri</span></code>
+provides several ways to do this for a single state. The first step is the
+<a class="reference internal" href="reference/interaction.html#peri.viz.interaction.OrthoManipulator" title="peri.viz.interaction.OrthoManipulator"><code class="xref py py-class docutils literal"><span class="pre">OrthoManipulator</span></code></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri.viz.interaction</span> <span class="kn">import</span> <span class="n">OrthoManipulator</span>
+<span class="n">OrthoManipulator</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will pull up an interactive viewer which allows you to examine the raw
+data, model image, fit residuals, and the different components of the model.
+Hit <code class="docutils literal"><span class="pre">Q</span></code> to cycle through the diffferent view modes, and click on a particular
+region in the image to see the orthogonal cross-sections of these modes. If you
+see structure in the residuals of your fit &#8211; shadows of particles or stripes
+and long-wavelength variation in the residuals &#8211; then your model isn&#8217;t
+complete or your fit isn&#8217;t the best. For my state, we see that the fit is
+pretty good, as you can see below.</p>
+<div class="figure align-center" id="id12">
+<img alt="``OrthoManipulator(st)``" src="_images/OM-finish-st.png" />
+<p class="caption"><span class="caption-text">The <a class="reference internal" href="reference/interaction.html#peri.viz.interaction.OrthoManipulator" title="peri.viz.interaction.OrthoManipulator"><code class="xref py py-class docutils literal"><span class="pre">OrthoManipulator</span></code></a>. You can see the raw
+data on the left and the fit residuals on the right. The residuals are
+almost perfect Gaussian white noise.</span></p>
+</div>
+<p>You can look closer for structure in the residuals by looking at the Fourier
+transform of the residuals (hit <code class="docutils literal"><span class="pre">W</span></code>). Again, if you see structure in the
+residuals in Fourier space, your model isn&#8217;t complete or your fit isn&#8217;t the
+best.</p>
+<p>If the residuals look OK by eye, check their distribution and deviation from
+gaussianity. You can do this quickly with</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri.viz</span> <span class="kn">import</span> <span class="n">plots</span>
+<span class="n">plots</span><span class="o">.</span><span class="n">examine_unexplained_noise</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will bring up a figure that plots the distribution of residuals in real
+and Fourier space and compares them with a normal distribution expected from
+the variance of the residuals. If you see significant deviation of the data
+from a Gaussian, then your model isn&#8217;t complete or your fit isn&#8217;t good.</p>
+<div class="figure align-center" id="id13">
+<img alt="``plots.examine_unexplained_noise(st)``" src="_images/unexplained-noise.png" />
+<p class="caption"><span class="caption-text">The distribution of residuals in real and Fourier space. They should be
+perfect Gaussians. While the distribution of real-space residuals is an
+amazingly perfect Gaussian, there are some deviations in Fourier space at
+large <span class="math">\(x/\sigma\)</span>. Looking at the
+<a class="reference internal" href="reference/interaction.html#peri.viz.interaction.OrthoManipulator" title="peri.viz.interaction.OrthoManipulator"><code class="xref py py-class docutils literal"><span class="pre">OrthoManipulator</span></code></a>, these arise from a
+combination of scanning noise on our detector (some lines at
+<span class="math">\(q_x=0, q_z=0\)</span>) and from incompleteness in our model (a faint ring at
+moderate <span class="math">\(q\)</span> values).</span></p>
+</div>
+<p>What should you do if the fit is bad? First, I would try more optimizations of
+the state. If you optimize the state and the error changes, then you weren&#8217;t at
+the best-fit. Keep optimizing until the error stops changing and check again.</p>
+<p>If the error doesn&#8217;t decrease on optimization and the fit still isn&#8217;t good,
+then your model is incomplete. There are a few possibilities for an incomplete
+model: (a) you&#8217;ve picked the right component, but with the wrong parameters or
+amount of parameters, (b) you&#8217;ve picked the wrong component, (c) the
+mathematical relationship between the components is incorrect.</p>
+<p>Fixing (a) is easy. If you&#8217;ve realized that, say, your illumination isn&#8217;t high
+enough order, then just type something like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">old_ilm</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ilm&#39;</span><span class="p">)</span>
+<span class="n">new_ilm</span> <span class="o">=</span> <span class="n">ilms</span><span class="o">.</span><span class="n">BarnesStreakLegPoly2P1D</span><span class="p">(</span><span class="n">npts</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>  <span class="c1"># or whatever works</span>
+<span class="n">st</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;ilm&#39;</span><span class="p">,</span> <span class="n">new_ilm</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You&#8217;ll then need to re-optimize the state all over again. For some components
+like the illumination and background, you can speed this up a bit by fitting
+the new component before you continue optimizing, as described in the section
+on <a class="reference internal" href="optimization.html"><span class="doc">Optimization</span></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">peri.opt.optimize</span> <span class="kn">as</span> <span class="nn">opt</span>
+<span class="n">opt</span><span class="o">.</span><span class="n">fit_comp</span><span class="p">(</span><span class="n">new_ilm</span><span class="p">,</span> <span class="n">old_ilm</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>but you&#8217;ll still need to re-optimize the state as before.</p>
+<p>Fixing problems (b) and (c) are usually just as easy. Say you realized that
+your microscope is a point scanner and not a line scanning confocal. Just type:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">new_psf</span> <span class="o">=</span> <span class="n">exactpsf</span><span class="o">.</span><span class="n">FixedSSChebPinholePSF</span><span class="p">()</span>
+<span class="n">st</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;psf&#39;</span><span class="p">,</span> <span class="n">new_psf</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Likewise, say you used the wrong model. (Perhaps your particles are dyed and
+not the fluid.) Type</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">new_model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ConfocalDyedParticlesModel</span><span class="p">()</span>  <span class="c1"># or whatever model is best</span>
+<span class="n">st</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="n">new_model</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Again, you&#8217;ll need to re-optimize your state. You might be able to speed the
+second optimization up by optimizing certain parts first; see the
+<a class="reference internal" href="optimization.html"><span class="doc">Optimization</span></a> section for how to do this.</p>
+<p>Sometimes, however, the component or model you need isn&#8217;t included in the
+<code class="docutils literal"><span class="pre">peri</span></code> package. For instance, you could be imaging rods on a 4Pi microscope
+or with STEM, changing your objects, point-spread function and image formation
+model to things that aren&#8217;t currently included in the <code class="docutils literal"><span class="pre">peri</span></code> package.
+If this is the case, you&#8217;ll need to develop <code class="docutils literal"><span class="pre">peri</span></code> to include a new model or
+component! See the developer&#8217;s section of the documentation to get started.</p>
+<p>The quality of the data analysis that <code class="docutils literal"><span class="pre">peri</span></code> returns is directly related to
+the quality of the generative model that you use. If your model is not a good
+description of the data, then the parameters extracted from the model won&#8217;t be
+accurate. Thus it&#8217;s very important to ensure that your model accurately
+describes your experimental images. To ensure that the model is accurate, we&#8217;ve
+found that it&#8217;s best to construct the model in a systematic way. For instance,
+for our confocal images we started by taking a blank image with the laser off,
+as a way to measure our background intensity. Next we measure and fit an image
+of just fluorescent dye, to describe our illumination correctly. Then we add
+a slab, then particles. We&#8217;ve provided a stripped-down version of this as a
+demo in scripts/test_genmodel.py. You should follow a similar protocol for your
+image formation model.</p>
+</div>
+<div class="section" id="if-the-fit-is-good-use-the-extracted-information-from-the-fit">
+<h2>If the fit is good, use the extracted information from the fit.<a class="headerlink" href="#if-the-fit-is-good-use-the-extracted-information-from-the-fit" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="reference/states.html#peri.states.ImageState" title="peri.states.ImageState"><code class="xref py py-class docutils literal"><span class="pre">ImageState</span></code></a> contains all the fitted parameters from
+the image and their values. The parameters are named with human-readable names
+that describe briefly which component and/or what the parameter describes.</p>
+<p>You can get the parameters and values by typing</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">st</span><span class="o">.</span><span class="n">params</span>
+<span class="k">print</span> <span class="n">st</span><span class="o">.</span><span class="n">values</span>
+</pre></div>
+</div>
+<p>which will print a very long list of all the state&#8217;s parameters and values.
+Usually this isn&#8217;t the best format to access the data. Instead, if you want a
+set of values for a certain set of parameters, use the <code class="docutils literal"><span class="pre">get_values</span></code> method.
+For instance, if I want to know the radius <code class="docutils literal"><span class="pre">a</span></code> of the 13th sphere or the
+fitted wavelength of the laser light from the point-spread function, I can
+type:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">st</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="s1">&#39;sph-13-a&#39;</span><span class="p">)</span>  <span class="c1"># 13th particle&#39;s radius, counting from 0</span>
+<span class="k">print</span> <span class="n">st</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="s1">&#39;psf-laser-wavelength&#39;</span><span class="p">)</span>  <span class="c1"># psf&#39;s fitted laser wavelength</span>
+</pre></div>
+</div>
+<p>In addition, there are several convenience functions. You can get all the
+positions or radii of all the particles in the state through these commands:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pos</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">()</span>
+<span class="n">rad</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_get_radii</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>These will return information on <em>all</em> the particles in the state, including
+ones fit to be outside the image! You can select only the particles inside an
+image by using <code class="xref py py-func docutils literal"><span class="pre">peri.test.analyze.good_particles()</span></code>, which will return a
+Boolean mask that is True for particles inside the image and False for those
+outside. The <code class="xref py py-mod docutils literal"><span class="pre">analyze</span></code> module has many other useful things for
+analyzing data, such as ways to calculate the packing fraction of the state and
+ways to save and load states as rapidly-loadable json files.</p>
+</div>
+<div class="section" id="making-this-faster">
+<h2>Making this faster<a class="headerlink" href="#making-this-faster" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have a completely-featured image, there is no point in repeating
+the tedium above to find the best positions and radii for the next image in
+your data. You can shortcut a lot of the human time by using some of the
+convenience functions in <code class="xref py py-mod docutils literal"><span class="pre">peri.runner</span></code>.</p>
+<p>All of these <code class="docutils literal"><span class="pre">runner</span></code> functions allow you to select the images and
+previously-featured states interactively through dialog boxes, for convenience.
+If this is not convenient you can instead pass the filenames for the states
+and images directly to the runner functions, along with a whole lot more
+options. Read the documentation if you want to know more!</p>
+<p>Here&#8217;s how to feature an image quickly...</p>
+<div class="section" id="using-the-microscope-parameters-from-another-state">
+<h3>...using the microscope parameters from another state<a class="headerlink" href="#using-the-microscope-parameters-from-another-state" title="Permalink to this headline">¶</a></h3>
+<p>You&#8217;ve already featured a few images from your dataset and have a good
+<code class="docutils literal"><span class="pre">peri</span></code> state for your microscope. You don&#8217;t want to spend a ton of time
+re-featuring the microscope parameters again; you just want the positions in
+the next image. If the particles in the new image have a radius of roughly
+5 pixels, run</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">runner</span><span class="o">.</span><span class="n">get_particles_featuring</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will pull up a file dialog box asking you to select the image to feature
+and the previously-featured state to take the microscope parameters from.
+Once you&#8217;ve done this, it will run on its own and save the state to the same
+directory as the image.</p>
+</div>
+<div class="section" id="using-the-microscope-parameters-and-positions-from-another-state">
+<h3>...using the microscope parameters and positions from another state<a class="headerlink" href="#using-the-microscope-parameters-and-positions-from-another-state" title="Permalink to this headline">¶</a></h3>
+<p>If the particles haven&#8217;t moved by a whole lot from one frame in your dataset
+to the next, then you can use</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">runner</span><span class="o">.</span><span class="n">translate_featuring</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>which also allows for you to select the image through dialog boxes.</p>
+</div>
+<div class="section" id="from-scratch">
+<h3>...from scratch<a class="headerlink" href="#from-scratch" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">runner</span></code> functions also allow for featuring images from scratch, without
+having a previously featured state. However, you&#8217;ll need to write and supply a
+statemaker function that makes a complete <code class="docutils literal"><span class="pre">ImageState</span></code>. The statemaker
+function needs to provide a model that can accurately describe your microscope
+image formation. See the <code class="docutils literal"><span class="pre">runner</span></code> documentation or the example statemaker
+in scripts/statemaker_example.py for details. To feature an image of dark
+spherical particles with a radius of roughly 5 pixels on a bright background,
+type:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">runner</span><span class="o">.</span><span class="n">get_initial_featuring</span><span class="p">(</span><span class="n">statemaker</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal"><span class="pre">statemaker</span></code> is the statemaker function. You&#8217;ll select the image
+through dialog boxes.</p>
+</div>
+<div class="section" id="from-a-guess-of-positions-and-radii">
+<h3>...from a guess of positions and radii<a class="headerlink" href="#from-a-guess-of-positions-and-radii" title="Permalink to this headline">¶</a></h3>
+<p>Perhaps you&#8217;ve already spent a lot of time with another method and have a
+pretty good guess for all the particle positions and radii. In that case, run</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">runner</span><span class="o">.</span><span class="n">feature_from_pos_rad</span><span class="p">(</span><span class="n">statemaker</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">rad</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once again, you&#8217;ll need a statemaker function. You will be able to select the
+image through dialog boxes.</p>
+</div>
+</div>
+<div class="section" id="checking-your-model-even-more">
+<h2>Checking your model even more<a class="headerlink" href="#checking-your-model-even-more" title="Permalink to this headline">¶</a></h2>
+<p>Once you have multiple images featured, you can check the quality of your model
+even more by looking at the variation of parameters from image to image. If
+your model is truly exact and you are truly at the best-possible fit, then the
+fitted parameters shouldn&#8217;t change from image to image except for the tiny
+amount of the Cramer-Rao bound. However, if your model is incomplete, the
+systematic effects missing from the model will couple to the effects included
+in the model, and small changes in the image (e.g. particles shifting) will
+cause changes in the fitted parameters abover the Cramer-Rao bound. For our
+confocal images of spheres, we&#8217;ve found that checking the radii variation from
+frame-to-frame in a movie of freely-diffusing particles is a stringent test of
+the quality of the fit and model. This is implemented in
+<code class="xref py py-func docutils literal"><span class="pre">peri.test.track.calculate_state_radii_fluctuations()</span></code>, which uses the
+<a class="reference external" href="http://soft-matter.github.io/trackpy/v0.3.2/">trackpy</a> package.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">PERI Walkthrough</a><ul>
+<li><a class="reference internal" href="#what-is-peri">What is PERI?</a></li>
+<li><a class="reference internal" href="#take-a-microscope-image">Take a microscope image.</a></li>
+<li><a class="reference internal" href="#create-a-mathematical-model-of-the-image-formation-process">Create a mathematical model of the image formation process.</a></li>
+<li><a class="reference internal" href="#fit-that-mathematical-model-to-the-image">Fit that mathematical model to the image.</a></li>
+<li><a class="reference internal" href="#if-the-fit-is-not-good-improve-the-mathematical-model">If the fit is not good, improve the mathematical model.</a></li>
+<li><a class="reference internal" href="#if-the-fit-is-good-use-the-extracted-information-from-the-fit">If the fit is good, use the extracted information from the fit.</a></li>
+<li><a class="reference internal" href="#making-this-faster">Making this faster</a><ul>
+<li><a class="reference internal" href="#using-the-microscope-parameters-from-another-state">...using the microscope parameters from another state</a></li>
+<li><a class="reference internal" href="#using-the-microscope-parameters-and-positions-from-another-state">...using the microscope parameters and positions from another state</a></li>
+<li><a class="reference internal" href="#from-scratch">...from scratch</a></li>
+<li><a class="reference internal" href="#from-a-guess-of-positions-and-radii">...from a guess of positions and radii</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#checking-your-model-even-more">Checking your model even more</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="previous chapter">Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="architecture.html"
+                        title="next chapter">Package architecture</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/walkthrough.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="architecture.html" title="Package architecture"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

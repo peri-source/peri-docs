@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>peri.logger &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for peri.logger</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A simple but pretty logging interface for configurable logs across all packages.</span>
+<span class="sd">To use, simply import the base log and (maybe) tack on a child context:</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    from peri.logger import log</span>
+<span class="sd">    clog = log.getChild(&quot;&lt;child name&gt;&quot;) # optional</span>
+
+<span class="sd">    The possible options are:</span>
+<span class="sd">    clog.{info,debug,warn,error,fatal}(...)</span>
+
+<span class="sd">Call with:</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    log.info(&#39;something %r&#39; % object)</span>
+<span class="sd">    log.error(&#39;bad thing&#39;)</span>
+
+<span class="sd">You can set the level of information displayed, for example, to only display</span>
+<span class="sd">critical errors. The order is debug, info, warn, error, fatal</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    log.set_level(&#39;info&#39;)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">StringIO</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.handlers</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">contextmanager</span>
+
+<span class="kn">from</span> <span class="nn">peri</span> <span class="k">import</span> <span class="n">conf</span>
+
+<div class="viewcode-block" id="Logger"><a class="viewcode-back" href="../../reference/logger.html#peri.logger.Logger">[docs]</a><span class="k">class</span> <span class="nc">Logger</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="s1">&#39;vvv&#39;</span><span class="p">,</span> <span class="n">colorlogs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logtofile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">logfilename</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new logger class. Since the logging interface is actually global,</span>
+<span class="sd">        any new logs will create even more clutter on the screen. Therefore,</span>
+<span class="sd">        only create one! (as is created at the bottom of this file)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;peri&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">=</span> <span class="n">sanitize</span><span class="p">(</span><span class="n">verbosity</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logfilename</span> <span class="o">=</span> <span class="n">logfilename</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">v2l</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">verbosity</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+        <span class="n">form</span>  <span class="o">=</span> <span class="n">v2f</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">verbosity</span><span class="p">,</span> <span class="s1">&#39;standard&#39;</span><span class="p">)</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;console-color&#39;</span> <span class="k">if</span> <span class="n">colorlogs</span> <span class="k">else</span> <span class="s1">&#39;console-bw&#39;</span>
+
+        <span class="k">if</span> <span class="n">logtofile</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_handler</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s1">&#39;rotating-log&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="n">formatter</span><span class="o">=</span><span class="n">form</span><span class="p">,</span>
+                <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logfilename</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_handler</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="n">formatter</span><span class="o">=</span><span class="n">form</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;console-color&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_handlers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="n">listify</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_handler</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Logger.set_level"><a class="viewcode-back" href="../../reference/logger.html#peri.logger.Logger.set_level">[docs]</a>    <span class="k">def</span> <span class="nf">set_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the logging level (which types of logs are actually printed / recorded)</span>
+<span class="sd">        to one of [&#39;debug&#39;, &#39;info&#39;, &#39;warn&#39;, &#39;error&#39;, &#39;fatal&#39;] in that order</span>
+<span class="sd">        of severity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_handlers</span><span class="p">(</span><span class="n">handlers</span><span class="p">):</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">levels</span><span class="p">[</span><span class="n">level</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Logger.set_formatter"><a class="viewcode-back" href="../../reference/logger.html#peri.logger.Logger.set_formatter">[docs]</a>    <span class="k">def</span> <span class="nf">set_formatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formatter</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the text format of messages to one of the pre-determined forms,</span>
+<span class="sd">        one of [&#39;quiet&#39;, &#39;minimal&#39;, &#39;standard&#39;, &#39;verbose&#39;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_handlers</span><span class="p">(</span><span class="n">handlers</span><span class="p">):</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">formatters</span><span class="p">[</span><span class="n">formatter</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Logger.add_handler"><a class="viewcode-back" href="../../reference/logger.html#peri.logger.Logger.add_handler">[docs]</a>    <span class="k">def</span> <span class="nf">add_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;console-color&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">formatter</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add another handler to the logging system if not present already.</span>
+<span class="sd">        Available handlers are currently: [&#39;console-bw&#39;, &#39;console-color&#39;, &#39;rotating-log&#39;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># make sure the the log file has a name</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;rotating-log&#39;</span> <span class="ow">and</span> <span class="s1">&#39;filename&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">logfilename</span><span class="p">})</span>
+
+        <span class="c1"># make sure the the log file has a name</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;stringio&#39;</span> <span class="ow">and</span> <span class="s1">&#39;stringio&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;stringio&#39;</span><span class="p">:</span> <span class="n">StringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()})</span>
+
+        <span class="n">handler</span> <span class="o">=</span> <span class="n">types</span><span class="p">[</span><span class="n">name</span><span class="p">](</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_handler_raw</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="n">formatter</span><span class="o">=</span><span class="n">formatter</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">add_handler_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">formatter</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">levels</span><span class="p">[</span><span class="n">level</span><span class="p">])</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">formatters</span><span class="p">[</span><span class="n">formatter</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">handler</span>
+
+<div class="viewcode-block" id="Logger.remove_handler"><a class="viewcode-back" href="../../reference/logger.html#peri.logger.Logger.remove_handler">[docs]</a>    <span class="k">def</span> <span class="nf">remove_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove handler from the logging system if present already.</span>
+<span class="sd">        Available handlers are currently: [&#39;console-bw&#39;, &#39;console-color&#39;, &#39;rotating-log&#39;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">removeHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="n">name</span><span class="p">])</span></div>
+
+    <span class="nd">@contextmanager</span>
+<div class="viewcode-block" id="Logger.noformat"><a class="viewcode-back" href="../../reference/logger.html#peri.logger.Logger.noformat">[docs]</a>    <span class="k">def</span> <span class="nf">noformat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Temporarily do not use any formatter so that text printed is raw &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">formats</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_handlers</span><span class="p">():</span>
+                <span class="n">formats</span><span class="p">[</span><span class="n">h</span><span class="p">]</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">formatter</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_formatter</span><span class="p">(</span><span class="n">formatter</span><span class="o">=</span><span class="s1">&#39;quiet&#39;</span><span class="p">)</span>
+            <span class="k">yield</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">formats</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="n">k</span><span class="o">.</span><span class="n">formatter</span> <span class="o">=</span> <span class="n">v</span></div>
+
+<div class="viewcode-block" id="Logger.set_verbosity"><a class="viewcode-back" href="../../reference/logger.html#peri.logger.Logger.set_verbosity">[docs]</a>    <span class="k">def</span> <span class="nf">set_verbosity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="s1">&#39;vvv&#39;</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the verbosity level of a certain log handler or of all handlers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        verbosity : &#39;v&#39; to &#39;vvvvv&#39;</span>
+<span class="sd">            the level of verbosity, more v&#39;s is more verbose</span>
+
+<span class="sd">        handlers : string, or list of strings</span>
+<span class="sd">            handler names can be found in ``peri.logger.types.keys()``</span>
+<span class="sd">            Current set is::</span>
+
+<span class="sd">                [&#39;console-bw&#39;, &#39;console-color&#39;, &#39;rotating-log&#39;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">=</span> <span class="n">sanitize</span><span class="p">(</span><span class="n">verbosity</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_level</span><span class="p">(</span><span class="n">v2l</span><span class="p">[</span><span class="n">verbosity</span><span class="p">],</span> <span class="n">handlers</span><span class="o">=</span><span class="n">handlers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_formatter</span><span class="p">(</span><span class="n">v2f</span><span class="p">[</span><span class="n">verbosity</span><span class="p">],</span> <span class="n">handlers</span><span class="o">=</span><span class="n">handlers</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">warn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">exception</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">fatal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">getChild</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<span class="n">BWHandler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span>
+<span class="n">LogHandler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">RotatingFileHandler</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">peri.logger_colors</span> <span class="k">import</span> <span class="n">PygmentHandler</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">PygmentHandler</span> <span class="o">=</span> <span class="n">BWHandler</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">loggr</span> <span class="k">import</span> <span class="n">LoggrHandler</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">LoggrHandler</span> <span class="o">=</span> <span class="n">BWHandler</span>
+
+<span class="n">types</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;stringio&#39;</span><span class="p">:</span> <span class="n">BWHandler</span><span class="p">,</span>
+    <span class="s1">&#39;console-bw&#39;</span><span class="p">:</span> <span class="n">BWHandler</span><span class="p">,</span>
+    <span class="s1">&#39;console-color&#39;</span><span class="p">:</span> <span class="n">PygmentHandler</span><span class="p">,</span>
+    <span class="s1">&#39;rotating-log&#39;</span><span class="p">:</span> <span class="n">LogHandler</span><span class="p">,</span>
+    <span class="s1">&#39;loggr&#39;</span><span class="p">:</span> <span class="n">LoggrHandler</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">levels</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;debug&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+    <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+    <span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">,</span>
+    <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+    <span class="s1">&#39;fatal&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">FATAL</span>
+<span class="p">}</span>
+
+<span class="n">formatters</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;quiet&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;minimal&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;standard&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;verbose&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%(filename)s</span><span class="s1">:</span><span class="si">%(lineno)d</span><span class="s1"> | </span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span>
+<span class="p">}</span>
+
+<span class="n">v2l</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;&#39;</span><span class="p">:</span>     <span class="s1">&#39;fatal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;v&#39;</span><span class="p">:</span>    <span class="s1">&#39;error&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;vv&#39;</span><span class="p">:</span>   <span class="s1">&#39;warn&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;vvv&#39;</span><span class="p">:</span>  <span class="s1">&#39;info&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;vvvv&#39;</span><span class="p">:</span> <span class="s1">&#39;debug&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;vvvvv&#39;</span><span class="p">:</span><span class="s1">&#39;debug&#39;</span>
+<span class="p">}</span>
+
+<span class="n">v2f</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;&#39;</span><span class="p">:</span>      <span class="s1">&#39;quiet&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;v&#39;</span><span class="p">:</span>     <span class="s1">&#39;minimal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;vv&#39;</span><span class="p">:</span>    <span class="s1">&#39;minimal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;vvv&#39;</span><span class="p">:</span>   <span class="s1">&#39;standard&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;vvvv&#39;</span><span class="p">:</span>  <span class="s1">&#39;standard&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;vvvvv&#39;</span><span class="p">:</span> <span class="s1">&#39;verbose&#39;</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">listify</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">a</span>
+
+<span class="k">def</span> <span class="nf">sanitize</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">num</span><span class="p">]),</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s1">&#39;v&#39;</span><span class="o">*</span><span class="n">num</span>
+
+<span class="n">cf</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">load_conf</span><span class="p">()</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span>
+    <span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;verbosity&#39;</span><span class="p">),</span> <span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;log-colors&#39;</span><span class="p">),</span>
+    <span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;log-to-file&#39;</span><span class="p">),</span> <span class="n">cf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;log-filename&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

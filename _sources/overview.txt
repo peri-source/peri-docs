@@ -1,0 +1,25 @@
+Architecture overview
+=====================
+
+In order to facilitate adding new models and adapting the included models to
+new types of microscopes, we will describe here the basic structure of PERI the
+Python package. 
+
+The goal of PERI is to compare (and ultimately fit) a model to a set of data,
+usually images from a microscope. If the noise in the image is Gaussian
+distributed then this problem reduces to a least-squares optimization comparing
+our synthetic image to the data, :math:`\rm{min}_{\sigma} \sum_i | M(\sigma)_i
+- I_i |^2` where :math:`M(\sigma)_i` is the model image of parameters
+:math:`\sigma` at pixel :math:`i` and :math:`I_i` is the corresponding data
+pixel.
+
+Models
+------
+
+
+
+Components
+----------
+
+
+

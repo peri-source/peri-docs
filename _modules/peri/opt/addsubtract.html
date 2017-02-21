@@ -1,0 +1,986 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>peri.opt.addsubtract &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for peri.opt.addsubtract</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.ndimage</span> <span class="k">as</span> <span class="nn">nd</span>
+
+<span class="kn">import</span> <span class="nn">peri</span>
+<span class="kn">from</span> <span class="nn">peri</span> <span class="k">import</span> <span class="n">initializers</span>
+<span class="kn">from</span> <span class="nn">peri.util</span> <span class="k">import</span> <span class="n">Tile</span>
+<span class="kn">import</span> <span class="nn">peri.opt.optimize</span> <span class="k">as</span> <span class="nn">opt</span>
+
+<span class="kn">from</span> <span class="nn">peri.logger</span> <span class="k">import</span> <span class="n">log</span>
+<span class="n">CLOG</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;addsub&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="feature_guess"><a class="viewcode-back" href="../../../reference/opt.html#peri.opt.addsubtract.feature_guess">[docs]</a><span class="k">def</span> <span class="nf">feature_guess</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">rad</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">minmass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_tp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">trim_edge</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Makes a guess at particle positions using heuristic centroid methods.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    st : :class:`peri.states.State`</span>
+<span class="sd">        The state to check adding particles to.</span>
+<span class="sd">    rad : Float</span>
+<span class="sd">        The feature size for featuring.</span>
+<span class="sd">    invert : Bool, optional</span>
+<span class="sd">        Whether to invert the image. Default is ``True``, i.e. dark particles</span>
+<span class="sd">    minmass : Float or None, optional</span>
+<span class="sd">        The minimum mass/masscut of a particle. Default is ``None`` =</span>
+<span class="sd">        calculated internally.</span>
+<span class="sd">    use_tp : Bool, optional</span>
+<span class="sd">        Whether or not to use trackpy. Default is ``False``, since trackpy</span>
+<span class="sd">        cuts out particles at the edge.</span>
+<span class="sd">    trim_edge : Bool, optional</span>
+<span class="sd">        Whether to trim particles at the edge pixels of the image. Can be</span>
+<span class="sd">        useful for initial featuring but is bad for adding missing particles</span>
+<span class="sd">        as they are frequently at the edge. Default is ``False``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    guess : [N,3] numpy.ndarray</span>
+<span class="sd">        The featured positions of the particles, sorted in order of decreasing</span>
+<span class="sd">        feature mass.</span>
+<span class="sd">    npart : Int</span>
+<span class="sd">        The number of added particles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># FIXME does not use the **kwargs, but needs b/c called with wrong kwargs</span>
+    <span class="k">if</span> <span class="n">invert</span><span class="p">:</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">st</span><span class="o">.</span><span class="n">residuals</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">residuals</span>
+    <span class="k">return</span> <span class="n">_feature_guess</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">rad</span><span class="p">,</span> <span class="n">minmass</span><span class="o">=</span><span class="n">minmass</span><span class="p">,</span> <span class="n">use_tp</span><span class="o">=</span><span class="n">use_tp</span><span class="p">,</span>
+            <span class="n">trim_edge</span><span class="o">=</span><span class="n">trim_edge</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_feature_guess</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">rad</span><span class="p">,</span> <span class="n">minmass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_tp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">trim_edge</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Workhorse of feature_guess&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">minmass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># we use 1% of the feature size mass as a cutoff;</span>
+        <span class="c1"># it&#39;s easier to remove than to add</span>
+        <span class="n">minmass</span> <span class="o">=</span> <span class="n">rad</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">4</span><span class="o">/</span><span class="mf">3.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">0.01</span>
+        <span class="c1"># 0.03 is a magic number; works well</span>
+    <span class="k">if</span> <span class="n">use_tp</span><span class="p">:</span>
+        <span class="n">diameter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">rad</span><span class="p">)</span>
+        <span class="n">diameter</span> <span class="o">+=</span> <span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="n">diameter</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">peri</span><span class="o">.</span><span class="n">trackpy</span><span class="o">.</span><span class="n">locate</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">diameter</span><span class="p">),</span> <span class="n">minmass</span><span class="o">=</span><span class="n">minmass</span><span class="p">)</span>
+        <span class="n">npart</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;mass&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">guess</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">npart</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+        <span class="n">guess</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]</span>
+        <span class="n">guess</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span>
+        <span class="n">guess</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;mass&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">guess</span><span class="p">,</span> <span class="n">mass</span> <span class="o">=</span> <span class="n">initializers</span><span class="o">.</span><span class="n">local_max_featuring</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">rad</span><span class="p">,</span>
+                <span class="n">minmass</span><span class="o">=</span><span class="n">minmass</span><span class="p">,</span> <span class="n">trim_edge</span><span class="o">=</span><span class="n">trim_edge</span><span class="p">)</span>
+        <span class="n">npart</span> <span class="o">=</span> <span class="n">guess</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># I want to return these sorted by mass:</span>
+    <span class="n">inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">mass</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># biggest mass first</span>
+    <span class="k">return</span> <span class="n">guess</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">npart</span>
+
+
+<span class="k">def</span> <span class="nf">check_add_particles</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">guess</span><span class="p">,</span> <span class="n">rad</span><span class="o">=</span><span class="s1">&#39;calc&#39;</span><span class="p">,</span> <span class="n">do_opt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">im_change_frac</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">min_derr</span><span class="o">=</span><span class="s1">&#39;3sig&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks whether to add particles at a given position by seeing if adding</span>
+<span class="sd">    the particle improves the fit of the state.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    st : :class:`peri.states.State`</span>
+<span class="sd">        The state to check adding particles to.</span>
+<span class="sd">    guess : [N,3] list-like</span>
+<span class="sd">        The positions of particles to check to add.</span>
+<span class="sd">    rad : {Float, ``&#39;calc&#39;``}, optional.</span>
+<span class="sd">        The radius of the newly-added particles. Default is ``&#39;calc&#39;``,</span>
+<span class="sd">        which uses the states current radii&#39;s median.</span>
+<span class="sd">    do_opt : Bool, optional</span>
+<span class="sd">        Whether to optimize the particle position before checking if it</span>
+<span class="sd">        should be kept. Default is True (optimizes position).</span>
+<span class="sd">    im_change_frac : Float</span>
+<span class="sd">        How good the change in error needs to be relative to the change in</span>
+<span class="sd">        the difference image. Default is 0.2; i.e. if the error does not</span>
+<span class="sd">        decrease by 20% of the change in the difference image, do not add</span>
+<span class="sd">        the particle.</span>
+<span class="sd">    min_derr : Float or &#39;3sig&#39;</span>
+<span class="sd">        The minimal improvement in error to add a particle. Default</span>
+<span class="sd">        is ``&#39;3sig&#39; = 3*st.sigma``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    accepts : Int</span>
+<span class="sd">        The number of added particles</span>
+<span class="sd">    new_poses : [N,3] list</span>
+<span class="sd">        List of the positions of the added particles. If ``do_opt==True``,</span>
+<span class="sd">        then these positions will differ from the input &#39;guess&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># FIXME does not use the **kwargs, but needs b/c called with wrong kwargs</span>
+    <span class="k">if</span> <span class="n">min_derr</span> <span class="o">==</span> <span class="s1">&#39;3sig&#39;</span><span class="p">:</span>
+        <span class="n">min_derr</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">st</span><span class="o">.</span><span class="n">sigma</span>
+    <span class="n">accepts</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">new_poses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">rad</span> <span class="ow">is</span> <span class="s1">&#39;calc&#39;</span><span class="p">:</span>
+        <span class="n">rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_radii</span><span class="p">())</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">30</span> <span class="o">+</span> <span class="s1">&#39;ADDING&#39;</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">30</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">  Z</span><span class="se">\t</span><span class="s1">  Y</span><span class="se">\t</span><span class="s1">  X</span><span class="se">\t</span><span class="s1">  R</span><span class="se">\t</span><span class="s1">|</span><span class="se">\t</span><span class="s1"> ERR0</span><span class="se">\t\t</span><span class="s1"> ERR1&#39;</span>
+    <span class="k">with</span> <span class="n">log</span><span class="o">.</span><span class="n">noformat</span><span class="p">():</span>
+        <span class="n">CLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">guess</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">p0</span> <span class="o">=</span> <span class="n">guess</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
+        <span class="n">absent_err</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span>
+        <span class="n">absent_d</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_add_particle</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">rad</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">do_opt</span><span class="p">:</span>
+            <span class="c1"># the slowest part of this</span>
+            <span class="n">opt</span><span class="o">.</span><span class="n">do_levmarq_particles</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">damping</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">run_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">eig_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_rad</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">present_err</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span>
+        <span class="n">present_d</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">dont_kill</span> <span class="o">=</span> <span class="n">should_particle_exist</span><span class="p">(</span><span class="n">absent_err</span><span class="p">,</span> <span class="n">present_err</span><span class="p">,</span> <span class="n">absent_d</span><span class="p">,</span>
+                <span class="n">present_d</span><span class="p">,</span> <span class="n">im_change_frac</span><span class="o">=</span><span class="n">im_change_frac</span><span class="p">,</span> <span class="n">min_derr</span><span class="o">=</span><span class="n">min_derr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dont_kill</span><span class="p">:</span>
+            <span class="n">accepts</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">()[</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_radii</span><span class="p">()[</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+            <span class="n">new_poses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="n">part_msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%2.2f</span><span class="se">\t</span><span class="si">%3.2f</span><span class="se">\t</span><span class="si">%3.2f</span><span class="se">\t</span><span class="si">%3.2f</span><span class="se">\t</span><span class="s1">|</span><span class="se">\t</span><span class="si">%4.3f</span><span class="s1">  </span><span class="se">\t</span><span class="si">%4.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">p</span> <span class="o">+</span> <span class="n">r</span> <span class="o">+</span> <span class="p">(</span><span class="n">absent_err</span><span class="p">,</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">))</span>
+            <span class="k">with</span> <span class="n">log</span><span class="o">.</span><span class="n">noformat</span><span class="p">():</span>
+                <span class="n">CLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">part_msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">obj_remove_particle</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">absent_err</span> <span class="o">-</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;updates not exact?&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">accepts</span><span class="p">,</span> <span class="n">new_poses</span>
+
+
+<span class="k">def</span> <span class="nf">check_remove_particle</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">im_change_frac</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">min_derr</span><span class="o">=</span><span class="s1">&#39;3sig&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks whether to remove particle &#39;ind&#39; from state &#39;st&#39;. If removing the</span>
+<span class="sd">    particle increases the error by less than max( min_derr, change in image *</span>
+<span class="sd">    im_change_frac), then the particle is removed.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    st : :class:`peri.states.State`</span>
+<span class="sd">        The state to check adding particles to.</span>
+<span class="sd">    ind : Int</span>
+<span class="sd">        The index of the particle to check to remove.</span>
+<span class="sd">    im_change_frac : Float</span>
+<span class="sd">        How good the change in error needs to be relative to the change in</span>
+<span class="sd">        the difference image. Default is 0.2; i.e. if the error does not</span>
+<span class="sd">        decrease by 20% of the change in the difference image, do not add</span>
+<span class="sd">        the particle.</span>
+<span class="sd">    min_derr : Float or &#39;3sig&#39;</span>
+<span class="sd">        The minimal improvement in error to add a particle. Default is</span>
+<span class="sd">        ``&#39;3sig&#39; = 3*st.sigma``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    killed : Bool</span>
+<span class="sd">        Whether the particle was removed.</span>
+<span class="sd">    p : Tuple</span>
+<span class="sd">        The position of the removed particle.</span>
+<span class="sd">    r : Tuple</span>
+<span class="sd">        The radius of the removed particle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># FIXME does not use the **kwargs, but needs b/c called with wrong kwargs</span>
+    <span class="k">if</span> <span class="n">min_derr</span> <span class="o">==</span> <span class="s1">&#39;3sig&#39;</span><span class="p">:</span>
+        <span class="n">min_derr</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">st</span><span class="o">.</span><span class="n">sigma</span>
+    <span class="n">present_err</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">;</span> <span class="n">present_d</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">p</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_remove_particle</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">absent_err</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">;</span> <span class="n">absent_d</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">should_particle_exist</span><span class="p">(</span><span class="n">absent_err</span><span class="p">,</span> <span class="n">present_err</span><span class="p">,</span> <span class="n">absent_d</span><span class="p">,</span> <span class="n">present_d</span><span class="p">,</span>
+            <span class="n">im_change_frac</span><span class="o">=</span><span class="n">im_change_frac</span><span class="p">,</span> <span class="n">min_derr</span><span class="o">=</span><span class="n">min_derr</span><span class="p">):</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">obj_add_particle</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">killed</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">killed</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">killed</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="p">(</span><span class="n">r</span><span class="p">,)</span>
+
+
+<span class="k">def</span> <span class="nf">should_particle_exist</span><span class="p">(</span><span class="n">absent_err</span><span class="p">,</span> <span class="n">present_err</span><span class="p">,</span> <span class="n">absent_d</span><span class="p">,</span> <span class="n">present_d</span><span class="p">,</span>
+        <span class="n">im_change_frac</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">min_derr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks whether or not adding a particle should be present.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    absent_err : Float</span>
+<span class="sd">        The state error without the particle.</span>
+<span class="sd">    present_err : Float</span>
+<span class="sd">        The state error with the particle.</span>
+<span class="sd">    absent_d : numpy.ndarray</span>
+<span class="sd">        The state residuals without the particle.</span>
+<span class="sd">    present_d : numpy.ndarray</span>
+<span class="sd">        The state residuals with the particle.</span>
+<span class="sd">    im_change_frac : Float, optional</span>
+<span class="sd">        How good the change in error needs to be relative to the change in</span>
+<span class="sd">        the residuals. Default is 0.2; i.e. return False if the error does</span>
+<span class="sd">        not decrease by 0.2 x the change in the residuals.</span>
+<span class="sd">    min_derr : Float, optional</span>
+<span class="sd">        The minimal improvement in error. Default is 0.1</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Bool</span>
+<span class="sd">        True if the errors is better with the particle present.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">delta_im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">present_d</span> <span class="o">-</span> <span class="n">absent_d</span><span class="p">)</span>
+    <span class="n">im_change</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">delta_im</span><span class="p">,</span> <span class="n">delta_im</span><span class="p">)</span>
+    <span class="n">err_cutoff</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">im_change_frac</span> <span class="o">*</span> <span class="n">im_change</span><span class="p">,</span> <span class="n">min_derr</span><span class="p">])</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">absent_err</span> <span class="o">-</span> <span class="n">present_err</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">err_cutoff</span>
+
+
+<span class="k">def</span> <span class="nf">add_missing_particles</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">rad</span><span class="o">=</span><span class="s1">&#39;calc&#39;</span><span class="p">,</span> <span class="n">tries</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Attempts to add missing particles to the state.</span>
+
+<span class="sd">    Operates by:</span>
+<span class="sd">    (1) featuring the difference image using feature_guess,</span>
+<span class="sd">    (2) attempting to add the featured positions using check_add_particles.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    st : :class:`peri.states.State`</span>
+<span class="sd">        The state to check adding particles to.</span>
+<span class="sd">    rad : Float or &#39;calc&#39;, optional</span>
+<span class="sd">        The radius of the newly-added particles and of the feature size for</span>
+<span class="sd">        featuring. Default is &#39;calc&#39;, which uses the median of the state&#39;s</span>
+<span class="sd">        current radii.</span>
+<span class="sd">    tries : Int, optional</span>
+<span class="sd">        How many particles to attempt to add. Only tries to add the first</span>
+<span class="sd">        ``tries`` particles, in order of mass. Default is 50.</span>
+
+<span class="sd">    Other Parameters</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    invert : Bool, optional</span>
+<span class="sd">        Whether to invert the image. Default is ``True``, i.e. dark particles</span>
+<span class="sd">    minmass : Float or None, optionals</span>
+<span class="sd">        The minimum mass/masscut of a particle. Default is ``None``=calcualted</span>
+<span class="sd">        by ``feature_guess``.</span>
+<span class="sd">    use_tp : Bool, optional</span>
+<span class="sd">        Whether to use trackpy in feature_guess. Default is False, since</span>
+<span class="sd">        trackpy cuts out particles at the edge.</span>
+
+<span class="sd">    do_opt : Bool, optional</span>
+<span class="sd">        Whether to optimize the particle position before checking if it</span>
+<span class="sd">        should be kept. Default is True (optimizes position).</span>
+<span class="sd">    im_change_frac : Float, optional</span>
+<span class="sd">        How good the change in error needs to be relative to the change</span>
+<span class="sd">        in the difference image. Default is 0.2; i.e. if the error does</span>
+<span class="sd">        not decrease by 20% of the change in the difference image, do</span>
+<span class="sd">        not add the particle.</span>
+
+<span class="sd">    min_derr : Float or &#39;3sig&#39;, optional</span>
+<span class="sd">        The minimal improvement in error to add a particle. Default</span>
+<span class="sd">        is ``&#39;3sig&#39; = 3*st.sigma``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    accepts : Int</span>
+<span class="sd">        The number of added particles</span>
+<span class="sd">    new_poses : [N,3] list</span>
+<span class="sd">        List of the positions of the added particles. If ``do_opt==True``,</span>
+<span class="sd">        then these positions will differ from the input &#39;guess&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">rad</span> <span class="o">==</span> <span class="s1">&#39;calc&#39;</span><span class="p">:</span>
+        <span class="n">rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_radii</span><span class="p">())</span>
+
+    <span class="n">guess</span><span class="p">,</span> <span class="n">npart</span> <span class="o">=</span> <span class="n">feature_guess</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">rad</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">tries</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">tries</span><span class="p">,</span> <span class="n">npart</span><span class="p">])</span>
+
+    <span class="n">accepts</span><span class="p">,</span> <span class="n">new_poses</span> <span class="o">=</span> <span class="n">check_add_particles</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">guess</span><span class="p">[:</span><span class="n">tries</span><span class="p">],</span> <span class="n">rad</span><span class="o">=</span><span class="n">rad</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">accepts</span><span class="p">,</span> <span class="n">new_poses</span>
+
+
+<span class="k">def</span> <span class="nf">remove_bad_particles</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">min_rad</span><span class="o">=</span><span class="s1">&#39;calc&#39;</span><span class="p">,</span> <span class="n">max_rad</span><span class="o">=</span><span class="s1">&#39;calc&#39;</span><span class="p">,</span> <span class="n">min_edge_dist</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+        <span class="n">check_rad_cutoff</span><span class="o">=</span><span class="p">[</span><span class="mf">3.5</span><span class="p">,</span><span class="mi">15</span><span class="p">],</span> <span class="n">check_outside_im</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tries</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">im_change_frac</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Removes improperly-featured particles from the state, based on a</span>
+<span class="sd">    combination of particle size and the change in error on removal.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    st : :class:`peri.states.State`</span>
+<span class="sd">        The state to remove bad particles from.</span>
+<span class="sd">    min_rad : Float, optional</span>
+<span class="sd">        All particles with radius below min_rad are automatically deleted.</span>
+<span class="sd">        Set to &#39;calc&#39; to make it the median rad - 25* radius std.</span>
+<span class="sd">        Default is &#39;calc&#39;.</span>
+
+<span class="sd">    max_rad : Float, optional</span>
+<span class="sd">        All particles with radius above max_rad are automatically deleted.</span>
+<span class="sd">        Set to &#39;calc&#39; to make it the median rad + 15* radius std.</span>
+<span class="sd">        Default is &#39;calc&#39;.</span>
+
+<span class="sd">    min_edge_dist : Float, optional</span>
+<span class="sd">        All particles within min_edge_dist of the (padded) image</span>
+<span class="sd">        edges are automatically deleted. Default is 2.0</span>
+
+<span class="sd">    check_rad_cutoff : 2-element list of floats, optional</span>
+<span class="sd">        Particles with radii &lt; check_rad_cutoff[0] or &gt; check_rad_cutoff[1]</span>
+<span class="sd">        are checked if they should be deleted. Set to &#39;calc&#39; to make it the</span>
+<span class="sd">        median rad +- 3.5 * radius std. Default is [3.5, 15].</span>
+
+<span class="sd">    check_outside_im : Bool, optional</span>
+<span class="sd">        If True, checks if particles located outside the unpadded image</span>
+<span class="sd">        should be deleted. Default is True.</span>
+
+<span class="sd">    tries : Int, optional</span>
+<span class="sd">        The maximum number of particles with radii &lt; check_rad_cutoff</span>
+<span class="sd">        to try to remove. Checks in increasing order of radius size.</span>
+<span class="sd">        Default is 50.</span>
+
+<span class="sd">    im_change_frac : Float, , optional</span>
+<span class="sd">        Number between 0 and 1. If removing a particle decreases the</span>
+<span class="sd">        error by less than im_change_frac*the change in the image, then</span>
+<span class="sd">        the particle is deleted. Default is 0.2</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    removed: Int</span>
+<span class="sd">        The cumulative number of particles removed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">is_near_im_edge</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">pos</span><span class="p">,</span> <span class="n">pad</span><span class="p">:</span> <span class="p">(((</span><span class="n">pos</span> <span class="o">+</span> <span class="n">st</span><span class="o">.</span><span class="n">pad</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">pad</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">pos</span> <span class="o">&gt;</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">ishape</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span> <span class="n">st</span><span class="o">.</span><span class="n">pad</span> <span class="o">-</span> <span class="n">pad</span><span class="p">))</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># returns True if the position is within &#39;pad&#39; of the _outer_ image edge</span>
+    <span class="n">removed</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">attempts</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">n_tot_part</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">q10</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.1</span> <span class="o">*</span> <span class="n">n_tot_part</span><span class="p">)</span>  <span class="c1"># 10% quartile</span>
+    <span class="n">r_sig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_radii</span><span class="p">())[</span><span class="n">q10</span><span class="p">:</span><span class="o">-</span><span class="n">q10</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+    <span class="n">r_med</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_radii</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">max_rad</span> <span class="o">==</span> <span class="s1">&#39;calc&#39;</span><span class="p">:</span>
+        <span class="n">max_rad</span> <span class="o">=</span> <span class="n">r_med</span> <span class="o">+</span> <span class="mi">15</span><span class="o">*</span><span class="n">r_sig</span>
+    <span class="k">if</span> <span class="n">min_rad</span> <span class="o">==</span> <span class="s1">&#39;calc&#39;</span><span class="p">:</span>
+        <span class="n">min_rad</span> <span class="o">=</span> <span class="n">r_med</span> <span class="o">-</span> <span class="mi">25</span><span class="o">*</span><span class="n">r_sig</span>
+    <span class="k">if</span> <span class="n">check_rad_cutoff</span> <span class="o">==</span> <span class="s1">&#39;calc&#39;</span><span class="p">:</span>
+        <span class="n">check_rad_cutoff</span> <span class="o">=</span> <span class="p">[</span><span class="n">r_med</span> <span class="o">-</span> <span class="mf">7.5</span><span class="o">*</span><span class="n">r_sig</span><span class="p">,</span> <span class="n">r_med</span> <span class="o">+</span> <span class="mf">7.5</span><span class="o">*</span><span class="n">r_sig</span><span class="p">]</span>
+
+    <span class="c1"># 1. Automatic deletion:</span>
+    <span class="n">rad_wrong_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">((</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_radii</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">min_rad</span><span class="p">)</span> <span class="o">|</span>
+            <span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_radii</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">max_rad</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">near_im_edge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">is_near_im_edge</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">(),</span>
+            <span class="n">min_edge_dist</span> <span class="o">-</span> <span class="n">st</span><span class="o">.</span><span class="n">pad</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">delete_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rad_wrong_size</span><span class="p">,</span> <span class="n">near_im_edge</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">delete_poses</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">()[</span><span class="n">delete_inds</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">27</span> <span class="o">+</span> <span class="s1">&#39;SUBTRACTING&#39;</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">28</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">  Z</span><span class="se">\t</span><span class="s1">  Y</span><span class="se">\t</span><span class="s1">  X</span><span class="se">\t</span><span class="s1">  R</span><span class="se">\t</span><span class="s1">|</span><span class="se">\t</span><span class="s1"> ERR0</span><span class="se">\t\t</span><span class="s1"> ERR1&#39;</span>
+    <span class="k">with</span> <span class="n">log</span><span class="o">.</span><span class="n">noformat</span><span class="p">():</span>
+        <span class="n">CLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">delete_poses</span><span class="p">:</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_closest_particle</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+        <span class="n">old_err</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span>
+        <span class="n">p</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_remove_particle</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">part_msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%2.2f</span><span class="se">\t</span><span class="si">%3.2f</span><span class="se">\t</span><span class="si">%3.2f</span><span class="se">\t</span><span class="si">%3.2f</span><span class="se">\t</span><span class="s1">|</span><span class="se">\t</span><span class="si">%4.3f</span><span class="s1">  </span><span class="se">\t</span><span class="si">%4.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="nb">tuple</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">r</span><span class="p">,)</span> <span class="o">+</span> <span class="p">(</span><span class="n">old_err</span><span class="p">,</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">))</span>
+        <span class="k">with</span> <span class="n">log</span><span class="o">.</span><span class="n">noformat</span><span class="p">():</span>
+            <span class="n">CLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">part_msg</span><span class="p">)</span>
+        <span class="n">removed</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># 2. Conditional deletion:</span>
+    <span class="n">check_rad_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">((</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_radii</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">check_rad_cutoff</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">|</span>
+            <span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_radii</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">check_rad_cutoff</span><span class="p">[</span><span class="mi">1</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">check_outside_im</span><span class="p">:</span>
+        <span class="n">check_edge_inds</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">is_near_im_edge</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">(),</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">pad</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">check_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">check_rad_inds</span><span class="p">,</span> <span class="n">check_edge_inds</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">check_inds</span> <span class="o">=</span> <span class="n">check_rad_inds</span>
+
+    <span class="n">check_inds</span> <span class="o">=</span> <span class="n">check_inds</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_radii</span><span class="p">()[</span><span class="n">check_inds</span><span class="p">])]</span>
+    <span class="n">tries</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">tries</span><span class="p">,</span> <span class="n">check_inds</span><span class="o">.</span><span class="n">size</span><span class="p">])</span>
+    <span class="n">check_poses</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">()[</span><span class="n">check_inds</span><span class="p">[:</span><span class="n">tries</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">check_poses</span><span class="p">:</span>
+        <span class="n">old_err</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_closest_particle</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+        <span class="n">killed</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">check_remove_particle</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">im_change_frac</span><span class="o">=</span><span class="n">im_change_frac</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">killed</span><span class="p">:</span>
+            <span class="n">removed</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">check_inds</span><span class="p">[</span><span class="n">check_inds</span> <span class="o">&gt;</span> <span class="n">ind</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>  <span class="c1"># cleaning up indices....</span>
+            <span class="n">delete_poses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+            <span class="n">part_msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%2.2f</span><span class="se">\t</span><span class="si">%3.2f</span><span class="se">\t</span><span class="si">%3.2f</span><span class="se">\t</span><span class="si">%3.2f</span><span class="se">\t</span><span class="s1">|</span><span class="se">\t</span><span class="si">%4.3f</span><span class="s1">  </span><span class="se">\t</span><span class="si">%4.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">p</span> <span class="o">+</span> <span class="n">r</span> <span class="o">+</span> <span class="p">(</span><span class="n">old_err</span><span class="p">,</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">))</span>
+            <span class="k">with</span> <span class="n">log</span><span class="o">.</span><span class="n">noformat</span><span class="p">():</span>
+                <span class="n">CLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">part_msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">removed</span><span class="p">,</span> <span class="n">delete_poses</span>
+
+
+<div class="viewcode-block" id="add_subtract"><a class="viewcode-back" href="../../../reference/opt.html#peri.opt.addsubtract.add_subtract">[docs]</a><span class="k">def</span> <span class="nf">add_subtract</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">max_npart</span><span class="o">=</span><span class="s1">&#39;calc&#39;</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mi">2</span><span class="n">e8</span><span class="p">,</span>
+        <span class="n">always_check_remove</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Automatically adds and subtracts missing &amp; extra particles.</span>
+
+<span class="sd">    Operates by removing bad particles then adding missing particles on</span>
+<span class="sd">    repeat, until either no particles are added/removed or after `max_iter`</span>
+<span class="sd">    attempts.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    st: :class:`peri.states.State`</span>
+<span class="sd">        The state to add and subtract particles to.</span>
+<span class="sd">    max_iter : Int, optional</span>
+<span class="sd">        The maximum number of add-subtract loops to use. Default is 7.</span>
+<span class="sd">        Terminates after either max_iter loops or when nothing has changed.</span>
+<span class="sd">    max_npart : Int or &#39;calc&#39;, optional</span>
+<span class="sd">        The maximum number of particles to add before optimizing the non-psf</span>
+<span class="sd">        globals. Default is ``&#39;calc&#39;``, which uses 5% of the initial number</span>
+<span class="sd">        of particles.</span>
+<span class="sd">    max_mem : Int, optional</span>
+<span class="sd">        The maximum memory to use for optimization after adding max_npart</span>
+<span class="sd">        particles. Default is 2e8.</span>
+<span class="sd">    always_check_remove : Bool, optional</span>
+<span class="sd">        Set to True to always check whether to remove particles. If ``False``,</span>
+<span class="sd">        only checks for removal while particles were removed on the previous</span>
+<span class="sd">        attempt. Default is False.</span>
+
+<span class="sd">    Other Parameters</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    invert : Bool, optional</span>
+<span class="sd">        ``True`` if the particles are dark on a bright background, ``False``</span>
+<span class="sd">        if they are bright on a dark background. Default is ``True``.</span>
+<span class="sd">    min_rad : Float, optional</span>
+<span class="sd">        Particles with radius below ``min_rad`` are automatically deleted.</span>
+<span class="sd">        Default is ``&#39;calc&#39;`` = median rad - 25* radius std.</span>
+<span class="sd">    max_rad : Float, optional</span>
+<span class="sd">        Particles with radius above ``max_rad`` are automatically deleted.</span>
+<span class="sd">        Default is ``&#39;calc&#39;`` = median rad + 15* radius std, but you should</span>
+<span class="sd">        change this for your particle sizes.</span>
+
+<span class="sd">    min_edge_dist : Float, optional</span>
+<span class="sd">        Particles closer to the edge of the padded image than this are</span>
+<span class="sd">        automatically deleted. Default is 2.0.</span>
+<span class="sd">    check_rad_cutoff : 2-element float list.</span>
+<span class="sd">        Particles with ``radii &lt; check_rad_cutoff[0]`` or ``&gt; check...[1]``</span>
+<span class="sd">        are checked if they should be deleted (not automatic). Default is</span>
+<span class="sd">        ``[3.5, 15]``.</span>
+<span class="sd">    check_outside_im : Bool, optional</span>
+<span class="sd">        Set to True to check whether to delete particles whose positions are</span>
+<span class="sd">        outside the un-padded image.</span>
+
+<span class="sd">    rad : Float, optional</span>
+<span class="sd">        The initial radius for added particles; added particles radii are</span>
+<span class="sd">        not fit until the end of ``add_subtract``. Default is ``&#39;calc&#39;``,</span>
+<span class="sd">        which uses the median radii of active particles.</span>
+
+<span class="sd">    tries : Int, optional</span>
+<span class="sd">        The number of particles to attempt to remove or add, per iteration.</span>
+<span class="sd">        Default is 50.</span>
+
+<span class="sd">    im_change_frac : Float, optional</span>
+<span class="sd">        How good the change in error needs to be relative to the change in</span>
+<span class="sd">        the difference image. Default is 0.2; i.e. if the error does not</span>
+<span class="sd">        decrease by 20% of the change in the difference image, do not add</span>
+<span class="sd">        the particle.</span>
+
+<span class="sd">    min_derr : Float, optional</span>
+<span class="sd">        The minimum change in the state&#39;s error to keep a particle in the</span>
+<span class="sd">        image. Default is ``&#39;3sig&#39;`` which uses ``3*st.sigma``.</span>
+
+<span class="sd">    do_opt : Bool, optional</span>
+<span class="sd">        Set to False to avoid optimizing particle positions after adding.</span>
+<span class="sd">    minmass : Float, optional</span>
+<span class="sd">        The minimum mass for a particle to be identified as a feature,</span>
+<span class="sd">        as used by trackpy. Defaults to a decent guess.</span>
+
+<span class="sd">    use_tp : Bool, optional</span>
+<span class="sd">        Set to True to use trackpy to find missing particles inside the</span>
+<span class="sd">        image. Not recommended since trackpy deliberately cuts out particles</span>
+<span class="sd">        at the edge of the image. Default is ``False``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    total_changed : Int</span>
+<span class="sd">        The total number of adds and subtracts done on the data. Not the</span>
+<span class="sd">        same as ``changed_inds.size`` since the same particle or particle</span>
+<span class="sd">        index can be added/subtracted multiple times.</span>
+<span class="sd">    added_positions : [N_added,3] numpy.ndarray</span>
+<span class="sd">        The positions of particles that have been added at any point in the</span>
+<span class="sd">        add-subtract cycle.</span>
+<span class="sd">    removed_positions : [N_added,3] numpy.ndarray</span>
+<span class="sd">        The positions of particles that have been removed at any point in</span>
+<span class="sd">        the add-subtract cycle.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    ------</span>
+<span class="sd">    Occasionally after the intial featuring a cluster of particles is</span>
+<span class="sd">    featured as 1 big particle. To fix these mistakes, it helps to set</span>
+<span class="sd">    max_rad to a physical value. This removes the big particle and allows</span>
+<span class="sd">    it to be re-featured by (several passes of) the adds.</span>
+
+<span class="sd">    The added/removed positions returned are whether or not the position</span>
+<span class="sd">    has been added or removed ever. It&#39;s possible that a position is</span>
+<span class="sd">    added, then removed during a later iteration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">max_npart</span> <span class="o">==</span> <span class="s1">&#39;calc&#39;</span><span class="p">:</span>
+        <span class="n">max_npart</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">total_changed</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">_change_since_opt</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">removed_poses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">added_poses0</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">added_poses</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">nr</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Check removal on the first loop</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nr</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">always_check_remove</span><span class="p">):</span>
+            <span class="n">nr</span><span class="p">,</span> <span class="n">rposes</span> <span class="o">=</span> <span class="n">remove_bad_particles</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">na</span><span class="p">,</span> <span class="n">aposes</span> <span class="o">=</span> <span class="n">add_missing_particles</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">current_changed</span> <span class="o">=</span> <span class="n">na</span> <span class="o">+</span> <span class="n">nr</span>
+        <span class="n">removed_poses</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">rposes</span><span class="p">)</span>
+        <span class="n">added_poses0</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">aposes</span><span class="p">)</span>
+        <span class="n">total_changed</span> <span class="o">+=</span> <span class="n">current_changed</span>
+        <span class="n">_change_since_opt</span> <span class="o">+=</span> <span class="n">current_changed</span>
+        <span class="k">if</span> <span class="n">current_changed</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">elif</span> <span class="n">_change_since_opt</span> <span class="o">&gt;</span> <span class="n">max_npart</span><span class="p">:</span>
+            <span class="n">_change_since_opt</span> <span class="o">*=</span> <span class="mi">0</span>
+            <span class="n">CLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Start add_subtract optimization.&#39;</span><span class="p">)</span>
+            <span class="n">opt</span><span class="o">.</span><span class="n">do_levmarq</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">opt</span><span class="o">.</span><span class="n">name_globals</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">remove_params</span><span class="o">=</span><span class="n">st</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="s1">&#39;psf&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">params</span><span class="p">),</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">run_length</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">num_eig_dirs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                    <span class="n">max_mem</span><span class="o">=</span><span class="n">max_mem</span><span class="p">,</span> <span class="n">eig_update_frequency</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">rz_order</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">use_accel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">CLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Add_subtract optimization:</span><span class="se">\t</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+
+    <span class="c1"># Optimize the added particles&#39; radii:</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">added_poses0</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_closest_particle</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">do_levmarq_particles</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span><span class="p">]),</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">damping</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+        <span class="n">added_poses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">()[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">total_changed</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">removed_poses</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">added_poses</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">identify_misfeatured_regions</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">filter_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">sigma_cutoff</span><span class="o">=</span><span class="mf">8.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Identifies regions of missing/misfeatured particles based on the</span>
+<span class="sd">    residuals&#39; local deviation from uniform Gaussian noise.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    st : :class:`peri.states.State`</span>
+<span class="sd">        The state in which to identify mis-featured regions.</span>
+
+<span class="sd">    filter_size : Int, best if odd.</span>
+<span class="sd">        The size of the filter for calculating the local standard deviation;</span>
+<span class="sd">        should approximately be the size of a poorly featured region in</span>
+<span class="sd">        each dimension. Default is 5.</span>
+
+<span class="sd">    sigma_cutoff : Float or `otsu`, optional</span>
+<span class="sd">        The max allowed deviation of the residuals from what is expected,</span>
+<span class="sd">        in units of the residuals&#39; standard deviation. Lower means more</span>
+<span class="sd">        sensitive, higher = less sensitive. Default is 8.0, i.e. one pixel</span>
+<span class="sd">        out of every 7*10^11 is mis-identified randomly. In practice the</span>
+<span class="sd">        noise is not Gaussian so there are still some regions mis-identified</span>
+<span class="sd">        as improperly featured. Set to ```otsu``` to calculate this number</span>
+<span class="sd">        based on an automatic Otsu threshold.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tiles : List of :class:`peri.util.Tile`</span>
+<span class="sd">        Each tile is the smallest bounding tile that contains an improperly</span>
+<span class="sd">        featured region. The list is sorted by the tile&#39;s volume.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Algorithm is</span>
+<span class="sd">    1.  Create a field of the local standard deviation, as measured over</span>
+<span class="sd">        a hypercube of size filter_size.</span>
+<span class="sd">    2.  Find the maximum reasonable value of the field. [The field should</span>
+<span class="sd">        be a random variable with mean of r.std() and standard deviation</span>
+<span class="sd">        of ~r.std() / sqrt(N), where r is the residuals and N is the</span>
+<span class="sd">        number of pixels in the hypercube.]</span>
+<span class="sd">    3.  Label &amp; Identify the misfeatured regions as portions where</span>
+<span class="sd">        the local error is too large.</span>
+<span class="sd">    4.  Parse the misfeatured regions into tiles.</span>
+<span class="sd">    5.  Return the sorted tiles.</span>
+<span class="sd">    The Otsu option to calculate the sigma cutoff works well for images</span>
+<span class="sd">    that actually contain missing particles, returning a number similar</span>
+<span class="sd">    to one calculated with a sigma cutoff. However, if the image is</span>
+<span class="sd">    well-featured with Gaussian residuals, then the Otsu threshold</span>
+<span class="sd">    splits the Gaussian down the middle instead of at the tails, which</span>
+<span class="sd">    is very bad. So use with caution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 1. Field of local std</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">residuals</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="n">filter_size</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+    <span class="n">weights</span> <span class="o">/=</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">nd</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">r</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">))</span>
+
+    <span class="c1"># 2. Maximal reasonable value of the field.</span>
+    <span class="k">if</span> <span class="n">sigma_cutoff</span> <span class="o">==</span> <span class="s1">&#39;otsu&#39;</span><span class="p">:</span>
+        <span class="n">max_ok</span> <span class="o">=</span> <span class="n">initializers</span><span class="o">.</span><span class="n">otsu_threshold</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># max_ok = f.mean() * (1 + sigma_cutoff / np.sqrt(weights.size))</span>
+        <span class="n">max_ok</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">+</span> <span class="n">sigma_cutoff</span> <span class="o">*</span> <span class="n">f</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+
+    <span class="c1"># 3. Label &amp; Identify</span>
+    <span class="n">bad</span> <span class="o">=</span> <span class="n">f</span> <span class="o">&gt;</span> <span class="n">max_ok</span>
+    <span class="n">labels</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="n">measurements</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">bad</span><span class="p">)</span>
+    <span class="n">inds</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="n">i</span><span class="p">))</span>
+
+    <span class="c1"># 4. Parse into tiles</span>
+    <span class="n">tiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">Tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">inds</span><span class="p">]</span>
+
+    <span class="c1"># 5. Sort and return</span>
+    <span class="n">volumes</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">volume</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tiles</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">tiles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">volumes</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+
+<span class="k">def</span> <span class="nf">add_subtract_misfeatured_tile</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">tile</span><span class="p">,</span> <span class="n">rad</span><span class="o">=</span><span class="s1">&#39;calc&#39;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">invert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_allowed_remove</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Automatically adds and subtracts missing &amp; extra particles in a region</span>
+<span class="sd">    of poor fit.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    st: :class:`peri.states.State`</span>
+<span class="sd">        The state to add and subtract particles to.</span>
+<span class="sd">    tile : :class:`peri.util.Tile`</span>
+<span class="sd">        The poorly-fit region to examine.</span>
+<span class="sd">    rad : Float or &#39;calc&#39;, optional</span>
+<span class="sd">        The initial radius for added particles; added particles radii are</span>
+<span class="sd">        not fit until the end of add_subtract. Default is ``&#39;calc&#39;``, which</span>
+<span class="sd">        uses the median radii of active particles.</span>
+<span class="sd">    max_iter : Int, optional</span>
+<span class="sd">        The maximum number of loops for attempted adds at one tile location.</span>
+<span class="sd">        Default is 3.</span>
+<span class="sd">    invert : Bool, optional</span>
+<span class="sd">        Whether to invert the image for feature_guess. Default is True, i.e.</span>
+<span class="sd">        dark particles on bright background.</span>
+<span class="sd">    max_allowed_remove : Int, optional</span>
+<span class="sd">        The maximum number of particles to remove. If the misfeatured tile</span>
+<span class="sd">        contains more than this many particles, raises an error. If it </span>
+<span class="sd">        contains more than half as many particles, logs a warning. If more</span>
+<span class="sd">        than this many particles are added, they are optimized in blocks of</span>
+<span class="sd">        ``max_allowed_remove``. Default is 20.</span>
+
+<span class="sd">    Other Parameters</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    im_change_frac : Float on [0, 1], optional.</span>
+<span class="sd">        If adding or removing a particle decreases the error less than </span>
+<span class="sd">        ``im_change_frac``*the change in the image, the particle is deleted.</span>
+<span class="sd">        Default is 0.2.</span>
+
+<span class="sd">    min_derr : {Float, ``&#39;3sig&#39;``}, optional</span>
+<span class="sd">        The minimum change in the state&#39;s error to keep a particle in the</span>
+<span class="sd">        image. Default is ``&#39;3sig&#39;`` which uses ``3*st.sigma``.</span>
+
+<span class="sd">    do_opt : Bool, optional</span>
+<span class="sd">        Set to False to avoid optimizing particle positions after adding</span>
+<span class="sd">        them. Default is True.</span>
+
+<span class="sd">    minmass : Float, optional</span>
+<span class="sd">        The minimum mass for a particle to be identified as a feature, as</span>
+<span class="sd">        used by trackpy. Defaults to a decent guess.</span>
+
+<span class="sd">    use_tp : Bool, optional</span>
+<span class="sd">        Set to True to use trackpy to find missing particles inside the</span>
+<span class="sd">        image. Not recommended since trackpy deliberately cuts out particles</span>
+<span class="sd">        at the edge of the image. Default is False.</span>
+
+<span class="sd">    Outputs</span>
+<span class="sd">    -------</span>
+<span class="sd">    n_added : Int</span>
+<span class="sd">        The change in the number of particles, i.e. ``n_added-n_subtracted``</span>
+<span class="sd">    ainds: List of ints</span>
+<span class="sd">        The indices of the added particles.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    --------</span>
+<span class="sd">    The added/removed positions returned are whether or not the</span>
+<span class="sd">    position has been added or removed ever. It&#39;s possible/probably that</span>
+<span class="sd">    a position is added, then removed during a later iteration.</span>
+
+<span class="sd">    Algorithm is:</span>
+<span class="sd">    1.  Remove all particles within the tile.</span>
+<span class="sd">    2.  Feature and add particles to the tile.</span>
+<span class="sd">    3.  Optimize the added particles positions only.</span>
+<span class="sd">    4.  Run 2-3 until no particles have been added.</span>
+<span class="sd">    5.  Optimize added particle radii</span>
+<span class="sd">    Because all the particles are removed within a tile, it is important</span>
+<span class="sd">    to set max_allowed_remove to a reasonable value. Otherwise, if the</span>
+<span class="sd">    tile is the size of the image it can take a long time to remove all</span>
+<span class="sd">    the particles and re-add them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">rad</span> <span class="o">==</span> <span class="s1">&#39;calc&#39;</span><span class="p">:</span>
+        <span class="n">rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_radii</span><span class="p">())</span>
+    <span class="c1"># 1. Remove all possibly bad particles within the tile.</span>
+    <span class="n">initial_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+    <span class="n">rinds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">tile</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">()))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">rinds</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;=</span> <span class="n">max_allowed_remove</span><span class="p">:</span>
+        <span class="n">CLOG</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="s1">&#39;Misfeatured region too large!&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span>
+    <span class="k">elif</span> <span class="n">rinds</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;=</span> <span class="n">max_allowed_remove</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+        <span class="n">CLOG</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Large misfeatured regions.&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">rinds</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">rpos</span><span class="p">,</span> <span class="n">rrad</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_remove_particle</span><span class="p">(</span><span class="n">rinds</span><span class="p">)</span>
+
+    <span class="c1"># 2-4. Feature and add particles to the tile, optimize, run until none added</span>
+    <span class="n">n_added</span> <span class="o">=</span> <span class="o">-</span><span class="n">rinds</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">added_poses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">invert</span><span class="p">:</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">st</span><span class="o">.</span><span class="n">residuals</span><span class="p">[</span><span class="n">tile</span><span class="o">.</span><span class="n">slicer</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">residuals</span><span class="p">[</span><span class="n">tile</span><span class="o">.</span><span class="n">slicer</span><span class="p">]</span>
+        <span class="n">guess</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_feature_guess</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">rad</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">accepts</span><span class="p">,</span> <span class="n">poses</span> <span class="o">=</span> <span class="n">check_add_particles</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">guess</span><span class="o">+</span><span class="n">tile</span><span class="o">.</span><span class="n">l</span><span class="p">,</span> <span class="n">rad</span><span class="o">=</span><span class="n">rad</span><span class="p">,</span>
+                <span class="n">do_opt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">added_poses</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">poses</span><span class="p">)</span>
+        <span class="n">n_added</span> <span class="o">+=</span> <span class="n">accepts</span>
+        <span class="k">if</span> <span class="n">accepts</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># for-break-else</span>
+        <span class="n">CLOG</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Runaway adds or insufficient max_iter&#39;</span><span class="p">)</span>
+
+    <span class="c1"># 5. Optimize added pos + rad:</span>
+    <span class="n">ainds</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">added_poses</span><span class="p">:</span>
+        <span class="n">ainds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_closest_particle</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ainds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_allowed_remove</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ainds</span><span class="p">),</span> <span class="n">max_allowed_remove</span><span class="p">):</span>
+            <span class="n">opt</span><span class="o">.</span><span class="n">do_levmarq_particles</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ainds</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span>
+                    <span class="n">max_allowed_remove</span><span class="p">]),</span> <span class="n">include_rad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">ainds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">do_levmarq_particles</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">ainds</span><span class="p">,</span> <span class="n">include_rad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">max_iter</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1"># 6. Ensure that current error after add-subtracting is lower than initial</span>
+    <span class="n">did_something</span> <span class="o">=</span> <span class="p">(</span><span class="n">rinds</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ainds</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">did_something</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">error</span> <span class="o">&gt;</span> <span class="n">initial_error</span><span class="p">):</span>
+        <span class="n">CLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Failed addsub, Tile </span><span class="si">{}</span><span class="s1"> -&gt; </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tile</span><span class="o">.</span><span class="n">l</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                <span class="n">tile</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ainds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_remove_particle</span><span class="p">(</span><span class="n">ainds</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rinds</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rpos</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">rrad</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)):</span>
+                <span class="n">_</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">obj_add_particle</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">n_added</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">ainds</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="n">n_added</span><span class="p">,</span> <span class="n">ainds</span>
+
+
+<div class="viewcode-block" id="add_subtract_locally"><a class="viewcode-back" href="../../../reference/opt.html#peri.opt.addsubtract.add_subtract_locally">[docs]</a><span class="k">def</span> <span class="nf">add_subtract_locally</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">region_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">filter_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">sigma_cutoff</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Automatically adds and subtracts missing particles based on local</span>
+<span class="sd">    regions of poor fit.</span>
+
+<span class="sd">    Calls identify_misfeatured_regions to identify regions, then</span>
+<span class="sd">    add_subtract_misfeatured_tile on the tiles in order of size until</span>
+<span class="sd">    region_depth tiles have been checked without adding any particles.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    st: :class:`peri.states.State`</span>
+<span class="sd">        The state to add and subtract particles to.</span>
+<span class="sd">    region_depth : Int</span>
+<span class="sd">        The minimum amount of regions to try; the algorithm terminates if</span>
+<span class="sd">        region_depth regions have been tried without adding particles.</span>
+
+<span class="sd">    Other Parameters</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    filter_size : Int, optional</span>
+<span class="sd">        The size of the filter for calculating the local standard deviation;</span>
+<span class="sd">        should approximately be the size of a poorly featured region in each</span>
+<span class="sd">        dimension. Best if odd. Default is 5.</span>
+<span class="sd">    sigma_cutoff : Float, optional</span>
+<span class="sd">        The max allowed deviation of the residuals from what is expected,</span>
+<span class="sd">        in units of the residuals&#39; standard deviation. Lower means more</span>
+<span class="sd">        sensitive, higher = less sensitive. Default is 8.0, i.e. one pixel</span>
+<span class="sd">        out of every ``7*10^11`` is mis-identified randomly. In practice the</span>
+<span class="sd">        noise is not Gaussian so there are still some regions mis-</span>
+<span class="sd">        identified as improperly featured.</span>
+<span class="sd">    rad : Float or &#39;calc&#39;, optional</span>
+<span class="sd">        The initial radius for added particles; added particles radii are</span>
+<span class="sd">        not fit until the end of add_subtract. Default is ``&#39;calc&#39;``, which</span>
+<span class="sd">        uses the median radii of active particles.</span>
+<span class="sd">    max_iter : Int, optional</span>
+<span class="sd">        The maximum number of loops for attempted adds at one tile location.</span>
+<span class="sd">        Default is 3.</span>
+<span class="sd">    invert : Bool, optional</span>
+<span class="sd">        Whether to invert the image for feature_guess. Default is ``True``,</span>
+<span class="sd">        i.e. dark particles on bright background.</span>
+<span class="sd">    max_allowed_remove : Int, optional</span>
+<span class="sd">        The maximum number of particles to remove. If the misfeatured tile</span>
+<span class="sd">        contains more than this many particles, raises an error. If it</span>
+<span class="sd">        contains more than half as many particles, throws a warning. If more</span>
+<span class="sd">        than this many particles are added, they are optimized in blocks of</span>
+<span class="sd">        ``max_allowed_remove``. Default is 20.</span>
+<span class="sd">    im_change_frac : Float, between 0 and 1.</span>
+<span class="sd">        If adding or removing a particle decreases the error less than</span>
+<span class="sd">        ``im_change_frac *`` the change in the image, the particle is deleted.</span>
+<span class="sd">        Default is 0.2.</span>
+<span class="sd">    min_derr : Float</span>
+<span class="sd">        The minimum change in the state&#39;s error to keep a particle in the</span>
+<span class="sd">        image. Default is ``&#39;3sig&#39;`` which uses ``3*st.sigma``.</span>
+<span class="sd">    do_opt : Bool, optional</span>
+<span class="sd">        Set to False to avoid optimizing particle positions after adding</span>
+<span class="sd">        them. Default is True</span>
+<span class="sd">    minmass : Float, optional</span>
+<span class="sd">        The minimum mass for a particle to be identified as a feature, as</span>
+<span class="sd">        used by trackpy. Defaults to a decent guess.</span>
+<span class="sd">    use_tp : Bool, optional</span>
+<span class="sd">        Set to True to use trackpy to find missing particles inside the</span>
+<span class="sd">        image. Not recommended since trackpy deliberately cuts out</span>
+<span class="sd">        particles at the edge of the image. Default is False.</span>
+<span class="sd">    max_allowed_remove : Int, optional</span>
+<span class="sd">        The maximum number of particles to remove. If the misfeatured tile</span>
+<span class="sd">        contains more than this many particles, raises an error. If it</span>
+<span class="sd">        contains more than half as many particles, throws a warning. If more</span>
+<span class="sd">        than this many particles are added, they are optimized in blocks of</span>
+<span class="sd">        ``max_allowed_remove``. Default is 20.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    n_added : Int</span>
+<span class="sd">        The change in the number of particles; i.e the number added - number</span>
+<span class="sd">        removed.</span>
+<span class="sd">    new_poses : List</span>
+<span class="sd">        [N,3] element list of the added particle positions.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Algorithm Description</span>
+
+<span class="sd">    1. Identify mis-featured regions by how much the local residuals</span>
+<span class="sd">       deviate from the global residuals, as measured by the standard</span>
+<span class="sd">       deviation of both.</span>
+<span class="sd">    2. Loop over each of those regions, and:</span>
+
+<span class="sd">       a. Remove every particle in the current region.</span>
+<span class="sd">       b. Try to add particles in the current region until no more</span>
+<span class="sd">          can be added while adequately decreasing the error.</span>
+<span class="sd">       c. Terminate if at least region_depth regions have been</span>
+<span class="sd">          checked without successfully adding a particle.</span>
+
+<span class="sd">    Because this algorithm is more judicious about chooosing regions to</span>
+<span class="sd">    check, and more aggressive about removing particles in those regions,</span>
+<span class="sd">    it runs faster and does a better job than the (global) add_subtract.</span>
+<span class="sd">    However, this function usually does not work better as an initial add-</span>
+<span class="sd">    subtract on an image, since (1) it doesn&#39;t check for removing small/big</span>
+<span class="sd">    particles per se, and (2) when the poorly-featured regions of the image</span>
+<span class="sd">    are large or when the fit is bad, it will remove essentially all of the</span>
+<span class="sd">    particles, taking a long time. As a result, it&#39;s usually best to do a</span>
+<span class="sd">    normal add_subtract first and using this function for tough missing or</span>
+<span class="sd">    double-featured particles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 1. Find regions of poor tiles:</span>
+    <span class="n">tiles</span> <span class="o">=</span> <span class="n">identify_misfeatured_regions</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">filter_size</span><span class="o">=</span><span class="n">filter_size</span><span class="p">,</span>
+            <span class="n">sigma_cutoff</span><span class="o">=</span><span class="n">sigma_cutoff</span><span class="p">)</span>
+    <span class="c1"># 2. Add and subtract in the regions:</span>
+    <span class="n">n_empty</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">n_added</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">new_poses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tiles</span><span class="p">:</span>
+        <span class="n">curn</span><span class="p">,</span> <span class="n">curinds</span> <span class="o">=</span> <span class="n">add_subtract_misfeatured_tile</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">curn</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">n_empty</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">n_added</span> <span class="o">+=</span> <span class="n">curn</span>
+            <span class="n">new_poses</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">()[</span><span class="n">curinds</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">n_empty</span> <span class="o">&gt;</span> <span class="n">region_depth</span><span class="p">:</span>
+            <span class="k">break</span>  <span class="c1"># some message or something?</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># for-break-else</span>
+        <span class="k">pass</span>
+        <span class="c1"># CLOG.info(&#39;All regions contained particles.&#39;)</span>
+        <span class="c1"># something else?? this is not quite true</span>
+    <span class="k">return</span> <span class="n">n_added</span><span class="p">,</span> <span class="n">new_poses</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

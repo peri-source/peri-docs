@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>peri.logger &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="peri.models" href="models.html" />
+    <link rel="prev" title="peri.interpolation" href="interpolation.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="peri.models"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="interpolation.html" title="peri.interpolation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-peri.logger">
+<span id="peri-logger"></span><h1>peri.logger<a class="headerlink" href="#module-peri.logger" title="Permalink to this headline">¶</a></h1>
+<p>A simple but pretty logging interface for configurable logs across all packages.
+To use, simply import the base log and (maybe) tack on a child context:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri.logger</span> <span class="kn">import</span> <span class="n">log</span>
+<span class="n">clog</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s2">&quot;&lt;child name&gt;&quot;</span><span class="p">)</span> <span class="c1"># optional</span>
+
+<span class="n">The</span> <span class="n">possible</span> <span class="n">options</span> <span class="n">are</span><span class="p">:</span>
+<span class="n">clog</span><span class="o">.</span><span class="p">{</span><span class="n">info</span><span class="p">,</span><span class="n">debug</span><span class="p">,</span><span class="n">warn</span><span class="p">,</span><span class="n">error</span><span class="p">,</span><span class="n">fatal</span><span class="p">}(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Call with:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;something </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">object</span><span class="p">)</span>
+<span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;bad thing&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can set the level of information displayed, for example, to only display
+critical errors. The order is debug, info, warn, error, fatal</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">log</span><span class="o">.</span><span class="n">set_level</span><span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="peri.logger.Logger">
+<em class="property">class </em><code class="descclassname">peri.logger.</code><code class="descname">Logger</code><span class="sig-paren">(</span><em>verbosity='vvv'</em>, <em>colorlogs=False</em>, <em>logtofile=False</em>, <em>logfilename=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/logger.html#Logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.logger.Logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new logger class. Since the logging interface is actually global,
+any new logs will create even more clutter on the screen. Therefore,
+only create one! (as is created at the bottom of this file)</p>
+<dl class="method">
+<dt id="peri.logger.Logger.set_level">
+<code class="descname">set_level</code><span class="sig-paren">(</span><em>level='info'</em>, <em>handlers=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/logger.html#Logger.set_level"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.logger.Logger.set_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the logging level (which types of logs are actually printed / recorded)
+to one of [&#8216;debug&#8217;, &#8216;info&#8217;, &#8216;warn&#8217;, &#8216;error&#8217;, &#8216;fatal&#8217;] in that order
+of severity</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.logger.Logger.set_formatter">
+<code class="descname">set_formatter</code><span class="sig-paren">(</span><em>formatter='standard'</em>, <em>handlers=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/logger.html#Logger.set_formatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.logger.Logger.set_formatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the text format of messages to one of the pre-determined forms,
+one of [&#8216;quiet&#8217;, &#8216;minimal&#8217;, &#8216;standard&#8217;, &#8216;verbose&#8217;]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.logger.Logger.add_handler">
+<code class="descname">add_handler</code><span class="sig-paren">(</span><em>name='console-color'</em>, <em>level='info'</em>, <em>formatter='standard'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/logger.html#Logger.add_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.logger.Logger.add_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add another handler to the logging system if not present already.
+Available handlers are currently: [&#8216;console-bw&#8217;, &#8216;console-color&#8217;, &#8216;rotating-log&#8217;]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.logger.Logger.remove_handler">
+<code class="descname">remove_handler</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/logger.html#Logger.remove_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.logger.Logger.remove_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove handler from the logging system if present already.
+Available handlers are currently: [&#8216;console-bw&#8217;, &#8216;console-color&#8217;, &#8216;rotating-log&#8217;]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.logger.Logger.noformat">
+<code class="descname">noformat</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwds</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/logger.html#Logger.noformat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.logger.Logger.noformat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temporarily do not use any formatter so that text printed is raw</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.logger.Logger.set_verbosity">
+<code class="descname">set_verbosity</code><span class="sig-paren">(</span><em>verbosity='vvv'</em>, <em>handlers=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/logger.html#Logger.set_verbosity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.logger.Logger.set_verbosity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the verbosity level of a certain log handler or of all handlers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>verbosity</strong> (<em>'v' to 'vvvvv'</em>) &#8211; the level of verbosity, more v&#8217;s is more verbose</li>
+<li><strong>handlers</strong> (<em>string</em><em>, or </em><em>list of strings</em>) &#8211; <p>handler names can be found in <code class="docutils literal"><span class="pre">peri.logger.types.keys()</span></code>
+Current set is:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;console-bw&#39;</span><span class="p">,</span> <span class="s1">&#39;console-color&#39;</span><span class="p">,</span> <span class="s1">&#39;rotating-log&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="interpolation.html"
+                        title="previous chapter">peri.interpolation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="models.html"
+                        title="next chapter">peri.models</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/reference/logger.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="peri.models"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="interpolation.html" title="peri.interpolation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

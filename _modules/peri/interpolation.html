@@ -1,0 +1,372 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>peri.interpolation &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for peri.interpolation</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="BarnesInterpolation1D"><a class="viewcode-back" href="../../reference/interpolation.html#peri.interpolation.BarnesInterpolation1D">[docs]</a><span class="k">class</span> <span class="nc">BarnesInterpolation1D</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">filter_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">clipsize</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">damp</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">blocksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">donorm</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A class for 1-d barnes interpolation. Give data points d at locations x.</span>
+
+<span class="sd">        See [1]_, equations 1-7 for implementation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : ndarray, 1-dimensional</span>
+<span class="sd">            input positions, x values for data points</span>
+
+<span class="sd">        d : ndarray, 1-dimensional</span>
+<span class="sd">            input values, y values for data points</span>
+
+<span class="sd">        filter_size : float, optional.</span>
+<span class="sd">            control parameter for weight function (sigma), should be the</span>
+<span class="sd">            average data spacing. Defaults to the average distance for</span>
+<span class="sd">            sorted ``x``.</span>
+
+<span class="sd">        iterations : integer, optional</span>
+<span class="sd">            how many iterations to perform. only two needed with a high damping</span>
+<span class="sd">            Defaults to 4</span>
+
+<span class="sd">        clip : boolean, optional</span>
+<span class="sd">            whether to clip the number of data points used by the filtersize</span>
+<span class="sd">            Default is False</span>
+
+<span class="sd">        clipsize : float, optional</span>
+<span class="sd">            Total clipsize is determined by clipsize * filter_size</span>
+<span class="sd">            Default is 3</span>
+
+<span class="sd">        damp : float, optional</span>
+<span class="sd">            the damping parameter used in accelerating convergence. Default</span>
+<span class="sd">            is 0.95</span>
+
+<span class="sd">        blocksize : Int or None, optional</span>
+<span class="sd">            Memory-based performance feature. For very large ``x`` or ``d``</span>
+<span class="sd">            calculating the distance matrix between each point can require</span>
+<span class="sd">            excessive memory overhead. To avoid this, set ``blocksize`` to</span>
+<span class="sd">            a moderate int, causing the Barnes to compute the distance</span>
+<span class="sd">            matrix in blocks. Does not change the final results. Default is</span>
+<span class="sd">            None, which uses all the data all at once, using lots of mem.</span>
+
+<span class="sd">        donorm : bool, optional</span>
+<span class="sd">            If False, uses an old, incorrect method to evaluate the interpolant</span>
+<span class="sd">            rather than the correct version. Default is True. If you&#39;re using</span>
+<span class="sd">            this, set it to True.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        .. [1] S. E. Koch, M. DesJardins, P. J. Kocin, J. Climate Appl.</span>
+<span class="sd">                Meteor. 22 1487-1503 (1983)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">damp</span> <span class="o">=</span> <span class="n">damp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clip</span> <span class="o">=</span> <span class="n">clip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span> <span class="o">=</span> <span class="n">iterations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">donorm</span> <span class="o">=</span> <span class="n">donorm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocksize</span> <span class="o">=</span> <span class="n">blocksize</span>
+
+        <span class="k">if</span> <span class="n">filter_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filter_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_filter_size</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filter_size</span> <span class="o">=</span> <span class="n">filter_size</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clipsize</span> <span class="o">=</span> <span class="n">clipsize</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_size</span>
+
+    <span class="k">def</span> <span class="nf">_default_filter_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span>
+
+    <span class="k">def</span> <span class="nf">_distance_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Pairwise distance between each point in `a` and each point in `b`&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="p">[:,</span><span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">b</span><span class="p">[</span><span class="kc">None</span><span class="p">,:])</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="k">def</span> <span class="nf">_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rsq</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;weighting function for Barnes&quot;&quot;&quot;</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_size</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">clip</span><span class="p">:</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">rsq</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">rsq</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="n">rsq</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">clipsize</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">o</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">rsq</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">o</span>
+
+<div class="viewcode-block" id="BarnesInterpolation1D.__call__"><a class="viewcode-back" href="../../reference/interpolation.html#peri.interpolation.BarnesInterpolation1D.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rvecs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the values interpolated at positions rvecs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">donorm</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_newcall</span><span class="p">(</span><span class="n">rvecs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_oldcall</span><span class="p">(</span><span class="n">rvecs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_eval_firstorder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rvecs</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The first-order Barnes approximation&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocksize</span><span class="p">:</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_distance_matrix</span><span class="p">(</span><span class="n">rvecs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># distance between points</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>  <span class="c1"># Gaussian weights</span>
+            <span class="k">return</span> <span class="n">weights</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># weighted sum</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Now rather than calculating the distance matrix all at once,</span>
+            <span class="c1"># we do it in chunks over rvecs</span>
+            <span class="n">ans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">rvecs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+            <span class="n">bs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocksize</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">rvecs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bs</span><span class="p">):</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_distance_matrix</span><span class="p">(</span><span class="n">rvecs</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">a</span><span class="o">+</span><span class="n">bs</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+                <span class="n">ans</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">a</span><span class="o">+</span><span class="n">bs</span><span class="p">]</span> <span class="o">+=</span> <span class="n">weights</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ans</span>
+
+    <span class="k">def</span> <span class="nf">_newcall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rvecs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Correct, normalized version of Barnes&quot;&quot;&quot;</span>
+        <span class="c1">#1. Initial guess for output:</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="mi">1</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_size</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_firstorder</span><span class="p">(</span><span class="n">rvecs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+        <span class="c1">#2. There are differences between 0th order at the points and</span>
+        <span class="c1">#   the passed data, so we iterate to remove:</span>
+        <span class="n">ondata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_firstorder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterations</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_firstorder</span><span class="p">(</span><span class="n">rvecs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="o">-</span><span class="n">ondata</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+            <span class="n">ondata</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_firstorder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="o">-</span><span class="n">ondata</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+            <span class="n">sigma</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">damp</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span> <span class="nf">_oldcall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rvecs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Barnes w/o normalizing the weights&quot;&quot;&quot;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_size</span>
+
+
+        <span class="n">dist0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_distance_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">dist1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_distance_matrix</span><span class="p">(</span><span class="n">rvecs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="p">(</span><span class="n">dist0</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="p">(</span><span class="n">dist1</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterations</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="p">(</span><span class="n">dist1</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">-</span> <span class="n">tmp</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="p">(</span><span class="n">dist0</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">-</span> <span class="n">tmp</span><span class="p">)</span>
+            <span class="n">g</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">damp</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<span class="k">class</span> <span class="nc">BarnesInterpolationND</span><span class="p">(</span><span class="n">BarnesInterpolation1D</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A class for barnes interpolation in N dimensions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : ndarray, 2-dimensional</span>
+<span class="sd">            input positions, x values for data points. x[i] is the ith position</span>
+
+<span class="sd">        d : ndarray, 1-dimensional</span>
+<span class="sd">            input values, y values for data points. Same number of points as</span>
+<span class="sd">            x has positions.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        BarnesInterpolation1D</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BarnesInterpolationND</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_distance_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Pairwise distance between each point in `a` and each point in `b`&quot;&quot;&quot;</span>
+        <span class="n">sq</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># matrix = np.sum(map(lambda a,b: sq(a[:,None] - b[None,:]), a.T,</span>
+        <span class="c1">#   b.T), axis=0)</span>
+        <span class="c1"># A faster version than above:</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">sq</span><span class="p">(</span><span class="n">a</span><span class="p">[:,</span><span class="mi">0</span><span class="p">][:,</span><span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">b</span><span class="p">[:,</span><span class="mi">0</span><span class="p">][</span><span class="kc">None</span><span class="p">,:])</span>
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">b</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="n">matrix</span> <span class="o">+=</span> <span class="n">sq</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="kc">None</span><span class="p">,:])</span>
+        <span class="k">return</span> <span class="n">matrix</span>
+
+    <span class="k">def</span> <span class="nf">_default_filter_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">dist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span>
+
+<div class="viewcode-block" id="ChebyshevInterpolation1D"><a class="viewcode-back" href="../../reference/interpolation.html#peri.interpolation.ChebyshevInterpolation1D">[docs]</a><span class="k">class</span> <span class="nc">ChebyshevInterpolation1D</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">window</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">),</span> <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">evalpts</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A 1D Chebyshev approximation / interpolation for an ND function, approximating</span>
+<span class="sd">        (N-1)D in in the last dimension.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        func : callable</span>
+<span class="sd">            A function that takes scalar arguments (1D) and returns a N</span>
+<span class="sd">            dimensional array corresponding to that scalar. Make it such that,</span>
+<span class="sd">            for an array x, f(x)[.....,a] corresponds to f(x[a])</span>
+
+<span class="sd">        args : tuple [optional]</span>
+<span class="sd">            extra arguments to pass to func</span>
+
+<span class="sd">        window : tuple (length 2)</span>
+<span class="sd">            The bounds of the function over which we desire the interpolation</span>
+
+<span class="sd">        degree : integer</span>
+<span class="sd">            Degree of the Chebyshev interpolating polynomial</span>
+
+<span class="sd">        evalpts : integer</span>
+<span class="sd">            Number of Chebyshev points to evaluate the function at</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window</span> <span class="o">=</span> <span class="n">window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_order</span><span class="p">(</span><span class="n">evalpts</span><span class="p">,</span> <span class="n">degree</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_x2c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Convert windowdow coordinates to cheb coordinates [-1,1] &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_c2x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Convert cheb coordinates to windowdow coordinates &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">c</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="k">def</span> <span class="nf">_construct_coefficients</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the coefficients based on the func, degree, and interpolating points.</span>
+<span class="sd">        _coeffs is a [order, N,M,....] array</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Moved the -c0 to the coefficients defintion</span>
+<span class="sd">        app -= 0.5 * self._coeffs[0] -- moving this to the coefficients</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">degree</span>
+
+        <span class="n">N</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evalpts</span><span class="p">)</span>
+
+        <span class="n">lvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evalpts</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+        <span class="n">xpts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c2x</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="n">lvals</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="n">N</span><span class="p">))</span>
+        <span class="n">fpts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rollaxis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">xpts</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">degree</span><span class="p">):</span>
+            <span class="n">inner</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">fpts</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">a</span><span class="o">*</span><span class="p">(</span><span class="n">lvals</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="n">N</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evalpts</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="n">coeffs</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">/</span><span class="n">N</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">inner</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">0.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evalpts</span><span class="p">,</span> <span class="n">degree</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">evalpts</span> <span class="o">&lt;</span> <span class="n">degree</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Number of Chebyshev points must be &gt; degree&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">evalpts</span> <span class="o">=</span> <span class="n">evalpts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">degree</span> <span class="o">=</span> <span class="n">degree</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_construct_coefficients</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coefficients</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coeffs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">tk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates an individual Chebyshev polynomial `k` in coordinate space</span>
+<span class="sd">        with proper transformation given the window</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">))[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">polynomial</span><span class="o">.</span><span class="n">chebyshev</span><span class="o">.</span><span class="n">chebval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x2c</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">weights</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ChebyshevInterpolation1D.__call__"><a class="viewcode-back" href="../../reference/interpolation.html#peri.interpolation.ChebyshevInterpolation1D.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Approximates `func` at the coordinates x, which must be in the window.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            f(x) = \sum_{k=0}^{N-1} c_k T_k(x) - co/2</span>
+
+<span class="sd">        Output is in the format [A,...,x]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">polynomial</span><span class="o">.</span><span class="n">chebyshev</span><span class="o">.</span><span class="n">chebval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x2c</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coeffs</span><span class="p">,</span> <span class="n">tensor</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

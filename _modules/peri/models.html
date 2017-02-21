@@ -1,0 +1,462 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>peri.models &#8212; PERI 0.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/mathconf.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for peri.models</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">peri.comp</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">ComponentCollection</span><span class="p">,</span> <span class="n">GlobalScalar</span><span class="p">,</span> <span class="n">ilms</span><span class="p">,</span> <span class="n">psfs</span><span class="p">,</span> <span class="n">objs</span><span class="p">,</span> <span class="n">exactpsf</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">peri.logger</span> <span class="k">import</span> <span class="n">log</span> <span class="k">as</span> <span class="n">baselog</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">baselog</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;models&#39;</span><span class="p">)</span>
+
+<span class="n">allfields</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;const&#39;</span><span class="p">:</span> <span class="n">GlobalScalar</span><span class="p">,</span>
+    <span class="s1">&#39;poly3d&#39;</span><span class="p">:</span> <span class="n">ilms</span><span class="o">.</span><span class="n">Polynomial3D</span><span class="p">,</span>
+    <span class="s1">&#39;leg3d&#39;</span><span class="p">:</span> <span class="n">ilms</span><span class="o">.</span><span class="n">LegendrePoly3D</span><span class="p">,</span>
+    <span class="s1">&#39;poly2p1d&#39;</span><span class="p">:</span> <span class="n">ilms</span><span class="o">.</span><span class="n">Polynomial2P1D</span><span class="p">,</span>
+    <span class="s1">&#39;leg2p1d&#39;</span><span class="p">:</span> <span class="n">ilms</span><span class="o">.</span><span class="n">LegendrePoly2P1D</span><span class="p">,</span>
+    <span class="s1">&#39;cheb2p1d&#39;</span><span class="p">:</span> <span class="n">ilms</span><span class="o">.</span><span class="n">ChebyshevPoly2P1D</span><span class="p">,</span>
+    <span class="s1">&#39;barnesleg2p1d&#39;</span><span class="p">:</span> <span class="n">ilms</span><span class="o">.</span><span class="n">BarnesStreakLegPoly2P1D</span><span class="p">,</span>
+    <span class="s1">&#39;combo&#39;</span><span class="p">:</span> <span class="n">ComponentCollection</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">allpsfs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;identity&#39;</span><span class="p">:</span> <span class="n">psfs</span><span class="o">.</span><span class="n">IdentityPSF</span><span class="p">,</span>
+    <span class="s1">&#39;gauss2d&#39;</span><span class="p">:</span> <span class="n">psfs</span><span class="o">.</span><span class="n">AnisotropicGaussian</span><span class="p">,</span>
+    <span class="s1">&#39;gauss3d&#39;</span><span class="p">:</span> <span class="n">psfs</span><span class="o">.</span><span class="n">AnisotropicGaussianXYZ</span><span class="p">,</span>
+    <span class="s1">&#39;gauss4d&#39;</span><span class="p">:</span> <span class="n">psfs</span><span class="o">.</span><span class="n">Gaussian4DPoly</span><span class="p">,</span>
+    <span class="s1">&#39;gauss4d-leg&#39;</span><span class="p">:</span> <span class="n">psfs</span><span class="o">.</span><span class="n">Gaussian4DLegPoly</span><span class="p">,</span>
+    <span class="s1">&#39;gauss4d-mom&#39;</span><span class="p">:</span> <span class="n">psfs</span><span class="o">.</span><span class="n">GaussianMomentExpansion</span><span class="p">,</span>
+    <span class="s1">&#39;linescan&#39;</span><span class="p">:</span> <span class="n">exactpsf</span><span class="o">.</span><span class="n">ExactLineScanConfocalPSF</span><span class="p">,</span>
+    <span class="s1">&#39;cheb-linescan&#39;</span><span class="p">:</span> <span class="n">exactpsf</span><span class="o">.</span><span class="n">ChebyshevLineScanConfocalPSF</span><span class="p">,</span>
+    <span class="s1">&#39;cheb-linescan-fixedss&#39;</span><span class="p">:</span> <span class="n">exactpsf</span><span class="o">.</span><span class="n">FixedSSChebLinePSF</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">allobjs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;spheres&#39;</span><span class="p">:</span> <span class="n">objs</span><span class="o">.</span><span class="n">PlatonicSpheresCollection</span><span class="p">,</span>
+    <span class="s1">&#39;slab&#39;</span><span class="p">:</span> <span class="n">objs</span><span class="o">.</span><span class="n">Slab</span><span class="p">,</span>
+    <span class="s1">&#39;combo&#39;</span><span class="p">:</span> <span class="n">ComponentCollection</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">ModelError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../reference/models.html#peri.models.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        An abstraction for defining how to combine components into a complete</span>
+<span class="sd">        model as well as derivatives with respect to different variables.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        modelstr : dict of strings</span>
+<span class="sd">            (Using a custom model) The actual equations used to defined the model.</span>
+<span class="sd">            At least one eq. is required under the key `full`. Other partial</span>
+<span class="sd">            update equations can be added where the variable name (e.g. &#39;dI&#39;)</span>
+<span class="sd">            denotes a partial update of I, for example::</span>
+
+<span class="sd">                {&#39;full&#39;: &#39;H(P)&#39;, &#39;dP&#39;: &#39;H(dP)&#39;}</span>
+
+<span class="sd">        varmap : dict</span>
+<span class="sd">            (Using a custom model) The mapping of variables in the modelstr</span>
+<span class="sd">            equations to actual component types. For example::</span>
+
+<span class="sd">                {&#39;P&#39;: &#39;obj&#39;, &#39;H&#39;: &#39;psf&#39;}</span>
+
+<span class="sd">        registry : dict</span>
+<span class="sd">            A mapping of categories to components which this model will</span>
+<span class="sd">            accept. For example::</span>
+
+<span class="sd">                {</span>
+<span class="sd">                    &#39;obj&#39;: [objs.PlatonicSpheresCollection],</span>
+<span class="sd">                    &#39;psf&#39;: [psfs.Gaussian4DPoly, psfs.GaussianMomentExpansion]</span>
+<span class="sd">                }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modelstr</span> <span class="o">=</span> <span class="n">modelstr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">varmap</span> <span class="o">=</span> <span class="n">varmap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registry</span> <span class="o">=</span> <span class="n">registry</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ivarmap</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">varmap</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_consistency</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Model.check_consistency"><a class="viewcode-back" href="../../reference/models.html#peri.models.Model.check_consistency">[docs]</a>    <span class="k">def</span> <span class="nf">check_consistency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make sure that the required comps are included in the list of</span>
+<span class="sd">        components supplied by the user. Also check that the parameters are</span>
+<span class="sd">        consistent across the many components.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;([a-zA-Z_][a-zA-Z0-9_]*)&#39;</span><span class="p">)</span>
+
+        <span class="c1"># there at least must be the full model, not necessarily partial updates</span>
+        <span class="k">if</span> <span class="s1">&#39;full&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modelstr</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ModelError</span><span class="p">(</span>
+                <span class="s1">&#39;Model must contain a `full` key describing &#39;</span>
+                <span class="s1">&#39;the entire image formation&#39;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check that the two model descriptors are consistent</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">eq</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modelstr</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">eq</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">var</span><span class="p">:</span>
+                <span class="c1"># remove the derivative signs if there (dP -&gt; P)</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">r&quot;^d&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">varmap</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="s2">&quot;Variable &#39;</span><span class="si">%s</span><span class="s2">&#39; (eq. &#39;</span><span class="si">%s</span><span class="s2">&#39;: &#39;</span><span class="si">%s</span><span class="s2">&#39;) not found in category map </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span>
+                        <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">eq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">varmap</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">error</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ModelError</span><span class="p">(</span><span class="s1">&#39;Inconsistent varmap and modelstr descriptions&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.check_inputs"><a class="viewcode-back" href="../../reference/models.html#peri.models.Model.check_inputs">[docs]</a>    <span class="k">def</span> <span class="nf">check_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that the list of components `comp` is compatible with both the</span>
+<span class="sd">        varmap and modelstr for this Model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">compcats</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">category</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]</span>
+
+        <span class="c1"># Check that the components are all provided, given the categories</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">varmap</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modelstr</span><span class="p">[</span><span class="s1">&#39;full&#39;</span><span class="p">]:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Component (</span><span class="si">%s</span><span class="s1"> : </span><span class="si">%s</span><span class="s1">) not used in model.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">compcats</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Map component (</span><span class="si">%s</span><span class="s1"> : </span><span class="si">%s</span><span class="s1">) not found in list of components.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">))</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ModelError</span><span class="p">(</span><span class="s1">&#39;Component list incomplete or incorrect&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.diffname"><a class="viewcode-back" href="../../reference/models.html#peri.models.Model.diffname">[docs]</a>    <span class="k">def</span> <span class="nf">diffname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Transform a variable name into a derivative &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;d&#39;</span><span class="o">+</span><span class="n">name</span></div>
+
+<div class="viewcode-block" id="Model.get_base_model"><a class="viewcode-back" href="../../reference/models.html#peri.models.Model.get_base_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_base_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The complete model, no derivatives &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modelstr</span><span class="p">[</span><span class="s1">&#39;full&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Model.get_difference_model"><a class="viewcode-back" href="../../reference/models.html#peri.models.Model.get_difference_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_difference_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the equation corresponding to a variation wrt category. For example</span>
+<span class="sd">        if::</span>
+
+<span class="sd">            modelstr = {</span>
+<span class="sd">                &#39;full&#39; :&#39;H(I) + B&#39;,</span>
+<span class="sd">                &#39;dH&#39; : &#39;dH(I)&#39;,</span>
+<span class="sd">                &#39;dI&#39; : &#39;H(dI)&#39;,</span>
+<span class="sd">                &#39;dB&#39; : &#39;dB&#39;</span>
+<span class="sd">            }</span>
+
+<span class="sd">            varmap = {&#39;H&#39;: &#39;psf&#39;, &#39;I&#39;: &#39;obj&#39;, &#39;B&#39;: &#39;bkg&#39;}</span>
+
+<span class="sd">        then ``get_difference_model(&#39;obj&#39;) == modelstr[&#39;dI&#39;] == &#39;H(dI)&#39;``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ivarmap</span><span class="p">[</span><span class="n">category</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modelstr</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.map_vars"><a class="viewcode-back" href="../../reference/models.html#peri.models.Model.map_vars">[docs]</a>    <span class="k">def</span> <span class="nf">map_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comps</span><span class="p">,</span> <span class="n">funcname</span><span class="o">=</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="n">diffmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map component function ``funcname`` result into model variables</span>
+<span class="sd">        dictionary for use in eval of the model. If ``diffmap`` is provided then</span>
+<span class="sd">        that symbol is translated into &#39;d&#39;+diffmap.key and is replaced by</span>
+<span class="sd">        diffmap.value. ``**kwargs` are passed to the ``comp.funcname(**kwargs)``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">diffmap</span> <span class="o">=</span> <span class="n">diffmap</span> <span class="ow">or</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">:</span>
+            <span class="n">cat</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">category</span>
+
+            <span class="k">if</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">diffmap</span><span class="p">:</span>
+                <span class="n">symbol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ivarmap</span><span class="p">[</span><span class="n">cat</span><span class="p">])</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span> <span class="o">=</span> <span class="n">diffmap</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">symbol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ivarmap</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">funcname</span><span class="p">)(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="Model.evaluate"><a class="viewcode-back" href="../../reference/models.html#peri.models.Model.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comps</span><span class="p">,</span> <span class="n">funcname</span><span class="o">=</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="n">diffmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the output of a model. It is recommended that at some point</span>
+<span class="sd">        before using `evaluate`, that you make sure the inputs are valid using</span>
+<span class="sd">        :class:`~peri.models.Model.check_inputs`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        comps : list of :class:`~peri.comp.comp.Component`</span>
+<span class="sd">            Components which will be used to evaluate the model</span>
+
+<span class="sd">        funcname : string (default: &#39;get&#39;)</span>
+<span class="sd">            Name of the function which to evaluate for the components which</span>
+<span class="sd">            represent their output. That is, when each component is used in the</span>
+<span class="sd">            evaluation, it is really their ``attr(comp, funcname)`` which is used.</span>
+
+<span class="sd">        diffmap : dictionary</span>
+<span class="sd">            Extra mapping of derivatives or other symbols to extra variables.</span>
+<span class="sd">            For example, the difference in a component has been evaluated as</span>
+<span class="sd">            diff_obj so we set ``{&#39;I&#39;: diff_obj}``</span>
+
+<span class="sd">        ``**kwargs``:</span>
+<span class="sd">            Arguments passed to ``funcname`` of component objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">evar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">map_vars</span><span class="p">(</span><span class="n">comps</span><span class="p">,</span> <span class="n">funcname</span><span class="p">,</span> <span class="n">diffmap</span><span class="o">=</span><span class="n">diffmap</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">diffmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_base_model</span><span class="p">(),</span> <span class="n">evar</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">compname</span> <span class="o">=</span> <span class="n">diffmap</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_difference_model</span><span class="p">(</span><span class="n">compname</span><span class="p">),</span> <span class="n">evar</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_base_model</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ConfocalImageModel"><a class="viewcode-back" href="../../reference/models.html#peri.models.ConfocalImageModel">[docs]</a><span class="k">class</span> <span class="nc">ConfocalImageModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Confocal microscope image with simplifications made for performance.</span>
+<span class="sd">        In particular, the sensing and illumination point spread functions</span>
+<span class="sd">        are combined into one:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \\mathcal{M} = H(I(1-P) + CP) + B</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">varmap</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="s1">&#39;bkg&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">:</span> <span class="s1">&#39;ilm&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="s1">&#39;psf&#39;</span><span class="p">,</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="s1">&#39;obj&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="s1">&#39;offset&#39;</span>
+        <span class="p">}</span>
+        <span class="n">modelstr</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;full&#39;</span> <span class="p">:</span> <span class="s1">&#39;H(I*(1-P)+C*P) + B&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dI&#39;</span> <span class="p">:</span> <span class="s1">&#39;H(dI*(1-P))&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dP&#39;</span> <span class="p">:</span> <span class="s1">&#39;H((C-I)*dP)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dC&#39;</span> <span class="p">:</span> <span class="s1">&#39;H(dC*P)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dB&#39;</span> <span class="p">:</span> <span class="s1">&#39;dB&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">registry</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">,</span>
+            <span class="s1">&#39;ilm&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">,</span>
+            <span class="s1">&#39;psf&#39;</span><span class="p">:</span> <span class="n">allpsfs</span><span class="p">,</span>
+            <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="n">allobjs</span><span class="p">,</span>
+            <span class="s1">&#39;offset&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;const&#39;</span><span class="p">:</span> <span class="n">GlobalScalar</span><span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">Model</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span></div>
+
+<span class="k">class</span> <span class="nc">SmoothFieldModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A smooth field with one component:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \\mathcal{M} = I</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">varmap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;I&#39;</span><span class="p">:</span> <span class="s1">&#39;ilm&#39;</span><span class="p">}</span>
+        <span class="n">modelstr</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;full&#39;</span><span class="p">:</span> <span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="s1">&#39;dI&#39;</span><span class="p">:</span> <span class="s1">&#39;dI&#39;</span><span class="p">}</span>
+        <span class="n">registry</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ilm&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">}</span>
+        <span class="n">Model</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">BlurredFieldModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A blurred field, with two component:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \\mathcal{M} = H(I)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">varmap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="s1">&#39;psf&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">:</span> <span class="s1">&#39;ilm&#39;</span><span class="p">}</span>
+        <span class="n">modelstr</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;full&#39;</span><span class="p">:</span> <span class="s1">&#39;H(I)&#39;</span><span class="p">,</span> <span class="s1">&#39;dI&#39;</span><span class="p">:</span> <span class="s1">&#39;H(dI)&#39;</span><span class="p">}</span>
+        <span class="n">registry</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;psf&#39;</span><span class="p">:</span> <span class="n">allpsfs</span><span class="p">,</span> <span class="s1">&#39;ilm&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">}</span>
+        <span class="n">Model</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">ParticlesOnlyModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A model of only particles</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \\mathcal{M} = P</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">varmap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="s1">&#39;obj&#39;</span><span class="p">}</span>
+        <span class="n">modelstr</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;full&#39;</span><span class="p">:</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;dP&#39;</span><span class="p">:</span> <span class="s1">&#39;dP&#39;</span><span class="p">}</span>
+        <span class="n">registry</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="n">allobjs</span><span class="p">}</span>
+        <span class="n">Model</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">ConfocalDyedParticlesModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A model of particles blurred by a PSF, with a background and scale:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \\mathcal{M} = H(I*P) + B</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">varmap</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="s1">&#39;obj&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="s1">&#39;psf&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">:</span> <span class="s1">&#39;ilm&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="s1">&#39;bkg&#39;</span>
+        <span class="p">}</span>
+        <span class="n">modelstr</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;full&#39;</span><span class="p">:</span> <span class="s1">&#39;H(I*P) + B&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dP&#39;</span><span class="p">:</span> <span class="s1">&#39;H(I*dP)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dS&#39;</span><span class="p">:</span> <span class="s1">&#39;H(dI*P)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dB&#39;</span><span class="p">:</span> <span class="s1">&#39;dB&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">registry</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;psf&#39;</span><span class="p">:</span> <span class="n">allpsfs</span><span class="p">,</span>
+            <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="n">allobjs</span><span class="p">,</span>
+            <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">,</span>
+            <span class="s1">&#39;ilm&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">Model</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">BrightfieldImageModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Brightfield microscope image with simplifications made for performance.</span>
+<span class="sd">    In particular, the illumination from the condenser is presumed to be</span>
+<span class="sd">    Koehler and therefore slowly-varying compared to the PSF.</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \\mathcal{M} = I*(1+c*H(P)) + B</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">varmap</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="s1">&#39;bkg&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">:</span> <span class="s1">&#39;ilm&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="s1">&#39;psf&#39;</span><span class="p">,</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="s1">&#39;obj&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span><span class="s1">&#39;contrast&#39;</span>
+        <span class="p">}</span>
+        <span class="n">modelstr</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;full&#39;</span> <span class="p">:</span><span class="s1">&#39;I*(1+c*H(P)) + B&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dI&#39;</span> <span class="p">:</span> <span class="s1">&#39;dI*(1+c*H(P))&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dP&#39;</span> <span class="p">:</span> <span class="s1">&#39;I*c*H(dP)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dc&#39;</span> <span class="p">:</span> <span class="s1">&#39;I*dc*H(P)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dB&#39;</span> <span class="p">:</span> <span class="s1">&#39;dB&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">registry</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">,</span>
+            <span class="s1">&#39;ilm&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">,</span>
+            <span class="s1">&#39;psf&#39;</span><span class="p">:</span> <span class="n">allpsfs</span><span class="p">,</span>  <span class="c1">#FIXME should be 2d psfs</span>
+            <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="n">allobjs</span><span class="p">,</span>
+            <span class="s1">&#39;contrast&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;const&#39;</span><span class="p">:</span> <span class="n">GlobalScalar</span><span class="p">}</span>
+        <span class="p">}</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BrightfieldImageModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">)</span><span class="c1">#registry=registry)</span>
+
+<span class="k">class</span> <span class="nc">IlluminatedParticlesModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A model of particles illuminated by light, with a background.</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \\mathcal{M} = I * P + B</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">varmap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="s1">&#39;obj&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">:</span><span class="s1">&#39;ilm&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span><span class="s1">&#39;bkg&#39;</span><span class="p">}</span>
+        <span class="n">modelstr</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;full&#39;</span> <span class="p">:</span> <span class="s1">&#39;I*P + B&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dI&#39;</span> <span class="p">:</span> <span class="s1">&#39;dI*P&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dP&#39;</span> <span class="p">:</span> <span class="s1">&#39;I*dP&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dB&#39;</span> <span class="p">:</span> <span class="s1">&#39;dB&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">registry</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">,</span>
+            <span class="s1">&#39;ilm&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">,</span>
+            <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="n">allobjs</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">IlluminatedParticlesModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+                <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
+
+
+<span class="n">models</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;confocal-dyedfluid&#39;</span><span class="p">:</span> <span class="n">ConfocalImageModel</span><span class="p">,</span>
+    <span class="s1">&#39;confocal-dyedobjects&#39;</span><span class="p">:</span> <span class="n">ConfocalDyedParticlesModel</span><span class="p">,</span>
+    <span class="s1">&#39;smooth-field&#39;</span><span class="p">:</span> <span class="n">SmoothFieldModel</span><span class="p">,</span>
+    <span class="s1">&#39;blurred-field&#39;</span><span class="p">:</span> <span class="n">BlurredFieldModel</span>
+<span class="p">}</span>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>
