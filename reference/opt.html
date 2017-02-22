@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>peri.opt &#8212; PERI 0.1.1 documentation</title>
+    <title>peri.opt &#8212; PERI 0.1.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.1',
+        VERSION:     '0.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -47,7 +47,7 @@
         <li class="right" >
           <a href="models.html" title="peri.models"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">PERI 0.1.2 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -509,33 +509,30 @@ boolean mask <cite>blk</cite>.</p>
 </div>
 <p class="rubric">Notes</p>
 <p>There are 3 different options for optimizing:</p>
-<ul>
+<ul class="simple">
 <li><dl class="first docutils">
 <dt>do_run_1():</dt>
-<dd><p class="first last">Checks to calculate full, Broyden, and eigen J, then tries a step.
-If the step is accepted, decreases damping; if not, increases.</p>
-</dd>
+<dd>Checks to calculate full, Broyden, and eigen J, then tries a step.
+If the step is accepted, decreases damping; if not, increases.</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt>do_run_2():</dt>
-<dd><p class="first last">Checks to calculate full, Broyden, and eigen J, then tries a
+<dd>Checks to calculate full, Broyden, and eigen J, then tries a
 step with the current damping and with a decreased damping,
 accepting whichever is lower. Decreases damping iff the lower
 damping is better. It then calls do_internal_run() (see below).
 Rejected steps result in increased damping until a step is
-accepted. Checks for full, Broyden, and eigen J updates.</p>
-</dd>
+accepted. Checks for full, Broyden, and eigen J updates.</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt>do_internal_run():</dt>
-<dd><p class="first last">Checks for Broyden and eigen J updates only, then uses
+<dd>Checks for Broyden and eigen J updates only, then uses
 pre-calculated J, JTJ, etc to evaluate LM steps. Does
 not change damping during the run. Does not check do update
 the full J, but does check for Broyden, eigen updates.
-Does not work if J has not been evaluated yet.</p>
-</dd>
+Does not work if J has not been evaluated yet.</dd>
 </dl>
 </li>
 </ul>
@@ -550,19 +547,17 @@ this would be:</p>
 <li>do_run_2(): update_J_frequency=1, partial_update_frequency=1, run_length=2</li>
 </ul>
 <p>Partial Updates:</p>
-<ul>
+<ul class="simple">
 <li><dl class="first docutils">
-<dt>Broyden update <span class="classifier-delimiter">:</span> <span class="classifier">an update to J (and then JTJ) by approximating the</span></dt>
-<dd><p class="first last">derivative of the model as the finite difference of the last
-step. (rank-1)</p>
-</dd>
+<dt>Broyden update</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">an update to J (and then JTJ) by approximating the</span><dd>derivative of the model as the finite difference of the last
+step. (rank-1)</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt>Eigen update <span class="classifier-delimiter">:</span> <span class="classifier">a rank-num_eig_dirs update to J (and then JTJ) by</span></dt>
-<dd><p class="first last">finite-differencing with eig_dl along the highest num_eig_dirs
-eigendirections.</p>
-</dd>
+<dt>Eigen update</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">a rank-num_eig_dirs update to J (and then JTJ) by</span><dd>finite-differencing with eig_dl along the highest num_eig_dirs
+eigendirections.</dd>
 </dl>
 </li>
 </ul>
@@ -1456,12 +1451,12 @@ feature mass.</li>
         <li class="right" >
           <a href="models.html" title="peri.models"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">PERI 0.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">PERI 0.1.2 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>
