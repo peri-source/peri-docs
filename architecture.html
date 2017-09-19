@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -24,14 +24,14 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/mathconf.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Optimization and sampling" href="optimization.html" />
     <link rel="prev" title="PERI Walkthrough" href="walkthrough.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -63,12 +63,12 @@ the <code class="docutils literal"><span class="pre">peri</span></code> package 
 optimization image updates (frequently through local updates and caching). The
 description will proceed in three stages:</p>
 <ol class="arabic simple">
-<li><strong>The State</strong> &#8211; We talk about the <code class="docutils literal"><span class="pre">State</span></code> class, its properties, and
+<li><strong>The State</strong> – We talk about the <code class="docutils literal"><span class="pre">State</span></code> class, its properties, and
 model updates, through an example of fitting a polynomial.</li>
-<li><strong>The ImageState</strong> &#8211; We talk about the <code class="docutils literal"><span class="pre">ImageState</span></code> class, its
+<li><strong>The ImageState</strong> – We talk about the <code class="docutils literal"><span class="pre">ImageState</span></code> class, its
 properties, and model updates, through an example of an image of Gaussian
 discs.</li>
-<li><strong>Optimization and Advanced Components</strong> &#8211; We talk about optimization of
+<li><strong>Optimization and Advanced Components</strong> – We talk about optimization of
 stage two, demonstrating the local update framework and other advanced
 components, through the optimization and model fitting of the image of
 Gaussian discs.</li>
@@ -91,7 +91,7 @@ leaving you to implement only a few methods in order to have a functioning
 <a class="reference internal" href="reference/states.html#peri.states.State" title="peri.states.State"><code class="xref py py-class docutils literal"><span class="pre">State</span></code></a>, you must know about the following class methods:</p>
 <dl class="class">
 <dt>
-<em class="property">class </em><code class="descclassname">peri.states.</code><code class="descname">State</code><span class="sig-paren">(</span><em>params, values, logpriors=None, hyper_params=['sigma'], hyper_values=[0.04], **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/peri/states.html#State"><span class="viewcode-link">[source]</span></a></dt>
+<em class="property">class </em><code class="descclassname">peri.states.</code><code class="descname">State</code><span class="sig-paren">(</span><em>params, values, logpriors=None, hyper_params=[‘sigma’], hyper_values=[0.04], **kwargs</em><span class="sig-paren">)</span></dt>
 <dd><p>A model and corresponding functions to perform a fit to data using a
 variety of optimization routines. A model takes parameters and values
 (names and values) which determine the output of a model, which is then
@@ -101,15 +101,15 @@ compared with data.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>params</strong> (<em>list of strings</em>) &#8211; The names of the parameters (should be a unique set)</li>
-<li><strong>values</strong> (<em>list of numbers</em>) &#8211; The corresponding values of the parameters</li>
-<li><strong>logpriors</strong> (list of <cite>peri.prior.Prior</cite>) &#8211; Priors (constraints) to apply to parameters</li>
-<li><strong>hyper_params</strong> (<em>list of strings</em><em>, </em><em>optional</em>) &#8211; The names of any hyper-parameters (should be a unique set).
-Stored as a <cite>peri.comp.ParameterGroup</cite>. Default is <cite>[&#8216;sigma&#8217;]</cite>,
+<li><strong>params</strong> (<em>list of strings</em>) – The names of the parameters (should be a unique set)</li>
+<li><strong>values</strong> (<em>list of numbers</em>) – The corresponding values of the parameters</li>
+<li><strong>logpriors</strong> (list of <cite>peri.prior.Prior</cite>) – Priors (constraints) to apply to parameters</li>
+<li><strong>hyper_params</strong> (<em>list of strings</em><em>, </em><em>optional</em>) – The names of any hyper-parameters (should be a unique set).
+Stored as a <cite>peri.comp.ParameterGroup</cite>. Default is <cite>[‘sigma’]</cite>,
 the standard-deviation of the noise distribution.</li>
-<li><strong>hyper_values</strong> (<em>list of numbers</em><em>, </em><em>optional</em>) &#8211; The corresponding values of the hyper-parameters. Stored as a
+<li><strong>hyper_values</strong> (<em>list of numbers</em><em>, </em><em>optional</em>) – The corresponding values of the hyper-parameters. Stored as a
 <cite>peri.comp.ParameterGroup</cite>. Default is <cite>[0.04]</cite></li>
-<li><strong>kwargs</strong> &#8211; Arguments to pass to super class <code class="xref py py-class docutils literal"><span class="pre">peri.comp.ParameterGroup</span></code>
+<li><strong>kwargs</strong> – Arguments to pass to super class <code class="xref py py-class docutils literal"><span class="pre">peri.comp.ParameterGroup</span></code>
 including <cite>ordered</cite> and <cite>category</cite>.</li>
 </ul>
 </td>
@@ -119,15 +119,15 @@ including <cite>ordered</cite> and <cite>category</cite>.</li>
 <dl class="attribute">
 <dt>
 <code class="descname">data</code></dt>
-<dd><p><em>Class property</em> &#8211; the raw data of the model fit. Should return a number
+<dd><p><em>Class property</em> – the raw data of the model fit. Should return a number
 (preferrably float) or an ndarray (essentially any object which as
-operands +-/...). This object is constant since it is data.</p>
+operands +-/…). This object is constant since it is data.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">model</code></dt>
-<dd><p><em>Class property</em> &#8211; the current model fit to the data. Should return a
+<dd><p><em>Class property</em> – the current model fit to the data. Should return a
 number or ndarray. Ideally this object should be an object updated by
 the <a class="reference internal" href="reference/states.html#peri.states.State.update" title="peri.states.State.update"><code class="xref py py-func docutils literal"><span class="pre">peri.states.State.update()</span></code></a> function and simply returned in
 this property</p>
@@ -135,7 +135,7 @@ this property</p>
 
 <dl class="method">
 <dt>
-<code class="descname">update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/peri/states.html#State.update"><span class="viewcode-link">[source]</span></a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span></dt>
 <dd><p>Update a single parameter or group of parameters <code class="docutils literal"><span class="pre">params</span></code>
 with <code class="docutils literal"><span class="pre">values</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -143,8 +143,8 @@ with <code class="docutils literal"><span class="pre">values</span></code>.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>params</strong> (<em>string</em><em> or </em><em>list of strings</em>) &#8211; Parameter names which to update</li>
-<li><strong>value</strong> (<em>number</em><em> or </em><em>list of numbers</em>) &#8211; Values of those parameters which to update</li>
+<li><strong>params</strong> (<em>string</em><em> or </em><em>list of strings</em>) – Parameter names which to update</li>
+<li><strong>value</strong> (<em>number</em><em> or </em><em>list of numbers</em>) – Values of those parameters which to update</li>
 </ul>
 </td>
 </tr>
@@ -157,24 +157,26 @@ with <code class="docutils literal"><span class="pre">values</span></code>.</p>
 </div>
 <div class="section" id="state-class">
 <h3>State class<a class="headerlink" href="#state-class" title="Permalink to this headline">¶</a></h3>
-<p>To demonstrate this <code class="docutils literal"><span class="pre">State</span></code> class, let&#8217;s implement a polynomial fit class
+<p>To demonstrate this <code class="docutils literal"><span class="pre">State</span></code> class, let’s implement a polynomial fit class
 which fits a one dimensional curve to an arbitrary degree polynomial.  In the
 following class, we subclass <a class="reference internal" href="reference/states.html#peri.states.State" title="peri.states.State"><code class="xref py py-class docutils literal"><span class="pre">State</span></code></a> and implement the
 properties and functions that we outlined in the previous section. In
 particular, in the <code class="docutils literal"><span class="pre">__init__</span></code>, we store the input <code class="docutils literal"><span class="pre">x</span></code> points as a member
 variable and <code class="docutils literal"><span class="pre">y</span></code> values as data. We then set up parameter names and values
 depending on whether the user supplied coefficients the init. We call the
-superclasses&#8217; init and call update with these parameters and values to make
+superclasses’ init and call update with these parameters and values to make
 sure that the model is calculated.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">PolyFitState</span><span class="p">(</span><span class="n">peri</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">State</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">coeffs</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="k">class</span> <span class="nc">PolyFitState</span><span class="p">(</span><span class="n">peri</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">State</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">coeffs</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">y</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_xpts</span> <span class="o">=</span> <span class="n">x</span>
 
         <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c-</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">order</span><span class="p">)]</span>  <span class="c1"># names for the coefficients</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">coeffs</span> <span class="k">if</span> <span class="n">coeffs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span><span class="o">*</span><span class="n">order</span>  <span class="c1"># and their values</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">PolyFitState</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PolyFitState</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="bp">False</span>
         <span class="p">)</span>
 
@@ -193,12 +195,12 @@ sure that the model is calculated.</p>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal"><span class="pre">update</span></code> function for this class simply uses numpy&#8217;s <code class="docutils literal"><span class="pre">polyval</span></code> function
+<p>The <code class="docutils literal"><span class="pre">update</span></code> function for this class simply uses numpy’s <code class="docutils literal"><span class="pre">polyval</span></code> function
 to evaluate the parameter values as a polynomial at the stored <code class="docutils literal"><span class="pre">x</span></code> values.
 This model value is stored as a member variable and returned for the <code class="docutils literal"><span class="pre">model</span></code>
 property. The <code class="docutils literal"><span class="pre">data</span></code> property is simple the stored <code class="docutils literal"><span class="pre">y</span></code> values.</p>
 <p>We can then make an instance of this <code class="docutils literal"><span class="pre">PolyFitState</span></code> and begin to fit fake
-&#8216;data&#8217; with our model.</p>
+‘data’ with our model.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># noise level</span>
 <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.3</span>
 
@@ -224,11 +226,11 @@ the sensitivity matrix <span class="math">\(J^T J\)</span>:</p>
 <span class="n">pl</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">JTJ</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;bone&#39;</span><span class="p">)</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">params</span><span class="p">)),</span> <span class="n">s</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">params</span><span class="p">)),</span> <span class="n">s</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">r&quot;$J^T J$ for PolyFitState&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$J^T J$ for PolyFitState&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="figure align-center" id="id1">
-<a class="reference internal image-reference" href="_images/arch_polyfit_jtj.png"><img alt="``pl.imshow(s.JTJ(), cmap='bone')``" src="_images/arch_polyfit_jtj.png" style="width: 704.0px; height: 503.2px;" /></a>
+<a class="reference internal image-reference" href="_images/arch_polyfit_jtj.png"><img alt="``pl.imshow(s.JTJ(), cmap='bone')``" src="_images/arch_polyfit_jtj.png" style="width: 704.0px; height: 503.20000000000005px;" /></a>
 <p class="caption"><span class="caption-text">Showing the relatively boring structure of <span class="math">\(J^T J\)</span> for the PolyFitState.</span></p>
 </div>
 <p>or we can calculate the <a class="reference external" href="https://en.wikipedia.org/wiki/Cram%C3%A9r%E2%80%93Rao_bound">Cramer-Rao bound</a> for the fit
@@ -240,10 +242,10 @@ parameters:</p>
 <div class="section" id="optimization">
 <h4>Optimization<a class="headerlink" href="#optimization" title="Permalink to this headline">¶</a></h4>
 <p>From here, we can optimize the parameters of the state along with the estimated
-noise level. First, we will do so using Monte Carlo sampling, particularly with
-a multidimensional slice sampler.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">pl</span>
-<span class="kn">from</span> <span class="nn">peri.mc</span> <span class="kn">import</span> <span class="n">sample</span>
+noise level. <code class="docutils literal"><span class="pre">peri</span></code> provides several ways to optimize the state’s parameters.
+First, we will demonstrate using Monte Carlo sampling, particularly with
+a multidimensional slice sampler, to optimize the state:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">peri.mc</span> <span class="kn">import</span> <span class="n">sample</span>
 
 <span class="c1"># burn a number of samples if hadn&#39;t optimized yet</span>
 <span class="c1">#h = sample.sample_state(s, s.params, N=1000, doprint=True, procedure=&#39;uniform&#39;)</span>
@@ -257,20 +259,21 @@ a multidimensional slice sampler.</p>
 </div>
 <p>We can also optimize the <code class="docutils literal"><span class="pre">PolyFitState</span></code> using variations on nonlinear least
 squares optimization with <a class="reference external" href="https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm">Levenberg-Marquardt</a>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">peri.opt.optimize</span> <span class="kn">as</span> <span class="nn">opt</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">peri.opt.optimize</span> <span class="kn">as</span> <span class="nn">opt</span>
 <span class="n">opt</span><span class="o">.</span><span class="n">do_levmarq</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
 
 <span class="n">fig</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">_xpts</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Data&#39;</span><span class="p">)</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">_xpts</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Model&#39;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">r&quot;$x$&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">r&quot;$y$&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$x$&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$y$&quot;</span><span class="p">)</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">)</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Best fit model&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="figure align-center" id="id2">
-<a class="reference internal image-reference" href="_images/arch_polyfit_fit.png"><img alt="``opt.do_levmarq(s, s.params[1:]); pl.plot(s.data); pl.plot(s.model)``" src="_images/arch_polyfit_fit.png" style="width: 704.0px; height: 503.2px;" /></a>
+<a class="reference internal image-reference" href="_images/arch_polyfit_fit.png"><img alt="``opt.do_levmarq(s, s.params[1:]); pl.plot(s.data); pl.plot(s.model)``" src="_images/arch_polyfit_fit.png" style="width: 704.0px; height: 503.20000000000005px;" /></a>
 <p class="caption"><span class="caption-text">Comparison of data and model fit for PolyFitState with data seeded from
 an 8th order polynomial with noise.</span></p>
 </div>
@@ -300,7 +303,7 @@ point-spread-function (PSF). In particular, the model we will be creating is:</p
 <p>where <span class="math">\(P\)</span> is the point spread function and <span class="math">\(S\)</span> is the shape
 function which defines the <em>Platonic</em> solid, and <span class="math">\(B\)</span> is a spatially
 varying background which may represent any number of confounding factors
-in image formation. We&#8217;ll start with a simple model of two-dimensional circular
+in image formation. We’ll start with a simple model of two-dimensional circular
 discs, infludenced by microscope optics through an anisotropic Gaussian point-
 spread function, and imaged on a detector with non-uniform background:</p>
 <div class="math">
@@ -309,13 +312,13 @@ S(\bvec{x}; \{\bvec{p}_, a_i\}) &amp;= \sum_{i=0}^{N_{\rm{particles}}}  \frac{1}
 B(\bvec{x}) &amp;= \sum_{i=0}^{C_x} \sum_{j=0}^{C_y} c_{ij} L_i(x) L_j(y)\end{split}\]</div>
 <p>Since each of this functional form seem distinct, we separate our model into
 small objects which we call <code class="docutils literal"><span class="pre">components</span></code>. These <code class="docutils literal"><span class="pre">components</span></code> calculate part
-of the model (<span class="math">\(P\)</span>, <span class="math">\(S\)</span>, ...) over a certain region, or <code class="docutils literal"><span class="pre">Tile</span></code>,
+of the model (<span class="math">\(P\)</span>, <span class="math">\(S\)</span>, …) over a certain region, or <code class="docutils literal"><span class="pre">Tile</span></code>,
 then get combined back into the overall model. This philosophy can be expressed
 simply as:</p>
 <ul class="simple">
-<li><strong>Model</strong> (<a class="reference internal" href="reference/models.html#peri.models.Model" title="peri.models.Model"><code class="xref py py-class docutils literal"><span class="pre">Model</span></code></a>) &#8211; The entire equation (and derivatives) describing the image formation <span class="math">\(\mathcal{M}\)</span></li>
-<li><strong>Component</strong> (<a class="reference internal" href="reference/comp.html#peri.comp.comp.Component" title="peri.comp.comp.Component"><code class="xref py py-class docutils literal"><span class="pre">Component</span></code></a>) &#8211; Small subsections of the model e.g. <span class="math">\(P\)</span>, <span class="math">\(S\)</span>, <span class="math">\(B\)</span></li>
-<li><strong>Tile</strong> (<a class="reference internal" href="reference/util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a>) &#8211; Regions of the image over which parts of the model are calculated.</li>
+<li><strong>Model</strong> (<a class="reference internal" href="reference/models.html#peri.models.Model" title="peri.models.Model"><code class="xref py py-class docutils literal"><span class="pre">Model</span></code></a>) – The entire equation (and derivatives) describing the image formation <span class="math">\(\mathcal{M}\)</span></li>
+<li><strong>Component</strong> (<a class="reference internal" href="reference/comp.html#peri.comp.comp.Component" title="peri.comp.comp.Component"><code class="xref py py-class docutils literal"><span class="pre">Component</span></code></a>) – Small subsections of the model e.g. <span class="math">\(P\)</span>, <span class="math">\(S\)</span>, <span class="math">\(B\)</span></li>
+<li><strong>Tile</strong> (<a class="reference internal" href="reference/util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a>) – Regions of the image over which parts of the model are calculated.</li>
 </ul>
 <div class="section" id="model">
 <h3>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h3>
@@ -323,12 +326,12 @@ simply as:</p>
 <code class="docutils literal"><span class="pre">Model</span></code>, or the equation that produces our model image. To create a new model,
 we simply subclass the <a class="reference internal" href="reference/models.html#peri.models.Model" title="peri.models.Model"><code class="xref py py-class docutils literal"><span class="pre">Model</span></code></a> class and overwrite the
 <code class="docutils literal"><span class="pre">__init__</span></code> function. This function holds the actual equations which are
-called to calculate the model image. For our example here, let&#8217;s simply
+called to calculate the model image. For our example here, let’s simply
 translate the equation above:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">peri.models</span>
 
 <span class="k">class</span> <span class="nc">GaussianDiscModel</span><span class="p">(</span><span class="n">peri</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># gives human readable labels to equation variables</span>
         <span class="n">varmap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="s1">&#39;psf&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="s1">&#39;disc&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="s1">&#39;off&#39;</span><span class="p">}</span>
 
@@ -338,7 +341,7 @@ translate the equation above:</p>
         <span class="n">modelstr</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;full&#39;</span> <span class="p">:</span> <span class="s1">&#39;P(D) + C&#39;</span><span class="p">}</span>
 
         <span class="c1"># calls the super-class&#39; init</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">GaussianDiscModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GaussianDiscModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="bp">None</span>
         <span class="p">)</span>
 </pre></div>
@@ -347,7 +350,7 @@ translate the equation above:</p>
 (variable map) that essentially acts to give human labels to the variables in
 the model equation. We define a psf <span class="math">\(P\)</span>, disc image <span class="math">\(D\)</span>, and
 constant offset <span class="math">\(C\)</span>. The <code class="docutils literal"><span class="pre">modelstr</span></code> defines the actual equation (which
-will be <code class="docutils literal"><span class="pre">eval</span></code>&#8216;d) in terms of the variables defined above. In this equation,
+will be <code class="docutils literal"><span class="pre">eval</span></code>’d) in terms of the variables defined above. In this equation,
 the <code class="docutils literal"><span class="pre">Component</span></code> given by each label (psf, disc, off) will have their
 <code class="docutils literal"><span class="pre">get()</span></code> function called and inserted into the string. More on this later.</p>
 <p>We are done with this section of the example. In the next example we will talk
@@ -368,13 +371,13 @@ example).</p>
 <p>At the lowest level, a <code class="docutils literal"><span class="pre">Component</span></code> is a <code class="docutils literal"><span class="pre">ParameterGroup</span></code>, a storage
 container for values and names associated with those values.  A
 <a class="reference internal" href="reference/comp.html#peri.comp.comp.ParameterGroup" title="peri.comp.comp.ParameterGroup"><code class="xref py py-class docutils literal"><span class="pre">ParameterGroup</span></code></a> is a container that provides a common
-interface to any object which computes &#8220;something&#8221; based on a set of
+interface to any object which computes “something” based on a set of
 <code class="docutils literal"><span class="pre">parameters</span></code> (string names) and <code class="docutils literal"><span class="pre">values</span></code> (the values associated with those
 names). In the most basic form, a <code class="docutils literal"><span class="pre">ParameterGroup</span></code> must care about the
 following structure:</p>
 <dl class="class">
 <dt>
-<em class="property">class </em><code class="descclassname">peri.comp.comp.</code><code class="descname">ParameterGroup</code><span class="sig-paren">(</span><em>params=None</em>, <em>values=None</em>, <em>ordered=True</em>, <em>category='param'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/peri/comp/comp.html#ParameterGroup"><span class="viewcode-link">[source]</span></a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.comp.</code><code class="descname">ParameterGroup</code><span class="sig-paren">(</span><em>params=None</em>, <em>values=None</em>, <em>ordered=True</em>, <em>category=’param’</em><span class="sig-paren">)</span></dt>
 <dd><p>Any object which computes something based on parameters and values can
 be considered a <code class="docutils literal"><span class="pre">ParameterGroup</span></code>. This class provides a common
 interface since <code class="docutils literal"><span class="pre">ParameterGroup</span></code> appears throughout <code class="docutils literal"><span class="pre">PERI</span></code>
@@ -383,7 +386,7 @@ form, a <code class="docutils literal"><span class="pre">ParameterGroup</span></
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="n">parameter_name</span><span class="p">:</span> <span class="n">parameter_value</span><span class="p">,</span> <span class="o">...</span> <span class="p">}</span>
 </pre></div>
 </div>
-<p>The use of a dictionary is strictly optional &#8211; as long as the following
+<p>The use of a dictionary is strictly optional – as long as the following
 methods are provided, the parameters and values may be stored in any
 format that is convenient:</p>
 <blockquote>
@@ -400,11 +403,11 @@ format that is convenient:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>params</strong> (<em>string</em><em>, </em><em>list of strings</em>) &#8211; The names of the parameters, in the proper order</li>
-<li><strong>values</strong> (<em>number</em><em>, </em><em>list of numbers</em>) &#8211; The values corresponding to the parameter names</li>
-<li><strong>ordered</strong> (<em>boolean</em><em> (</em><em>default: True</em><em>)</em><em></em>) &#8211; If True, uses an OrderedDict so that parameter order is
+<li><strong>params</strong> (<em>string</em><em>, </em><em>list of strings</em>) – The names of the parameters, in the proper order</li>
+<li><strong>values</strong> (<em>number</em><em>, </em><em>list of numbers</em>) – The values corresponding to the parameter names</li>
+<li><strong>ordered</strong> (<em>boolean</em><em> (</em><em>default: True</em><em>)</em>) – If True, uses an OrderedDict so that parameter order is
 deterministic independent of number of parameters</li>
-<li><strong>category</strong> (<em>string</em><em> (</em><em>default: 'param'</em><em>)</em><em></em>) &#8211; <p>Name of the category associated with this ParameterGroup.</p>
+<li><strong>category</strong> (<em>string</em><em> (</em><em>default: 'param'</em><em>)</em>) – <p>Name of the category associated with this ParameterGroup.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">FIXME : should only be a property of Component</p>
@@ -417,7 +420,32 @@ deterministic independent of number of parameters</li>
 </table>
 <dl class="method">
 <dt>
-<code class="descname">update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/peri/comp/comp.html#ParameterGroup.update"><span class="viewcode-link">[source]</span></a></dt>
+<code class="descname">get_values</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span></dt>
+<dd><p>Get the value of a list or single parameter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>string</em><em>, </em><em>list of string</em>) – name of parameters which to retrieve</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">set_values</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span></dt>
+<dd><p>Directly set the values corresponding to certain parameters.
+This does not necessarily trigger and update of the calculation,</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="reference/comp.html#peri.comp.comp.ParameterGroup.update" title="peri.comp.comp.ParameterGroup.update"><code class="xref py py-func docutils literal"><span class="pre">update()</span></code></a> : full update func</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span></dt>
 <dd><p>Update the calculation of the class based on a pair or pairs
 of parameters and associated values.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -425,38 +453,13 @@ of parameters and associated values.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>params</strong> (<em>string</em><em>, </em><em>list of strings</em>) &#8211; name of parameters to update</li>
-<li><strong>values</strong> (<em>number</em><em>, </em><em>list of numbers</em>) &#8211; cooresponding values to update</li>
+<li><strong>params</strong> (<em>string</em><em>, </em><em>list of strings</em>) – name of parameters to update</li>
+<li><strong>values</strong> (<em>number</em><em>, </em><em>list of numbers</em>) – cooresponding values to update</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/peri/comp/comp.html#ParameterGroup.get_values"><span class="viewcode-link">[source]</span></a></dt>
-<dd><p>Get the value of a list or single parameter.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>string</em><em>, </em><em>list of string</em>) &#8211; name of parameters which to retrieve</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">set_values</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/peri/comp/comp.html#ParameterGroup.set_values"><span class="viewcode-link">[source]</span></a></dt>
-<dd><p>Directly set the values corresponding to certain parameters.
-This does not necessarily trigger and update of the calculation,</p>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="reference/comp.html#peri.comp.comp.ParameterGroup.update" title="peri.comp.comp.ParameterGroup.update"><code class="xref py py-func docutils literal"><span class="pre">update()</span></code></a> : full update func</p>
-</div>
 </dd></dl>
 
 </dd></dl>
@@ -472,12 +475,12 @@ values which are used to compute part of the model image. Therefore, its
 computation for that component. Additionally, the <code class="docutils literal"><span class="pre">Components</span></code> must know
 something about the dimensions of the image over which they are expected to
 function as well as the current area of interest. It must also provide
-information about which parts of the image it finds important (but won&#8217;t deal
+information about which parts of the image it finds important (but won’t deal
 with this until the next section). Therefore, in the <a class="reference internal" href="reference/comp.html#peri.comp.comp.Component" title="peri.comp.comp.Component"><code class="xref py py-class docutils literal"><span class="pre">Component</span></code></a>
 class we need to know about:</p>
 <dl class="class">
 <dt>
-<em class="property">class </em><code class="descclassname">peri.comp.comp.</code><code class="descname">Component</code><span class="sig-paren">(</span><em>params</em>, <em>values</em>, <em>ordered=True</em>, <em>category='comp'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/peri/comp/comp.html#Component"><span class="viewcode-link">[source]</span></a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.comp.</code><code class="descname">Component</code><span class="sig-paren">(</span><em>params</em>, <em>values</em>, <em>ordered=True</em>, <em>category=’comp’</em><span class="sig-paren">)</span></dt>
 <dd><p>A <a class="reference internal" href="reference/comp.html#peri.comp.comp.ParameterGroup" title="peri.comp.comp.ParameterGroup"><code class="xref py py-class docutils literal"><span class="pre">ParameterGroup</span></code></a> which specifically computes
 over sections of an image for an <a class="reference internal" href="reference/states.html#peri.states.ImageState" title="peri.states.ImageState"><code class="xref py py-class docutils literal"><span class="pre">ImageState</span></code></a>. To
 this end, we require the implementation of several new member functions:</p>
@@ -498,11 +501,11 @@ we must incorporate tiling in this object.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>params</strong> (<em>string</em><em>, </em><em>list of strings</em>) &#8211; The names of the parameters, in the proper order</li>
-<li><strong>values</strong> (<em>number</em><em>, </em><em>list of numbers</em>) &#8211; The values corresponding to the parameter names</li>
-<li><strong>ordered</strong> (<em>boolean</em><em> (</em><em>default: True</em><em>)</em><em></em>) &#8211; If True, uses an OrderedDict so that parameter order is
+<li><strong>params</strong> (<em>string</em><em>, </em><em>list of strings</em>) – The names of the parameters, in the proper order</li>
+<li><strong>values</strong> (<em>number</em><em>, </em><em>list of numbers</em>) – The values corresponding to the parameter names</li>
+<li><strong>ordered</strong> (<em>boolean</em><em> (</em><em>default: True</em><em>)</em>) – If True, uses an OrderedDict so that parameter order is
 deterministic independent of number of parameters</li>
-<li><strong>category</strong> (<em>string</em><em> (</em><em>default: 'param'</em><em>)</em><em></em>) &#8211; Name of the category associated with this ParameterGroup.</li>
+<li><strong>category</strong> (<em>string</em><em> (</em><em>default: 'param'</em><em>)</em>) – Name of the category associated with this ParameterGroup.</li>
 </ul>
 </td>
 </tr>
@@ -510,13 +513,38 @@ deterministic independent of number of parameters</li>
 </table>
 <dl class="method">
 <dt>
-<code class="descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/peri/comp/comp.html#Component.initialize"><span class="viewcode-link">[source]</span></a></dt>
-<dd><p>Begin anew and initialize the component</p>
+<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Return the <cite>natural</cite> part of the model. In the case of most elements it
+is the calculated field, for others it is the object itself.</p>
 </dd></dl>
 
 <dl class="method">
 <dt>
-<code class="descname">get_update_tile</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/peri/comp/comp.html#Component.get_update_tile"><span class="viewcode-link">[source]</span></a></dt>
+<code class="descname">get_padding_size</code><span class="sig-paren">(</span><em>tile</em><span class="sig-paren">)</span></dt>
+<dd><p>Get the amount of padding required for this object when calculating
+about a tile <cite>tile</cite>. Padding size is the total size, so half that
+on each side. For example, if this Component is a Gaussian point spread
+function, then the padding returned might be:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">peri</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">))</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tile</strong> (<a class="reference internal" href="reference/util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a>) – A tile defining the region of interest</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>pad</strong> – A tile corresponding to the required padding size</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="reference/util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">get_update_tile</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span></dt>
 <dd><p>This method returns a <a class="reference internal" href="reference/util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a> object defining the
 region of a field that has to be modified by the update of (params,
 values). For example, if this Component is the point-spread-function,
@@ -530,12 +558,12 @@ the entire image:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>params</strong> (<em>single param</em><em>, </em><em>list of params</em>) &#8211; A single parameter or list of parameters to be updated</li>
-<li><strong>values</strong> (<em>single value</em><em>, </em><em>list of values</em>) &#8211; The values corresponding to the params</li>
+<li><strong>params</strong> (<em>single param</em><em>, </em><em>list of params</em>) – A single parameter or list of parameters to be updated</li>
+<li><strong>values</strong> (<em>single value</em><em>, </em><em>list of values</em>) – The values corresponding to the params</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>tile</strong> &#8211; A tile corresponding to the image region</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>tile</strong> – A tile corresponding to the image region</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="reference/util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a></p>
@@ -547,37 +575,13 @@ the entire image:</p>
 
 <dl class="method">
 <dt>
-<code class="descname">get_padding_size</code><span class="sig-paren">(</span><em>tile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/peri/comp/comp.html#Component.get_padding_size"><span class="viewcode-link">[source]</span></a></dt>
-<dd><p>Get the amount of padding required for this object when calculating
-about a tile <cite>tile</cite>. Padding size is the total size, so half that
-on each side. For example, if this Component is a Gaussian point spread
-function, then the padding returned might be:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">peri</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">))</span>
-</pre></div>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tile</strong> (<a class="reference internal" href="reference/util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a>) &#8211; A tile defining the region of interest</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>pad</strong> &#8211; A tile corresponding to the required padding size</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="reference/util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<code class="descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Begin anew and initialize the component</p>
 </dd></dl>
 
 <dl class="method">
 <dt>
-<code class="descname">set_tile</code><span class="sig-paren">(</span><em>tile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/peri/comp/comp.html#Component.set_tile"><span class="viewcode-link">[source]</span></a></dt>
-<dd><p>Set the currently active tile region for the calculation</p>
-</dd></dl>
-
-<dl class="method">
-<dt>
-<code class="descname">set_shape</code><span class="sig-paren">(</span><em>shape</em>, <em>inner</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/peri/comp/comp.html#Component.set_shape"><span class="viewcode-link">[source]</span></a></dt>
+<code class="descname">set_shape</code><span class="sig-paren">(</span><em>shape</em>, <em>inner</em><span class="sig-paren">)</span></dt>
 <dd><p>Set the overall shape of the calculation area. The total shape of that
 the calculation can possibly occupy, in pixels. The second, inner, is
 the region of interest within the image.</p>
@@ -585,14 +589,19 @@ the region of interest within the image.</p>
 
 <dl class="method">
 <dt>
-<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/peri/comp/comp.html#Component.get"><span class="viewcode-link">[source]</span></a></dt>
-<dd><p>Return the <cite>natural</cite> part of the model. In the case of most elements it
-is the calculated field, for others it is the object itself.</p>
+<code class="descname">set_tile</code><span class="sig-paren">(</span><em>tile</em><span class="sig-paren">)</span></dt>
+<dd><p>Set the currently active tile region for the calculation</p>
 </dd></dl>
 
 </dd></dl>
 
-<p>Let&#8217;s sink our teeth in and create 2 of the components that will work in our
+<p>The flow-chart below illustrates the hierarchy of class inheritance in
+<code class="docutils literal"><span class="pre">peri</span></code>.</p>
+<div class="figure align-center" id="id3">
+<a class="reference internal image-reference" href="_images/inheritance_flowchart.svg"><img alt="Inheritance flowchart" src="_images/inheritance_flowchart.svg" /></a>
+<p class="caption"><span class="caption-text">Inheritance flowchart for the <code class="docutils literal"><span class="pre">peri</span></code> package. Arrows indicate inheritance.</span></p>
+</div>
+<p>Let’s sink our teeth in and create 2 of the components that will work in our
 <code class="docutils literal"><span class="pre">GaussianDiscModel</span></code> (one already available in the <code class="docutils literal"><span class="pre">peri</span></code> package). We will
 first create something to use as the psf, then a component to use as the disc
 element of the image. The offset component is already implemented in
@@ -606,9 +615,9 @@ element of the image. The offset component is already implemented in
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
 <span class="k">class</span> <span class="nc">GaussianPSF</span><span class="p">(</span><span class="n">peri</span><span class="o">.</span><span class="n">comp</span><span class="o">.</span><span class="n">comp</span><span class="o">.</span><span class="n">Component</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigmas</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigmas</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)):</span>
         <span class="c1"># setup the parameters and values which will be passed to super</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">GaussianPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GaussianPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;psf-sx&#39;</span><span class="p">,</span> <span class="s1">&#39;psf-sy&#39;</span><span class="p">],</span> <span class="n">values</span><span class="o">=</span><span class="n">sigmas</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;psf&#39;</span>
         <span class="p">)</span>
 
@@ -620,10 +629,10 @@ element of the image. The offset component is already implemented in
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Accept a field, apply the point-spread-function, and return</span>
-<span class="sd">        the resulting image of a blurred field</span>
+<span class="sd">        Accept a field (numpy.ndarray), apply the point-spread-function,</span>
+<span class="sd">        and return the resulting image of a blurred field</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># in order to avoid translations from the psf, we must create</span>
         <span class="c1"># real-space vectors that are zero in the corner and go positive</span>
@@ -661,7 +670,7 @@ element of the image. The offset component is already implemented in
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
 <span class="k">class</span> <span class="nc">PlatonicDiscs</span><span class="p">(</span><span class="n">peri</span><span class="o">.</span><span class="n">comp</span><span class="o">.</span><span class="n">comp</span><span class="o">.</span><span class="n">Component</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">radii</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">radii</span><span class="p">):</span>
         <span class="n">comp</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">]</span>
         <span class="n">params</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
 
@@ -673,7 +682,7 @@ element of the image. The offset component is already implemented in
 
         <span class="c1"># use our super-class structure to keep track of these parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">PlatonicDiscs</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PlatonicDiscs</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;disc&#39;</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -714,7 +723,7 @@ element of the image. The offset component is already implemented in
 <div class="section" id="imagestate-fitting-and-properties">
 <h3>ImageState, fitting, and properties<a class="headerlink" href="#imagestate-fitting-and-properties" title="Permalink to this headline">¶</a></h3>
 <p>Now that we have implemented an <code class="docutils literal"><span class="pre">GaussianDiscModel</span></code> along with various
-compatible components, let&#8217;s create a valid <code class="docutils literal"><span class="pre">ImageState</span></code> and explore its
+compatible components, let’s create a valid <code class="docutils literal"><span class="pre">ImageState</span></code> and explore its
 properties and perform a fit to fake data. First, we can create a state
 by using the <code class="docutils literal"><span class="pre">Model</span></code> and <code class="docutils literal"><span class="pre">Components</span></code> that we just created:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">initialize</span><span class="p">():</span>
@@ -738,13 +747,13 @@ by using the <code class="docutils literal"><span class="pre">Model</span></code
     <span class="k">return</span> <span class="n">s</span>
 </pre></div>
 </div>
-<p>Once we have created the state <code class="docutils literal"><span class="pre">s</span></code>, let&#8217;s look at some of its properties.
+<p>Once we have created the state <code class="docutils literal"><span class="pre">s</span></code>, let’s look at some of its properties.
 Many of them are the same as the properties available in the <code class="docutils literal"><span class="pre">PolyFitState</span></code>
 example since they inherit from <a class="reference internal" href="reference/states.html#peri.states.State" title="peri.states.State"><code class="xref py py-class docutils literal"><span class="pre">State</span></code></a>. For example,
 we can look at derivatives of the model w.r.t. different parameters using
 the following convenience function:</p>
-<div class="figure align-center" id="id3">
-<a class="reference internal image-reference" href="_images/arch_gdiscs_model.png"><img alt="pl.imshow(s.model, cmap='bone')" src="_images/arch_gdiscs_model.png" style="width: 366.8px; height: 390.6px;" /></a>
+<div class="figure align-center" id="id4">
+<a class="reference internal image-reference" href="_images/arch_gdiscs_model.png"><img alt="pl.imshow(s.model, cmap='bone')" src="_images/arch_gdiscs_model.png" style="width: 366.79999999999995px; height: 390.59999999999997px;" /></a>
 <p class="caption"><span class="caption-text">The model image create from our ImageState</span></p>
 </div>
 <p>Plotting the derivatives with respect to model parameters can be performed with
@@ -765,8 +774,8 @@ the following convenience function:</p>
 </pre></div>
 </div>
 <p>This code yields the following images</p>
-<div class="figure align-center" id="id4">
-<a class="reference internal image-reference" href="_images/arch_gdiscs_gradmodel.png"><img alt="``show_derivative(s, ...)" src="_images/arch_gdiscs_gradmodel.png" style="width: 598.5px; height: 455.0px;" /></a>
+<div class="figure align-center" id="id5">
+<a class="reference internal image-reference" href="_images/arch_gdiscs_gradmodel.png"><img alt="``show_derivative(s, ...)" src="_images/arch_gdiscs_gradmodel.png" style="width: 598.5px; height: 454.99999999999994px;" /></a>
 <p class="caption"><span class="caption-text">Gradients of the state with respect to various parameters in the model</span></p>
 </div>
 <p>Similarly, the <span class="math">\(J^T J\)</span> can be plotted using the <code class="docutils literal"><span class="pre">s.JTJ</span></code> convenience
@@ -777,18 +786,18 @@ function</p>
     <span class="n">pl</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">JTJ</span><span class="p">())),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;bone&#39;</span><span class="p">)</span>
     <span class="n">pl</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)),</span> <span class="n">p</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span>
     <span class="n">pl</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)),</span> <span class="n">p</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">)</span>
-    <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">r&#39;$J^T J$&#39;</span><span class="p">)</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$J^T J$&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Yields the approximate hessian</p>
-<div class="figure align-center" id="id5">
+<div class="figure align-center" id="id6">
 <a class="reference internal image-reference" href="_images/arch_gdiscs_jtj.png"><img alt="``show_derivative(s, ...)" src="_images/arch_gdiscs_jtj.png" style="width: 641.9px; height: 529.9px;" /></a>
 <p class="caption"><span class="caption-text"><span class="math">\(J^T J\)</span> for the GaussianDiscModel with the components we created
 earlier in this section. You can see the strong coupling between neighboring
 particles as well as the coupling between global values (psf and off) and
 local ones (disc)</span></p>
 </div>
-<p>Finally, let&#8217;s make sure that our model is able to accurately reproduce the
+<p>Finally, let’s make sure that our model is able to accurately reproduce the
 data (which happens to be generated from the model but has noise added to it).
 To do this, we will rattle the values of the model then perform a fit and
 compare the fit and errors to the true values.</p>
@@ -915,7 +924,7 @@ compare the fit and errors to the true values.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

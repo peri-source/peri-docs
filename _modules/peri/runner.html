@@ -1,12 +1,12 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>peri.runner &#8212; PERI 0.1.2 documentation</title>
+    <title>peri.runner &#8212; PERI 0.1.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.1.2',
+        VERSION:     '0.1.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,12 +24,12 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../_static/mathconf.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -63,9 +63,17 @@
 <span class="sd">    (use globals to start,          start from nothing)</span>
 <span class="sd">    (use positions to start,        start from trackpy)</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">future</span> <span class="k">import</span> <span class="n">standard_library</span>
+<span class="n">standard_library</span><span class="o">.</span><span class="n">install_aliases</span><span class="p">()</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span>
+
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">Tkinter</span> <span class="k">as</span> <span class="nn">tk</span>
-<span class="kn">import</span> <span class="nn">tkFileDialog</span> <span class="k">as</span> <span class="nn">tkfd</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">tkinter</span> <span class="k">as</span> <span class="nn">tk</span>
+    <span class="kn">import</span> <span class="nn">tkinter.filedialog</span> <span class="k">as</span> <span class="nn">tkfd</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">Tkinter</span> <span class="k">as</span> <span class="nn">tk</span>
+    <span class="kn">import</span> <span class="nn">tkFileDialog</span> <span class="k">as</span> <span class="nn">tkfd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">peri</span>
 <span class="kn">from</span> <span class="nn">peri</span> <span class="k">import</span> <span class="n">initializers</span><span class="p">,</span> <span class="n">util</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">logger</span>
@@ -350,7 +358,7 @@
     <span class="k">return</span> <span class="n">s</span>
 
 
-<div class="viewcode-block" id="optimize_from_initial"><a class="viewcode-back" href="../../reference/runner.html#peri.runner.optimize_from_initial">[docs]</a><span class="k">def</span> <span class="nf">optimize_from_initial</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mi">1</span><span class="n">e9</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">rz_order</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<div class="viewcode-block" id="optimize_from_initial"><a class="viewcode-back" href="../../reference/runner.html#peri.runner.optimize_from_initial">[docs]</a><span class="k">def</span> <span class="nf">optimize_from_initial</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">rz_order</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
         <span class="n">min_rad</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_rad</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Optimizes a state from an initial set of positions and radii, without</span>
@@ -404,7 +412,7 @@
     <span class="n">states</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="o">+</span><span class="s1">&#39;initial-addsub&#39;</span><span class="p">)</span>
 
     <span class="n">RLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Final polish:&#39;</span><span class="p">)</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">burn</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;polish&#39;</span><span class="p">,</span> <span class="n">n_loop</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">fractol</span><span class="o">=</span><span class="mi">3</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span> <span class="o">+</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">burn</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;polish&#39;</span><span class="p">,</span> <span class="n">n_loop</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">fractol</span><span class="o">=</span><span class="mf">3e-4</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span> <span class="o">+</span>
             <span class="s1">&#39;addsub-polish&#39;</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="n">max_mem</span><span class="p">,</span> <span class="n">rz_order</span><span class="o">=</span><span class="n">rz_order</span><span class="p">,</span> <span class="n">dowarn</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;converged&#39;</span><span class="p">]:</span>
         <span class="n">RLOG</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Optimization did not converge; consider re-running&#39;</span><span class="p">)</span>
@@ -434,7 +442,7 @@
 <span class="sd">            through a Tk window.</span>
 <span class="sd">        use_full_path : Bool, optional</span>
 <span class="sd">            Set to True to use the full path of the state instead of</span>
-<span class="sd">            partial path names (e.g. C:\Users\Me\Desktop\state.pkl vs</span>
+<span class="sd">            partial path names (e.g. /full/path/name/state.pkl vs</span>
 <span class="sd">            state.pkl). Default is False</span>
 
 <span class="sd">    Other Parameters</span>
@@ -527,7 +535,7 @@
 <span class="sd">            through a Tk window.</span>
 <span class="sd">        use_full_path : Bool, optional</span>
 <span class="sd">            Set to True to use the full path of the state instead of</span>
-<span class="sd">            partial path names (e.g. C:\Users\Me\Desktop\state.pkl vs</span>
+<span class="sd">            partial path names (e.g. /full/path/name/state.pkl vs</span>
 <span class="sd">            state.pkl). Default is False</span>
 <span class="sd">        actual_rad : Float or None, optional</span>
 <span class="sd">            The initial guess for the particle radii. Default is the median</span>
@@ -651,7 +659,7 @@
     <span class="k">return</span> <span class="n">state_name</span><span class="p">,</span> <span class="n">im_name</span>
 
 
-<span class="k">def</span> <span class="nf">_translate_particles</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mi">1</span><span class="n">e9</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">min_rad</span><span class="o">=</span><span class="s1">&#39;calc&#39;</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">_translate_particles</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">min_rad</span><span class="o">=</span><span class="s1">&#39;calc&#39;</span><span class="p">,</span>
         <span class="n">max_rad</span><span class="o">=</span><span class="s1">&#39;calc&#39;</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rz_order</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">do_polish</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Workhorse for translating particles. See get_particles_featuring for docs.</span>
@@ -671,10 +679,10 @@
 
     <span class="k">if</span> <span class="n">do_polish</span><span class="p">:</span>
         <span class="n">RLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Final Burn:&#39;</span><span class="p">)</span>
-        <span class="n">opt</span><span class="o">.</span><span class="n">burn</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;burn&#39;</span><span class="p">,</span> <span class="n">n_loop</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fractol</span><span class="o">=</span><span class="mi">3</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span> <span class="o">+</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">burn</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;burn&#39;</span><span class="p">,</span> <span class="n">n_loop</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fractol</span><span class="o">=</span><span class="mf">3e-4</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span> <span class="o">+</span>
                 <span class="s1">&#39;addsub-burn&#39;</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="n">max_mem</span><span class="p">,</span> <span class="n">rz_order</span><span class="o">=</span><span class="n">rz_order</span><span class="p">,</span><span class="n">dowarn</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">RLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Final Polish:&#39;</span><span class="p">)</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">burn</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;polish&#39;</span><span class="p">,</span> <span class="n">n_loop</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">fractol</span><span class="o">=</span><span class="mi">3</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span> <span class="o">+</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">burn</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;polish&#39;</span><span class="p">,</span> <span class="n">n_loop</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">fractol</span><span class="o">=</span><span class="mf">3e-4</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span> <span class="o">+</span>
                 <span class="s1">&#39;addsub-polish&#39;</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="n">max_mem</span><span class="p">,</span> <span class="n">rz_order</span><span class="o">=</span><span class="n">rz_order</span><span class="p">,</span>
                 <span class="n">dowarn</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;converged&#39;</span><span class="p">]:</span>
@@ -718,7 +726,7 @@
 <span class="sd">        `peri.opt.optimize.finish`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">minmass</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
-        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
             <span class="n">npart</span><span class="p">,</span> <span class="n">poses</span> <span class="o">=</span> <span class="n">addsub</span><span class="o">.</span><span class="n">add_subtract_locally</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">region_depth</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
                     <span class="n">minmass</span><span class="o">=</span><span class="n">minmass</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="n">invert</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">npart</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -758,13 +766,13 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -24,14 +24,14 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/mathconf.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="peri.opt" href="opt.html" />
     <link rel="prev" title="peri.logger" href="logger.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -60,7 +60,7 @@
 <h1>peri.models<a class="headerlink" href="#peri-models" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="peri.models.Model">
-<em class="property">class </em><code class="descclassname">peri.models.</code><code class="descname">Model</code><span class="sig-paren">(</span><em>modelstr</em>, <em>varmap</em>, <em>registry={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/models.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.models.Model" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.models.</code><code class="descname">Model</code><span class="sig-paren">(</span><em>modelstr</em>, <em>varmap</em>, <em>registry={}</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.models.Model" title="Permalink to this definition">¶</a></dt>
 <dd><p>An abstraction for defining how to combine components into a complete
 model as well as derivatives with respect to different variables.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -68,21 +68,21 @@ model as well as derivatives with respect to different variables.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>modelstr</strong> (<em>dict of strings</em>) &#8211; <p>(Using a custom model) The actual equations used to defined the model.
+<li><strong>modelstr</strong> (<em>dict of strings</em>) – <p>(Using a custom model) The actual equations used to defined the model.
 At least one eq. is required under the key <cite>full</cite>. Other partial
-update equations can be added where the variable name (e.g. &#8216;dI&#8217;)
+update equations can be added where the variable name (e.g. ‘dI’)
 denotes a partial update of I, for example:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;full&#39;</span><span class="p">:</span> <span class="s1">&#39;H(P)&#39;</span><span class="p">,</span> <span class="s1">&#39;dP&#39;</span><span class="p">:</span> <span class="s1">&#39;H(dP)&#39;</span><span class="p">}</span>
 </pre></div>
 </div>
 </li>
-<li><strong>varmap</strong> (<em>dict</em>) &#8211; <p>(Using a custom model) The mapping of variables in the modelstr
+<li><strong>varmap</strong> (<em>dict</em>) – <p>(Using a custom model) The mapping of variables in the modelstr
 equations to actual component types. For example:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="s1">&#39;obj&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="s1">&#39;psf&#39;</span><span class="p">}</span>
 </pre></div>
 </div>
 </li>
-<li><strong>registry</strong> (<em>dict</em>) &#8211; <p>A mapping of categories to components which this model will
+<li><strong>registry</strong> (<em>dict</em>) – <p>A mapping of categories to components which this model will
 accept. For example:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">objs</span><span class="o">.</span><span class="n">PlatonicSpheresCollection</span><span class="p">],</span>
@@ -98,7 +98,7 @@ accept. For example:</p>
 </table>
 <dl class="method">
 <dt id="peri.models.Model.check_consistency">
-<code class="descname">check_consistency</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/models.html#Model.check_consistency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.models.Model.check_consistency" title="Permalink to this definition">¶</a></dt>
+<code class="descname">check_consistency</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.models.Model.check_consistency" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make sure that the required comps are included in the list of
 components supplied by the user. Also check that the parameters are
 consistent across the many components.</p>
@@ -106,26 +106,52 @@ consistent across the many components.</p>
 
 <dl class="method">
 <dt id="peri.models.Model.check_inputs">
-<code class="descname">check_inputs</code><span class="sig-paren">(</span><em>comps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/models.html#Model.check_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.models.Model.check_inputs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">check_inputs</code><span class="sig-paren">(</span><em>comps</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.models.Model.check_inputs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check that the list of components <cite>comp</cite> is compatible with both the
 varmap and modelstr for this Model</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="peri.models.Model.diffname">
-<code class="descname">diffname</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/models.html#Model.diffname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.models.Model.diffname" title="Permalink to this definition">¶</a></dt>
+<code class="descname">diffname</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.models.Model.diffname" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transform a variable name into a derivative</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="peri.models.Model.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>comps</em>, <em>funcname=’get’</em>, <em>diffmap=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.models.Model.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the output of a model. It is recommended that at some point
+before using <cite>evaluate</cite>, that you make sure the inputs are valid using
+<a class="reference internal" href="#peri.models.Model.check_inputs" title="peri.models.Model.check_inputs"><code class="xref py py-class docutils literal"><span class="pre">check_inputs</span></code></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>comps</strong> (list of <a class="reference internal" href="comp.html#peri.comp.comp.Component" title="peri.comp.comp.Component"><code class="xref py py-class docutils literal"><span class="pre">Component</span></code></a>) – Components which will be used to evaluate the model</li>
+<li><strong>funcname</strong> (<em>string</em><em> (</em><em>default: 'get'</em><em>)</em>) – Name of the function which to evaluate for the components which
+represent their output. That is, when each component is used in the
+evaluation, it is really their <code class="docutils literal"><span class="pre">attr(comp,</span> <span class="pre">funcname)</span></code> which is used.</li>
+<li><strong>diffmap</strong> (<em>dictionary</em>) – Extra mapping of derivatives or other symbols to extra variables.
+For example, the difference in a component has been evaluated as
+diff_obj so we set <code class="docutils literal"><span class="pre">{'I':</span> <span class="pre">diff_obj}</span></code></li>
+<li><strong>**kwargs</strong> – Arguments passed to <code class="docutils literal"><span class="pre">funcname</span></code> of component objects</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="peri.models.Model.get_base_model">
-<code class="descname">get_base_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/models.html#Model.get_base_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.models.Model.get_base_model" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_base_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.models.Model.get_base_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>The complete model, no derivatives</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="peri.models.Model.get_difference_model">
-<code class="descname">get_difference_model</code><span class="sig-paren">(</span><em>category</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/models.html#Model.get_difference_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.models.Model.get_difference_model" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_difference_model</code><span class="sig-paren">(</span><em>category</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.models.Model.get_difference_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the equation corresponding to a variation wrt category. For example
 if:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">modelstr</span> <span class="o">=</span> <span class="p">{</span>
@@ -143,44 +169,18 @@ if:</p>
 
 <dl class="method">
 <dt id="peri.models.Model.map_vars">
-<code class="descname">map_vars</code><span class="sig-paren">(</span><em>comps</em>, <em>funcname='get'</em>, <em>diffmap=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/models.html#Model.map_vars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.models.Model.map_vars" title="Permalink to this definition">¶</a></dt>
+<code class="descname">map_vars</code><span class="sig-paren">(</span><em>comps</em>, <em>funcname=’get’</em>, <em>diffmap=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.models.Model.map_vars" title="Permalink to this definition">¶</a></dt>
 <dd><p>Map component function <code class="docutils literal"><span class="pre">funcname</span></code> result into model variables
 dictionary for use in eval of the model. If <code class="docutils literal"><span class="pre">diffmap</span></code> is provided then
-that symbol is translated into &#8216;d&#8217;+diffmap.key and is replaced by
+that symbol is translated into ‘d’+diffmap.key and is replaced by
 diffmap.value. <code class="docutils literal"><span class="pre">**kwargs`</span> <span class="pre">are</span> <span class="pre">passed</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">``comp.funcname(**kwargs)</span></code>.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.models.Model.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>comps</em>, <em>funcname='get'</em>, <em>diffmap=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/models.html#Model.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.models.Model.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate the output of a model. It is recommended that at some point
-before using <cite>evaluate</cite>, that you make sure the inputs are valid using
-<a class="reference internal" href="#peri.models.Model.check_inputs" title="peri.models.Model.check_inputs"><code class="xref py py-class docutils literal"><span class="pre">check_inputs</span></code></a></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>comps</strong> (list of <a class="reference internal" href="comp.html#peri.comp.comp.Component" title="peri.comp.comp.Component"><code class="xref py py-class docutils literal"><span class="pre">Component</span></code></a>) &#8211; Components which will be used to evaluate the model</li>
-<li><strong>funcname</strong> (<em>string</em><em> (</em><em>default: 'get'</em><em>)</em><em></em>) &#8211; Name of the function which to evaluate for the components which
-represent their output. That is, when each component is used in the
-evaluation, it is really their <code class="docutils literal"><span class="pre">attr(comp,</span> <span class="pre">funcname)</span></code> which is used.</li>
-<li><strong>diffmap</strong> (<em>dictionary</em>) &#8211; Extra mapping of derivatives or other symbols to extra variables.
-For example, the difference in a component has been evaluated as
-diff_obj so we set <code class="docutils literal"><span class="pre">{'I':</span> <span class="pre">diff_obj}</span></code></li>
-<li><strong>**kwargs</strong> &#8211; Arguments passed to <code class="docutils literal"><span class="pre">funcname</span></code> of component objects</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="peri.models.ConfocalImageModel">
-<em class="property">class </em><code class="descclassname">peri.models.</code><code class="descname">ConfocalImageModel</code><a class="reference internal" href="../_modules/peri/models.html#ConfocalImageModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.models.ConfocalImageModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.models.</code><code class="descname">ConfocalImageModel</code><a class="headerlink" href="#peri.models.ConfocalImageModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confocal microscope image with simplifications made for performance.
 In particular, the sensing and illumination point spread functions
 are combined into one:</p>
@@ -243,7 +243,7 @@ are combined into one:</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

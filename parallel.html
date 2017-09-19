@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -24,12 +24,12 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/mathconf.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -61,7 +61,7 @@
 need to employ many computer resources to analyze data in a reasonable amount
 of time. One such resource is provided by Amazon Webservices (AWS) Elastic
 Compute cloud (EC2). This section of the documentation</p>
-<p>starcluster createvolume &#8211;shutdown-volume-host &#8211;name vdwdata 20 us-west-2a &#8211;bid 0.50 &#8211;image-id=ami-d732f0b7 &#8211;instance-type=m3.medium</p>
+<p>starcluster createvolume –shutdown-volume-host –name vdwdata 20 us-west-2a –bid 0.50 –image-id=ami-d732f0b7 –instance-type=m3.medium</p>
 <p># needs to change permissions before uploading
 starcluster sshmaster cluster -u ubuntu
 sudo chown ubuntu:ubuntu /data</p>
@@ -123,7 +123,7 @@ sudo chown ubuntu:ubuntu /data</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

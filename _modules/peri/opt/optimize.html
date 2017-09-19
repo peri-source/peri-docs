@@ -1,12 +1,12 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>peri.opt.optimize &#8212; PERI 0.1.2 documentation</title>
+    <title>peri.opt.optimize &#8212; PERI 0.1.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.1.2',
+        VERSION:     '0.1.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,12 +24,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../../_static/mathconf.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -50,7 +50,9 @@
           <div class="body" role="main">
             
   <h1>Source code for peri.opt.optimize</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">map</span><span class="p">,</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">object</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
@@ -182,14 +184,14 @@
 <span class="sd">            remove_params removed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">all_params</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">params</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">param_particle</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">param_particle</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
         <span class="n">all_params</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">remove_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">remove_params</span><span class="p">):</span>
             <span class="n">all_params</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">all_params</span>
 
-<span class="k">def</span> <span class="nf">get_num_px_jtj</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">nparams</span><span class="p">,</span> <span class="n">decimate</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mi">1</span><span class="n">e9</span><span class="p">,</span> <span class="n">min_redundant</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_num_px_jtj</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">nparams</span><span class="p">,</span> <span class="n">decimate</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">min_redundant</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the number of pixels to use for J at a given memory usage.</span>
 
@@ -221,18 +223,18 @@
 <span class="sd">            The number of pixels at which to calcualte J.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">#1. Max for a given max_mem:</span>
-    <span class="n">px_mem</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_mem</span> <span class="o">/</span> <span class="mi">8</span> <span class="o">/</span> <span class="n">nparams</span><span class="p">)</span> <span class="c1">#1 float = 8 bytes</span>
+    <span class="n">px_mem</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_mem</span> <span class="o">//</span> <span class="mi">8</span> <span class="o">//</span> <span class="n">nparams</span><span class="p">)</span> <span class="c1">#1 float = 8 bytes</span>
     <span class="c1">#2. num_pix for a given redundancy</span>
     <span class="n">px_red</span> <span class="o">=</span> <span class="n">min_redundant</span><span class="o">*</span><span class="n">nparams</span>
     <span class="c1">#3. And # desired for decimation</span>
-    <span class="n">px_dec</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="n">decimate</span>
+    <span class="n">px_dec</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">size</span><span class="o">//</span><span class="n">decimate</span>
 
     <span class="k">if</span> <span class="n">px_red</span> <span class="o">&gt;</span> <span class="n">px_mem</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Insufficient max_mem for desired redundancy.&#39;</span><span class="p">)</span>
     <span class="n">num_px</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">px_dec</span><span class="p">,</span> <span class="n">px_red</span><span class="p">,</span> <span class="n">px_mem</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">num_px</span>
 
-<span class="k">def</span> <span class="nf">vectorize_damping</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">damping</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">increase_list</span><span class="o">=</span><span class="p">[[</span><span class="s1">&#39;psf-&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="n">e4</span><span class="p">]]):</span>
+<span class="k">def</span> <span class="nf">vectorize_damping</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">damping</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">increase_list</span><span class="o">=</span><span class="p">[[</span><span class="s1">&#39;psf-&#39;</span><span class="p">,</span> <span class="mf">1e4</span><span class="p">]]):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a non-constant damping vector, allowing certain parameters to be</span>
 <span class="sd">    more strongly damped than others.</span>
@@ -254,7 +256,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">damp_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">))</span> <span class="o">*</span> <span class="n">damping</span>
     <span class="k">for</span> <span class="n">nm</span><span class="p">,</span> <span class="n">fctr</span> <span class="ow">in</span> <span class="n">increase_list</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">damp_vec</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">damp_vec</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">nm</span> <span class="ow">in</span> <span class="n">params</span><span class="p">[</span><span class="n">a</span><span class="p">]:</span>
                 <span class="n">damp_vec</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">*=</span> <span class="n">fctr</span>
     <span class="k">return</span> <span class="n">damp_vec</span>
@@ -267,7 +269,7 @@
     <span class="c1"># right now</span>
     <span class="c1"># mmt = np.zeros([m.shape[0], m.shape[0]])  #6us</span>
     <span class="c1"># mt_tmp = np.zeros([step, m.shape[0]])</span>
-    <span class="c1"># for a in xrange(0, m.shape[1], step):</span>
+    <span class="c1"># for a in range(0, m.shape[1], step):</span>
         <span class="c1"># mx = min(a+step, m.shape[1])</span>
         <span class="c1"># mt_tmp[:mx-a,:] = m.T[a:mx]</span>
         <span class="c1"># # np.dot(m_tmp, m.T, out=mmt[a:mx])</span>
@@ -276,7 +278,7 @@
     <span class="c1"># return mmt</span>
     <span class="n">mmt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>  <span class="c1">#6us</span>
     <span class="c1"># m_tmp = np.zeros([step, m.shape[1]])</span>
-    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">step</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">step</span><span class="p">):</span>
         <span class="n">mx</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">a</span><span class="o">+</span><span class="n">step</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="c1"># m_tmp[:] = m[a:mx]</span>
         <span class="c1"># np.dot(m_tmp, m.T, out=mmt[a:mx])</span>
@@ -352,24 +354,36 @@
     <span class="n">particle_groups</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">tile</span> <span class="o">=</span> <span class="n">Tile</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="n">bounding_tile</span><span class="o">.</span><span class="n">l</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">bounding_tile</span><span class="o">.</span><span class="n">l</span> <span class="o">+</span> <span class="n">rs</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">doshift</span> <span class="o">==</span> <span class="s1">&#39;rand&#39;</span><span class="p">:</span>
-        <span class="n">shift</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+        <span class="n">doshift</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
     <span class="k">if</span> <span class="n">doshift</span><span class="p">:</span>
-        <span class="n">shift</span> <span class="o">=</span> <span class="n">rs</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">shift</span> <span class="o">=</span> <span class="n">rs</span> <span class="o">//</span> <span class="mi">2</span>
         <span class="n">n_translate</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">shift</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">deltas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">n_translate</span><span class="p">])</span>
 
-    <span class="n">groups</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">find_particles_in_tile</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">tile</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">*</span> <span class="n">rs</span> <span class="o">+</span> <span class="n">shift</span><span class="p">)),</span> <span class="o">*</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">deltas</span><span class="p">])</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">find_particles_in_tile</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">tile</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">*</span> <span class="n">rs</span> <span class="o">-</span> <span class="n">shift</span><span class="p">)),</span> <span class="o">*</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">deltas</span><span class="p">]))</span>
 
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">groups</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">groups</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-
+    <span class="k">assert</span> <span class="n">_check_groups</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">groups</span>
 
-<span class="k">def</span> <span class="nf">calc_particle_group_region_size</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">region_size</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mi">1</span><span class="n">e9</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_check_groups</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">groups</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Ensures that all particles are included in exactly 1 group&quot;&quot;&quot;</span>
+    <span class="n">ans</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+        <span class="n">ans</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">ans</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">obj_get_radii</span><span class="p">()):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">obj_get_radii</span><span class="p">()</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">ans</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">calc_particle_group_region_size</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">region_size</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mf">1e9</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Finds the biggest region size for LM particle optimization with a</span>
 <span class="sd">    given memory constraint.</span>
@@ -667,12 +681,12 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">damping</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">increase_damp_factor</span><span class="o">=</span><span class="mf">3.</span><span class="p">,</span> <span class="n">decrease_damp_factor</span><span class="o">=</span><span class="mf">8.</span><span class="p">,</span>
-                <span class="n">min_eigval</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">13</span><span class="p">,</span> <span class="n">marquardt_damping</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transtrum_damping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">use_accel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_accel_correction</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">paramtol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span>
-                <span class="n">errtol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">exptol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="n">fractol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="n">costol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">min_eigval</span><span class="o">=</span><span class="mf">1e-13</span><span class="p">,</span> <span class="n">marquardt_damping</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transtrum_damping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">use_accel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_accel_correction</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">paramtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+                <span class="n">errtol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">exptol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">fractol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">costol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">max_iter</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">run_length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">update_J_frequency</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                 <span class="n">broyden_update</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eig_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">eig_update_frequency</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                <span class="n">num_eig_dirs</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">eig_dl</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">broyden_update_frequency</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">num_eig_dirs</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">eig_dl</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">broyden_update_frequency</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">increase_damp_factor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">increase_damp_factor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">decrease_damp_factor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">decrease_damp_factor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_eigval</span> <span class="o">=</span> <span class="n">min_eigval</span>
@@ -780,12 +794,12 @@
         <span class="n">good_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">find_best_step</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">er1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">good_step</span><span class="p">:</span>
             <span class="n">er0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">er0</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">)</span><span class="o">/</span><span class="n">er0</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">7</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">er0</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">)</span><span class="o">/</span><span class="n">er0</span> <span class="o">&gt;</span> <span class="mf">1e-7</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Function updates are not exact.&#39;</span><span class="p">)</span>
             <span class="n">CLOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Bad step, increasing damping&#39;</span><span class="p">)</span>
             <span class="n">CLOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t\t</span><span class="si">%f</span><span class="se">\t</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">er1</span><span class="p">))</span>
             <span class="n">grad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_grad</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">_try</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_inner_loop</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">_try</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_inner_loop</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">increase_damping</span><span class="p">()</span>
                 <span class="n">delta_vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_LM_updates</span><span class="p">(</span><span class="n">grad</span><span class="p">)</span>
                 <span class="n">er1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span> <span class="o">+</span> <span class="n">delta_vals</span><span class="p">)</span>
@@ -795,7 +809,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">er0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span><span class="p">)</span>
                 <span class="n">CLOG</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Stuck!&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">er0</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">)</span><span class="o">/</span><span class="n">er0</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">7</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">er0</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">)</span><span class="o">/</span><span class="n">er0</span> <span class="o">&gt;</span> <span class="mf">1e-7</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Function updates are not exact.&#39;</span><span class="p">)</span>
 
         <span class="c1">#state is updated, now params:</span>
@@ -854,7 +868,7 @@
             <span class="n">grad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_grad</span><span class="p">()</span>
             <span class="n">CLOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Bad step, increasing damping&#39;</span><span class="p">)</span>
             <span class="n">CLOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%f</span><span class="se">\t</span><span class="si">%f</span><span class="se">\t</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">triplet</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">_try</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_inner_loop</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">_try</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_inner_loop</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">increase_damping</span><span class="p">()</span>
                 <span class="n">delta_vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_LM_updates</span><span class="p">(</span><span class="n">grad</span><span class="p">)</span>
                 <span class="n">er_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span> <span class="o">+</span> <span class="n">delta_vals</span><span class="p">)</span>
@@ -878,7 +892,7 @@
             <span class="n">CLOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%f</span><span class="se">\t</span><span class="si">%f</span><span class="se">\t</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">triplet</span><span class="p">)</span>
             <span class="c1">#Update to er1 params:</span>
             <span class="n">er1_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span> <span class="o">+</span> <span class="n">delta_params_1</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">er1_1</span> <span class="o">-</span> <span class="n">er1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">er1_1</span> <span class="o">-</span> <span class="n">er1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-6</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Function updates are not exact.&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_param_vals</span><span class="p">(</span><span class="n">delta_params_1</span><span class="p">,</span> <span class="n">incremental</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="n">er1</span>
@@ -963,7 +977,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">er0_0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span><span class="p">)</span>
                 <span class="n">CLOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Bad step!&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">er0</span> <span class="o">-</span> <span class="n">er0_0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">er0</span> <span class="o">-</span> <span class="n">er0_0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-6</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Function updates are not exact.&#39;</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_inner_run_counter</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -1244,7 +1258,7 @@
         <span class="sd">&quot;&quot;&quot;Updates J, JTJ, and internal counters.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">calc_J</span><span class="p">()</span>
         <span class="c1"># np.dot(j, j.T) is slightly faster but 2x as much mem</span>
-        <span class="n">step</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>  <span class="c1"># 1% more mem...</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mf">1e-2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>  <span class="c1"># 1% more mem...</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">JTJ</span> <span class="o">=</span> <span class="n">low_mem_sq</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>
         <span class="c1">#copies still, since J is not C -ordered but a slice of j_e...</span>
         <span class="c1">#doing self.J.copy() works but takes 2x as much ram..</span>
@@ -1267,7 +1281,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">vals_to_sub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">direction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="p">)</span>
         <span class="n">delta_vals</span> <span class="o">=</span> <span class="n">values</span> <span class="o">-</span> <span class="n">vals_to_sub</span>
-        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">direction</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">direction</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">+=</span> <span class="n">direction</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">*</span> <span class="n">delta_vals</span>
 
     <span class="k">def</span> <span class="nf">check_Broyden_J</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1296,7 +1310,7 @@
         <span class="n">CLOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Eigen update.&#39;</span><span class="p">)</span>
         <span class="n">vls</span><span class="p">,</span> <span class="n">vcs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">JTJ</span><span class="p">)</span>
         <span class="n">res0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_residuals</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="nb">min</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">num_eig_dirs</span><span class="p">,</span> <span class="n">vls</span><span class="o">.</span><span class="n">size</span><span class="p">])):</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">num_eig_dirs</span><span class="p">,</span> <span class="n">vls</span><span class="o">.</span><span class="n">size</span><span class="p">])):</span>
             <span class="c1">#1. Finding stiff directions</span>
             <span class="n">stif_dir</span> <span class="o">=</span> <span class="n">vcs</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">a</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="c1">#already normalized</span>
 
@@ -1401,7 +1415,7 @@
 <span class="sd">        param_vals : numpy.ndarray</span>
 <span class="sd">            The current best-fit parameter values of the function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">func_args</span><span class="o">=</span><span class="p">(),</span> <span class="n">func_kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="n">dl</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">func_args</span><span class="o">=</span><span class="p">(),</span> <span class="n">func_kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="n">dl</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
@@ -1412,7 +1426,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">dl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span><span class="p">)</span> <span class="o">*</span> <span class="n">dl</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dl</span> <span class="o">=</span> <span class="n">npj</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dl</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">LMFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LMFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_set_err_paramvals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1430,7 +1444,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">])</span>
         <span class="n">dp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span><span class="p">)</span>
         <span class="n">f0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
             <span class="n">dp</span> <span class="o">*=</span> <span class="mi">0</span>
             <span class="n">dp</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dl</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
             <span class="n">f1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span> <span class="o">+</span> <span class="n">dp</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">func_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">func_kwargs</span><span class="p">)</span>
@@ -1481,7 +1495,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">opt_obj</span> <span class="o">=</span> <span class="n">opt_obj</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">LMOptObj</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LMOptObj</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_set_err_paramvals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opt_obj</span><span class="o">.</span><span class="n">param_vals</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -1565,7 +1579,7 @@
     <span class="c1">#FIXME should have an allowed set of params, and then R(z) etc</span>
     <span class="c1">#parameterizations should be incorporated into this to eliminate</span>
     <span class="c1">#AugmentedState (or turn it into a subclass)</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">7</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dl</span> <span class="o">=</span> <span class="n">dl</span>
         <span class="k">if</span> <span class="n">p0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1580,7 +1594,7 @@
     <span class="k">def</span> <span class="nf">update_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_vals</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Updates with param_vals[i] = distance from self.p0 along self.direction[i].&quot;&quot;&quot;</span>
         <span class="n">dp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p0</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">param_vals</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">param_vals</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
             <span class="n">dp</span> <span class="o">+=</span> <span class="n">param_vals</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">directions</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p0</span> <span class="o">+</span> <span class="n">dp</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">param_vals</span>
@@ -1603,7 +1617,7 @@
         <span class="n">dl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
         <span class="n">p0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">J</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_vals</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
             <span class="n">dl</span> <span class="o">*=</span> <span class="mi">0</span>
             <span class="n">dl</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dl</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_function</span><span class="p">(</span><span class="n">p0</span> <span class="o">+</span> <span class="n">dl</span><span class="p">)</span>
@@ -1656,14 +1670,14 @@
 <span class="sd">        do_levmarq : Convenience function for LMGlobals</span>
 <span class="sd">        do_levmarq_particles : Convenience function for optimizing particles</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">param_names</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mi">1</span><span class="n">e9</span><span class="p">,</span> <span class="n">opt_kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">param_names</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">opt_kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">opt_kwargs</span> <span class="o">=</span> <span class="n">opt_kwargs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_mem</span> <span class="o">=</span> <span class="n">max_mem</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_pix</span> <span class="o">=</span> <span class="n">get_num_px_jtj</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">param_names</span><span class="p">),</span> <span class="n">max_mem</span><span class="o">=</span><span class="n">max_mem</span><span class="p">,</span>
                 <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">opt_kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">param_names</span> <span class="o">=</span> <span class="n">param_names</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">LMGlobals</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LMGlobals</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_set_err_paramvals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">error</span>
@@ -1784,7 +1798,7 @@
             <span class="n">abs_cos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">model_sine_2</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1">#superclass is fine</span>
-            <span class="n">abs_cos</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">calc_model_cosine</span><span class="p">(</span><span class="n">decimate</span><span class="o">=</span>
+            <span class="n">abs_cos</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">calc_model_cosine</span><span class="p">(</span><span class="n">decimate</span><span class="o">=</span>
                     <span class="n">decimate</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">abs_cos</span>
 
@@ -1857,20 +1871,20 @@
                 <span class="k">else</span> <span class="n">state</span><span class="o">.</span><span class="n">param_particle_pos</span><span class="p">(</span><span class="n">particles</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dif_tile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_diftile</span><span class="p">()</span>
         <span class="c1">#Max, min rads, distance from edge for allowed updates</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_MINRAD</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_MAXRAD</span> <span class="o">=</span> <span class="mi">2</span><span class="n">e2</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_MINDIST</span><span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_MINRAD</span> <span class="o">=</span> <span class="mf">1e-3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_MAXRAD</span> <span class="o">=</span> <span class="mf">2e2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_MINDIST</span><span class="o">=</span> <span class="mf">1e-3</span>
 
         <span class="c1">#is_rad, is_pos masks:</span>
         <span class="n">rad_nms</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">param_radii</span><span class="p">()</span> <span class="k">if</span> <span class="p">(</span><span class="n">include_rad</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s1">&#39;param_radii&#39;</span><span class="p">))</span> <span class="k">else</span> <span class="p">[])</span>  <span class="c1"># FIXME explicit rad</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_is_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">rad_nms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_names</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">p</span> <span class="ow">in</span> <span class="n">rad_nms</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_names</span><span class="p">])</span>
         <span class="n">pos_nms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">param_positions</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_pos</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>  <span class="c1"># FIXME explicit 3D</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_is_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">pos_nms</span><span class="p">)</span> <span class="o">&amp;</span>
-                    <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;zyx&#39;</span><span class="p">[</span><span class="n">a</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_names</span><span class="p">)))</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">LMParticles</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>  <span class="c1"># FIXME explicit 3D</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">pos_nms</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;zyx&#39;</span><span class="p">[</span><span class="n">a</span><span class="p">])</span>
+                    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_names</span><span class="p">]))</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LMParticles</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_diftile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">param_names</span><span class="p">])</span>
@@ -1904,7 +1918,7 @@
         <span class="n">values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_rad</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_rad</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MINRAD</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_MAXRAD</span><span class="p">)</span>
         <span class="n">pd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">pad</span>
-        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>  <span class="c1"># FIXME explicit 3D</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>  <span class="c1"># FIXME explicit 3D</span>
             <span class="n">values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_pos</span><span class="p">[</span><span class="n">a</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_pos</span><span class="p">[</span><span class="n">a</span><span class="p">]],</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_MINDIST</span> <span class="o">-</span> <span class="n">pd</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">ishape</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">+</span>
                     <span class="n">pd</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MINDIST</span><span class="p">)</span>
@@ -2000,7 +2014,7 @@
 <span class="sd">    references to the temp files by deleting the LMParticleGroupCollection</span>
 <span class="sd">    instance will close and remove the temporary files.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">region_size</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">do_calc_size</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mi">1</span><span class="n">e9</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">region_size</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">do_calc_size</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mf">1e9</span><span class="p">,</span>
             <span class="n">get_cos</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">save_J</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
@@ -2046,7 +2060,7 @@
                 <span class="n">CLOG</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Attempting to create many open files. Consider increasing max_mem and/or region_size to avoid crashes.&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_tempfiles</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_has_saved_J</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particle_groups</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particle_groups</span><span class="p">)):</span>
                 <span class="c1">#TemporaryFile is automatically deleted</span>
                 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;j&#39;</span><span class="p">,</span><span class="s1">&#39;tile&#39;</span><span class="p">]:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_tempfiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryFile</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()))</span>
@@ -2063,7 +2077,7 @@
     <span class="k">def</span> <span class="nf">_dump_j_diftile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_index</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">tile</span><span class="p">):</span>
         <span class="n">j_file</span><span class="p">,</span> <span class="n">tile_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tmpfiles</span><span class="p">(</span><span class="n">group_index</span><span class="p">)</span>
         <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">j_file</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
-        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">tile_file</span><span class="p">)</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">tile_file</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_load_j_diftile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_index</span><span class="p">):</span>
         <span class="n">j_file</span><span class="p">,</span> <span class="n">tile_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tmpfiles</span><span class="p">(</span><span class="n">group_index</span><span class="p">)</span>
@@ -2074,7 +2088,7 @@
 
     <span class="k">def</span> <span class="nf">_do_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;workhorse for the self.do_run_xx methods.&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particle_groups</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particle_groups</span><span class="p">)):</span>
             <span class="n">group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">particle_groups</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
             <span class="n">lp</span> <span class="o">=</span> <span class="n">LMParticles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;internal&#39;</span><span class="p">:</span>
@@ -2149,7 +2163,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">param_names</span><span class="p">,</span> <span class="n">rz_order</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
         <span class="n">rad_nms</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">param_radii</span><span class="p">()</span>
-        <span class="n">has_rad</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">param_names</span><span class="p">,</span> <span class="n">rad_nms</span><span class="p">)</span>
+        <span class="n">has_rad</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">param_names</span><span class="p">,</span> <span class="n">rad_nms</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">has_rad</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;param_names must not contain any radii.&#39;</span><span class="p">)</span>
 
@@ -2176,7 +2190,7 @@
 <span class="sd">        if any of the particle radii or positions have been changed</span>
 <span class="sd">        external to the augmented state.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">inds</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">inds</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">obj_get_positions</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rad_nms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">param_particle_rad</span><span class="p">(</span><span class="n">inds</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pos_nms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">param_particle_pos</span><span class="p">(</span><span class="n">inds</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_rad_nms</span><span class="p">])</span>
@@ -2265,7 +2279,7 @@
 <span class="sd">        do_levmarq : Convenience function for LMGlobals</span>
 <span class="sd">        do_levmarq_particles : Convenience function for optimizing particles</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aug_state</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mi">1</span><span class="n">e9</span><span class="p">,</span> <span class="n">opt_kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aug_state</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">opt_kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">aug_state</span> <span class="o">=</span> <span class="n">aug_state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">aug_state</span><span class="o">.</span><span class="n">state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">opt_kwargs</span> <span class="o">=</span> <span class="n">opt_kwargs</span>
@@ -2273,7 +2287,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">num_pix</span> <span class="o">=</span> <span class="n">get_num_px_jtj</span><span class="p">(</span><span class="n">aug_state</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">aug_state</span><span class="o">.</span><span class="n">param_vals</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
                 <span class="n">max_mem</span><span class="o">=</span><span class="n">max_mem</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">opt_kwargs</span><span class="p">)</span>
         <span class="c1"># super(LMAugmentedState, self).__init__(**kwargs)</span>
-        <span class="n">LMEngine</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">LMEngine</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_set_err_paramvals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aug_state</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">error</span>
@@ -2293,19 +2307,19 @@
         <span class="n">graderr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">sa</span><span class="o">.</span><span class="n">param_vals</span><span class="o">.</span><span class="n">size</span><span class="p">])</span>
 
         <span class="c1">#1. J for the state:</span>
-        <span class="n">kw</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opt_kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;out&#39;</span><span class="p">],</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">opt_kwargs</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="o">+</span> <span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="p">,</span> <span class="n">graderr</span><span class="p">]])}</span>
+        <span class="n">kw</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opt_kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;out&#39;</span><span class="p">],</span>
+                <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opt_kwargs</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">J</span><span class="p">,</span> <span class="n">graderr</span><span class="p">]])}</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">param_names</span>
         <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inds</span> <span class="o">=</span> <span class="n">get_rand_Japprox</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">num_inds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pix</span><span class="p">,</span>
                 <span class="n">include_cost</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>  <span class="c1"># storing via out kwarg</span>
 
         <span class="c1">#2. J for the augmented portion:</span>
         <span class="n">old_aug_vals</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">param_vals</span><span class="p">[</span><span class="n">sa</span><span class="o">.</span><span class="n">rscale_mask</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">dl</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span>
+        <span class="n">dl</span> <span class="o">=</span> <span class="mf">1e-6</span>
         <span class="n">i0</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">_inds</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">er0</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">error</span>
         <span class="n">ind0</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">old_aug_vals</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">old_aug_vals</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
             <span class="n">dx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">old_aug_vals</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
             <span class="n">dx</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">dl</span>
             <span class="n">sa</span><span class="o">.</span><span class="n">update_rscl_x_params</span><span class="p">(</span><span class="n">old_aug_vals</span> <span class="o">+</span> <span class="n">dx</span><span class="p">)</span>
@@ -2436,7 +2450,7 @@
         <span class="k">return</span> <span class="n">lp</span><span class="o">.</span><span class="n">stats</span></div>
 
 <span class="k">def</span> <span class="nf">do_levmarq_n_directions</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">run_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="n">damping</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="n">collect_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">marquardt_damping</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">damping</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">collect_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">marquardt_damping</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Optimization of a state along a specific set of directions in parameter</span>
 <span class="sd">    space.</span>
@@ -2464,8 +2478,8 @@
     <span class="k">if</span> <span class="n">collect_stats</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">lo</span><span class="o">.</span><span class="n">get_termination_stats</span><span class="p">()</span>
 
-<div class="viewcode-block" id="burn"><a class="viewcode-back" href="../../../reference/opt.html#peri.opt.optimize.burn">[docs]</a><span class="k">def</span> <span class="nf">burn</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">n_loop</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">collect_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">rz_order</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fractol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span>
-        <span class="n">errtol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;burn&#39;</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mi">1</span><span class="n">e9</span><span class="p">,</span> <span class="n">include_rad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<div class="viewcode-block" id="burn"><a class="viewcode-back" href="../../../reference/opt.html#peri.opt.optimize.burn">[docs]</a><span class="k">def</span> <span class="nf">burn</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">n_loop</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">collect_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">rz_order</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fractol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span>
+        <span class="n">errtol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;burn&#39;</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">include_rad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">do_line_min</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">partial_log</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dowarn</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Optimizes all the parameters of a state.</span>
@@ -2582,19 +2596,19 @@
     <span class="n">_delta_vals</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># storing the directions we&#39;ve moved along for line min</span>
     <span class="c1">#2. Optimize</span>
     <span class="n">CLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Start of loop </span><span class="si">%d</span><span class="s1">:</span><span class="se">\t</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">error</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">n_loop</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_loop</span><span class="p">):</span>
         <span class="n">start_err</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">error</span>
         <span class="n">start_params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">params</span><span class="p">])</span>
         <span class="c1">#2a. Globals</span>
         <span class="c1"># glbl_dmp = 0.3 if a == 0 else 3e-2</span>
         <span class="c1">####FIXME we damp degenerate but convenient spaces in the ilm, bkg</span>
         <span class="c1">####manually, but we should do it more betterer.</span>
-        <span class="n">BAD_DAMP</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e7</span>
+        <span class="n">BAD_DAMP</span> <span class="o">=</span> <span class="mf">1e7</span>
         <span class="n">BAD_LIST</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;ilm-scale&#39;</span><span class="p">,</span> <span class="n">BAD_DAMP</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;ilm-off&#39;</span><span class="p">,</span> <span class="n">BAD_DAMP</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;ilm-z-0&#39;</span><span class="p">,</span>
                 <span class="n">BAD_DAMP</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;bkg-z-0&#39;</span><span class="p">,</span> <span class="n">BAD_DAMP</span><span class="p">]]</span>
         <span class="c1">####</span>
         <span class="n">glbl_dmp</span> <span class="o">=</span> <span class="n">vectorize_damping</span><span class="p">(</span><span class="n">glbl_nms</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;rz&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">rz_order</span><span class="p">,</span> <span class="n">damping</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-                <span class="n">increase_list</span><span class="o">=</span><span class="p">[[</span><span class="s1">&#39;psf-&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="n">e1</span><span class="p">]]</span> <span class="o">+</span> <span class="n">BAD_LIST</span><span class="p">)</span>
+                <span class="n">increase_list</span><span class="o">=</span><span class="p">[[</span><span class="s1">&#39;psf-&#39;</span><span class="p">,</span> <span class="mf">3e1</span><span class="p">]]</span> <span class="o">+</span> <span class="n">BAD_LIST</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">a</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s1">&#39;do-particles&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">partial_log</span><span class="p">:</span>
                 <span class="n">log</span><span class="o">.</span><span class="n">set_level</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">)</span>
@@ -2613,7 +2627,7 @@
         <span class="n">all_loop_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
         <span class="c1">#2b. Particles</span>
-        <span class="n">prtl_dmp</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="n">a</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">2</span>
+        <span class="n">prtl_dmp</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="n">a</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="mf">1e-2</span>
         <span class="c1">#For now, I&#39;m calculating the region size. This might be a bad idea</span>
         <span class="c1">#because 1 bad particle can spoil the whole group.</span>
         <span class="n">pstats</span> <span class="o">=</span> <span class="n">do_levmarq_all_particle_groups</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">region_size</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -2654,8 +2668,8 @@
                 <span class="s1">&#39;line_stats&#39;</span><span class="p">:</span><span class="n">all_line_stats</span><span class="p">})</span>
     <span class="k">return</span> <span class="n">d</span></div>
 
-<div class="viewcode-block" id="finish"><a class="viewcode-back" href="../../../reference/opt.html#peri.opt.optimize.finish">[docs]</a><span class="k">def</span> <span class="nf">finish</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;finish&#39;</span><span class="p">,</span> <span class="n">n_loop</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mi">1</span><span class="n">e9</span><span class="p">,</span> <span class="n">separate_psf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">fractol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="n">errtol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="n">dowarn</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="finish"><a class="viewcode-back" href="../../../reference/opt.html#peri.opt.optimize.finish">[docs]</a><span class="k">def</span> <span class="nf">finish</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;finish&#39;</span><span class="p">,</span> <span class="n">n_loop</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">separate_psf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">fractol</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span> <span class="n">errtol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">dowarn</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Crawls slowly to the minimum-cost state.</span>
 
@@ -2707,9 +2721,9 @@
     <span class="c1">#nearby globals in a group and using the update tile only as the slicer,</span>
     <span class="c1">#rather than the full residuals.</span>
     <span class="n">gs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">max_mem</span> <span class="o">/</span> <span class="n">s</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">nbytes</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
-    <span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="nb">globals</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">a</span><span class="o">+</span><span class="n">gs</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nb">globals</span><span class="p">),</span> <span class="n">gs</span><span class="p">)]</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="nb">globals</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">a</span><span class="o">+</span><span class="n">gs</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nb">globals</span><span class="p">),</span> <span class="n">gs</span><span class="p">)]</span>
     <span class="n">CLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Start  ``finish``:</span><span class="se">\t</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">error</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">n_loop</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_loop</span><span class="p">):</span>
         <span class="n">start_err</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">error</span>
         <span class="c1">#1. Min globals:</span>
         <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
@@ -2729,7 +2743,7 @@
         <span class="c1">#3. Append vals, line min:</span>
         <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">params</span><span class="p">]))</span>
         <span class="n">dv</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]))[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span>
-        <span class="n">do_levmarq_n_directions</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">dv</span><span class="p">,</span> <span class="n">damping</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">errtol</span><span class="o">=</span><span class="mi">3</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">do_levmarq_n_directions</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">dv</span><span class="p">,</span> <span class="n">damping</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">errtol</span><span class="o">=</span><span class="mf">3e-4</span><span class="p">)</span>
         <span class="n">CLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Line min., loop </span><span class="si">{}</span><span class="s1">:</span><span class="se">\t</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">error</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">desc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">states</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">desc</span><span class="p">)</span>
@@ -2806,13 +2820,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

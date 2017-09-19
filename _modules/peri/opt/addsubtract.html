@@ -1,12 +1,12 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>peri.opt.addsubtract &#8212; PERI 0.1.2 documentation</title>
+    <title>peri.opt.addsubtract &#8212; PERI 0.1.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.1.2',
+        VERSION:     '0.1.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,12 +24,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../../_static/mathconf.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -50,7 +50,9 @@
           <div class="body" role="main">
             
   <h1>Source code for peri.opt.addsubtract</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.ndimage</span> <span class="k">as</span> <span class="nn">nd</span>
 
 <span class="kn">import</span> <span class="nn">peri</span>
@@ -174,7 +176,7 @@
     <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">30</span> <span class="o">+</span> <span class="s1">&#39;ADDING&#39;</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">30</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">  Z</span><span class="se">\t</span><span class="s1">  Y</span><span class="se">\t</span><span class="s1">  X</span><span class="se">\t</span><span class="s1">  R</span><span class="se">\t</span><span class="s1">|</span><span class="se">\t</span><span class="s1"> ERR0</span><span class="se">\t\t</span><span class="s1"> ERR1&#39;</span>
     <span class="k">with</span> <span class="n">log</span><span class="o">.</span><span class="n">noformat</span><span class="p">():</span>
         <span class="n">CLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">guess</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">guess</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
         <span class="n">p0</span> <span class="o">=</span> <span class="n">guess</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
         <span class="n">absent_err</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span>
         <span class="n">absent_d</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -198,7 +200,7 @@
                 <span class="n">CLOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">part_msg</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">st</span><span class="o">.</span><span class="n">obj_remove_particle</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">absent_err</span> <span class="o">-</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">absent_err</span> <span class="o">-</span> <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-4</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;updates not exact?&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">accepts</span><span class="p">,</span> <span class="n">new_poses</span>
 
@@ -462,7 +464,7 @@
     <span class="k">return</span> <span class="n">removed</span><span class="p">,</span> <span class="n">delete_poses</span>
 
 
-<div class="viewcode-block" id="add_subtract"><a class="viewcode-back" href="../../../reference/opt.html#peri.opt.addsubtract.add_subtract">[docs]</a><span class="k">def</span> <span class="nf">add_subtract</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">max_npart</span><span class="o">=</span><span class="s1">&#39;calc&#39;</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mi">2</span><span class="n">e8</span><span class="p">,</span>
+<div class="viewcode-block" id="add_subtract"><a class="viewcode-back" href="../../../reference/opt.html#peri.opt.addsubtract.add_subtract">[docs]</a><span class="k">def</span> <span class="nf">add_subtract</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">max_npart</span><span class="o">=</span><span class="s1">&#39;calc&#39;</span><span class="p">,</span> <span class="n">max_mem</span><span class="o">=</span><span class="mf">2e8</span><span class="p">,</span>
         <span class="n">always_check_remove</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Automatically adds and subtracts missing &amp; extra particles.</span>
@@ -578,7 +580,7 @@
     <span class="n">added_poses</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="n">nr</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Check removal on the first loop</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">nr</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">always_check_remove</span><span class="p">):</span>
             <span class="n">nr</span><span class="p">,</span> <span class="n">rposes</span> <span class="o">=</span> <span class="n">remove_bad_particles</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">na</span><span class="p">,</span> <span class="n">aposes</span> <span class="o">=</span> <span class="n">add_missing_particles</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -673,7 +675,7 @@
     <span class="n">bad</span> <span class="o">=</span> <span class="n">f</span> <span class="o">&gt;</span> <span class="n">max_ok</span>
     <span class="n">labels</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="n">measurements</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">bad</span><span class="p">)</span>
     <span class="n">inds</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
         <span class="n">inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="n">i</span><span class="p">))</span>
 
     <span class="c1"># 4. Parse into tiles</span>
@@ -777,7 +779,7 @@
     <span class="c1"># 2-4. Feature and add particles to the tile, optimize, run until none added</span>
     <span class="n">n_added</span> <span class="o">=</span> <span class="o">-</span><span class="n">rinds</span><span class="o">.</span><span class="n">size</span>
     <span class="n">added_poses</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">invert</span><span class="p">:</span>
             <span class="n">im</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">st</span><span class="o">.</span><span class="n">residuals</span><span class="p">[</span><span class="n">tile</span><span class="o">.</span><span class="n">slicer</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -797,7 +799,7 @@
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">added_poses</span><span class="p">:</span>
         <span class="n">ainds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">obj_closest_particle</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ainds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_allowed_remove</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ainds</span><span class="p">),</span> <span class="n">max_allowed_remove</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ainds</span><span class="p">),</span> <span class="n">max_allowed_remove</span><span class="p">):</span>
             <span class="n">opt</span><span class="o">.</span><span class="n">do_levmarq_particles</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ainds</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span>
                     <span class="n">max_allowed_remove</span><span class="p">]),</span> <span class="n">include_rad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">ainds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -974,13 +976,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

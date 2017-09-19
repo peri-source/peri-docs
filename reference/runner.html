@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -24,14 +24,14 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/mathconf.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="peri.states" href="states.html" />
     <link rel="prev" title="peri.opt" href="opt.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -60,43 +60,43 @@
 <h1>peri.runner<a class="headerlink" href="#peri-runner" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="peri.runner.locate_spheres">
-<code class="descclassname">peri.runner.</code><code class="descname">locate_spheres</code><span class="sig-paren">(</span><em>image</em>, <em>feature_rad</em>, <em>dofilter=False</em>, <em>order=(3</em>, <em>3</em>, <em>3)</em>, <em>trim_edge=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/runner.html#locate_spheres"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.runner.locate_spheres" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">peri.runner.</code><code class="descname">locate_spheres</code><span class="sig-paren">(</span><em>image</em>, <em>feature_rad</em>, <em>dofilter=False</em>, <em>order=(3</em>, <em>3</em>, <em>3)</em>, <em>trim_edge=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.runner.locate_spheres" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get an initial featuring of sphere positions in an image.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>image</strong> (<a class="reference internal" href="util.html#peri.util.Image" title="peri.util.Image"><code class="xref py py-class docutils literal"><span class="pre">peri.util.Image</span></code></a> object) &#8211; Image object which defines the image file as well as the region.</li>
-<li><strong>feature_rad</strong> (<em>float</em>) &#8211; Radius of objects to find, in pixels. This is a featuring radius
+<li><strong>image</strong> (<a class="reference internal" href="util.html#peri.util.Image" title="peri.util.Image"><code class="xref py py-class docutils literal"><span class="pre">peri.util.Image</span></code></a> object) – Image object which defines the image file as well as the region.</li>
+<li><strong>feature_rad</strong> (<em>float</em>) – Radius of objects to find, in pixels. This is a featuring radius
 and not a real radius, so a better value is frequently smaller
 than the real radius (half the actual radius is good). If <code class="docutils literal"><span class="pre">use_tp</span></code>
-is True, then the twice <code class="docutils literal"><span class="pre">feature_rad</span></code> is passed as trackpy&#8217;s
+is True, then the twice <code class="docutils literal"><span class="pre">feature_rad</span></code> is passed as trackpy’s
 <code class="docutils literal"><span class="pre">diameter</span></code> keyword.</li>
-<li><strong>dofilter</strong> (<em>boolean</em><em>, </em><em>optional</em>) &#8211; Whether to remove the background before featuring. Doing so can
+<li><strong>dofilter</strong> (<em>boolean</em><em>, </em><em>optional</em>) – Whether to remove the background before featuring. Doing so can
 often greatly increase the success of initial featuring and
 decrease later optimization time. Filtering functions by fitting
 the image to a low-order polynomial and featuring the residuals.
 In doing so, this will change the mean intensity of the featured
 image and hence the good value of <code class="docutils literal"><span class="pre">minmass</span></code> will change when
 <code class="docutils literal"><span class="pre">dofilter</span></code> is True. Default is False.</li>
-<li><strong>order</strong> (<em>3-element tuple</em><em>, </em><em>optional</em>) &#8211; If <cite>dofilter</cite>, the 2+1D Leg Poly approximation to the background
+<li><strong>order</strong> (<em>3-element tuple</em><em>, </em><em>optional</em>) – If <cite>dofilter</cite>, the 2+1D Leg Poly approximation to the background
 illumination field. Default is (3,3,3).</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name" colspan="2">Other Parameters:</th></tr>
-<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><ul class="first simple">
-<li><strong>invert</strong> (<em>boolean, optional</em>) &#8211; Whether to invert the image for featuring. Set to True if the
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><ul class="first simple">
+<li><strong>invert</strong> (<em>boolean, optional</em>) – Whether to invert the image for featuring. Set to True if the
 image is dark particles on a bright background. Default is True</li>
-<li><strong>minmass</strong> (<em>Float or None, optional</em>) &#8211; The minimum mass/masscut of a particle. Default is None, which
+<li><strong>minmass</strong> (<em>Float or None, optional</em>) – The minimum mass/masscut of a particle. Default is None, which
 calculates internally.</li>
-<li><strong>use_tp</strong> (<em>Bool, optional</em>) &#8211; Whether or not to use trackpy. Default is False, since trackpy
+<li><strong>use_tp</strong> (<em>Bool, optional</em>) – Whether or not to use trackpy. Default is False, since trackpy
 cuts out particles at the edge.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>positions</strong> &#8211; Positions of the particles in order (z,y,x) in image pixel units.</p>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>positions</strong> – Positions of the particles in order (z,y,x) in image pixel units.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray [N,3]</p>
@@ -112,7 +112,7 @@ centroid methods to find the particles.</p>
 
 <dl class="function">
 <dt id="peri.runner.optimize_from_initial">
-<code class="descclassname">peri.runner.</code><code class="descname">optimize_from_initial</code><span class="sig-paren">(</span><em>s</em>, <em>max_mem=1000000000.0</em>, <em>invert=True</em>, <em>desc=''</em>, <em>rz_order=3</em>, <em>min_rad=None</em>, <em>max_rad=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/runner.html#optimize_from_initial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.runner.optimize_from_initial" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">peri.runner.</code><code class="descname">optimize_from_initial</code><span class="sig-paren">(</span><em>s</em>, <em>max_mem=1000000000.0</em>, <em>invert=True</em>, <em>desc=”</em>, <em>rz_order=3</em>, <em>min_rad=None</em>, <em>max_rad=None</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.runner.optimize_from_initial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes a state from an initial set of positions and radii, without
 any known microscope parameters.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -120,25 +120,25 @@ any known microscope parameters.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>s</strong> (<a class="reference internal" href="states.html#peri.states.ImageState" title="peri.states.ImageState"><code class="xref py py-class docutils literal"><span class="pre">peri.states.ImageState</span></code></a>) &#8211; The state to optimize. It is modified internally and returned.</li>
-<li><strong>max_mem</strong> (<em>Numeric</em><em>, </em><em>optional</em>) &#8211; The maximum memory for the optimizer to use. Default is 1e9 (bytes)</li>
-<li><strong>invert</strong> (<em>Bool</em><em>, </em><em>optional</em>) &#8211; True if the image is dark particles on a bright background,
+<li><strong>s</strong> (<a class="reference internal" href="states.html#peri.states.ImageState" title="peri.states.ImageState"><code class="xref py py-class docutils literal"><span class="pre">peri.states.ImageState</span></code></a>) – The state to optimize. It is modified internally and returned.</li>
+<li><strong>max_mem</strong> (<em>Numeric</em><em>, </em><em>optional</em>) – The maximum memory for the optimizer to use. Default is 1e9 (bytes)</li>
+<li><strong>invert</strong> (<em>Bool</em><em>, </em><em>optional</em>) – True if the image is dark particles on a bright background,
 False otherwise. Used for add-subtract. Default is True.</li>
-<li><strong>desc</strong> (<em>String</em><em>, </em><em>optional</em>) &#8211; An additional description to infix for periodic saving along the
+<li><strong>desc</strong> (<em>String</em><em>, </em><em>optional</em>) – An additional description to infix for periodic saving along the
 way. Default is the null string <code class="docutils literal"><span class="pre">''</span></code>.</li>
-<li><strong>rz_order</strong> (<em>int</em><em>, </em><em>optional</em>) &#8211; <code class="docutils literal"><span class="pre">rz_order</span></code> as passed to opt.burn. Default is 3</li>
-<li><strong>min_rad</strong> (<em>Float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) &#8211; The minimum radius to identify a particles as bad, as passed to
+<li><strong>rz_order</strong> (<em>int</em><em>, </em><em>optional</em>) – <code class="docutils literal"><span class="pre">rz_order</span></code> as passed to opt.burn. Default is 3</li>
+<li><strong>min_rad</strong> (<em>Float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The minimum radius to identify a particles as bad, as passed to
 add-subtract. Default is None, which picks half the median radii.
 If your sample is not monodisperse you should pick a different
 value.</li>
-<li><strong>max_rad</strong> (<em>Float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) &#8211; The maximum radius to identify a particles as bad, as passed to
+<li><strong>max_rad</strong> (<em>Float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The maximum radius to identify a particles as bad, as passed to
 add-subtract. Default is None, which picks 1.5x the median radii.
 If your sample is not monodisperse you should pick a different
 value.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>s</strong> &#8211; The optimized state, which is the same as the input <code class="docutils literal"><span class="pre">s</span></code> but
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>s</strong> – The optimized state, which is the same as the input <code class="docutils literal"><span class="pre">s</span></code> but
 modified in-place.</p>
 </td>
 </tr>
@@ -151,13 +151,13 @@ modified in-place.</p>
 
 <dl class="function">
 <dt id="peri.runner.link_zscale">
-<code class="descclassname">peri.runner.</code><code class="descname">link_zscale</code><span class="sig-paren">(</span><em>st</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/runner.html#link_zscale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.runner.link_zscale" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">peri.runner.</code><code class="descname">link_zscale</code><span class="sig-paren">(</span><em>st</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.runner.link_zscale" title="Permalink to this definition">¶</a></dt>
 <dd><p>Links the state <code class="docutils literal"><span class="pre">st</span></code> psf zscale with the global zscale</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="peri.runner.finish_state">
-<code class="descclassname">peri.runner.</code><code class="descname">finish_state</code><span class="sig-paren">(</span><em>st</em>, <em>desc='finish-state'</em>, <em>invert=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/runner.html#finish_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.runner.finish_state" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">peri.runner.</code><code class="descname">finish_state</code><span class="sig-paren">(</span><em>st</em>, <em>desc=’finish-state’</em>, <em>invert=True</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.runner.finish_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Final optimization for the best-possible state.</p>
 <p>Runs a local add-subtract to capture any difficult-to-feature particles,
 then does another set of optimization designed to get to the best
@@ -167,10 +167,10 @@ possible fit.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>st</strong> (<a class="reference internal" href="states.html#peri.states.ImageState" title="peri.states.ImageState"><code class="xref py py-class docutils literal"><span class="pre">peri.states.ImageState</span></code></a>) &#8211; The state to finish</li>
-<li><strong>desc</strong> (<em>String</em><em>, </em><em>optional</em>) &#8211; Description to intermittently save the state as, as passed to
-state.save. Default is <cite>&#8216;finish-state&#8217;</cite>.</li>
-<li><strong>invert</strong> (<em>Bool</em>) &#8211; Whether to invert the image for featuring, as passed to
+<li><strong>st</strong> (<a class="reference internal" href="states.html#peri.states.ImageState" title="peri.states.ImageState"><code class="xref py py-class docutils literal"><span class="pre">peri.states.ImageState</span></code></a>) – The state to finish</li>
+<li><strong>desc</strong> (<em>String</em><em>, </em><em>optional</em>) – Description to intermittently save the state as, as passed to
+state.save. Default is <cite>‘finish-state’</cite>.</li>
+<li><strong>invert</strong> (<em>Bool</em>) – Whether to invert the image for featuring, as passed to
 addsubtract.add_subtract. Default is True.</li>
 </ul>
 </td>
@@ -234,7 +234,7 @@ addsubtract.add_subtract. Default is True.</li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

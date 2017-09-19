@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -24,14 +24,14 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/mathconf.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="peri.logger" href="logger.html" />
     <link rel="prev" title="peri.viz.interaction" href="interaction.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -67,7 +67,7 @@
 <h2>peri.interpolation.BarnesInterpolation1D<a class="headerlink" href="#peri-interpolation-barnesinterpolation1d" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="peri.interpolation.BarnesInterpolation1D">
-<em class="property">class </em><code class="descclassname">peri.interpolation.</code><code class="descname">BarnesInterpolation1D</code><span class="sig-paren">(</span><em>x</em>, <em>d</em>, <em>filter_size=None</em>, <em>iterations=4</em>, <em>clip=False</em>, <em>clipsize=3</em>, <em>damp=0.95</em>, <em>blocksize=None</em>, <em>donorm=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/interpolation.html#BarnesInterpolation1D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.interpolation.BarnesInterpolation1D" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.interpolation.</code><code class="descname">BarnesInterpolation1D</code><span class="sig-paren">(</span><em>x</em>, <em>d</em>, <em>filter_size=None</em>, <em>iterations=4</em>, <em>clip=False</em>, <em>clipsize=3</em>, <em>damp=0.95</em>, <em>blocksize=None</em>, <em>donorm=True</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.interpolation.BarnesInterpolation1D" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class for 1-d barnes interpolation. Give data points d at locations x.</p>
 <p>See <a class="footnote-reference" href="#id2" id="id1">[1]</a>, equations 1-7 for implementation.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -75,27 +75,27 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>ndarray</em><em>, </em><em>1-dimensional</em>) &#8211; input positions, x values for data points</li>
-<li><strong>d</strong> (<em>ndarray</em><em>, </em><em>1-dimensional</em>) &#8211; input values, y values for data points</li>
-<li><strong>filter_size</strong> (<em>float</em><em>, </em><em>optional.</em>) &#8211; control parameter for weight function (sigma), should be the
+<li><strong>x</strong> (<em>ndarray</em><em>, </em><em>1-dimensional</em>) – input positions, x values for data points</li>
+<li><strong>d</strong> (<em>ndarray</em><em>, </em><em>1-dimensional</em>) – input values, y values for data points</li>
+<li><strong>filter_size</strong> (<em>float</em><em>, </em><em>optional.</em>) – control parameter for weight function (sigma), should be the
 average data spacing. Defaults to the average distance for
 sorted <code class="docutils literal"><span class="pre">x</span></code>.</li>
-<li><strong>iterations</strong> (<em>integer</em><em>, </em><em>optional</em>) &#8211; how many iterations to perform. only two needed with a high damping
+<li><strong>iterations</strong> (<em>integer</em><em>, </em><em>optional</em>) – how many iterations to perform. only two needed with a high damping
 Defaults to 4</li>
-<li><strong>clip</strong> (<em>boolean</em><em>, </em><em>optional</em>) &#8211; whether to clip the number of data points used by the filtersize
+<li><strong>clip</strong> (<em>boolean</em><em>, </em><em>optional</em>) – whether to clip the number of data points used by the filtersize
 Default is False</li>
-<li><strong>clipsize</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; Total clipsize is determined by clipsize * filter_size
+<li><strong>clipsize</strong> (<em>float</em><em>, </em><em>optional</em>) – Total clipsize is determined by clipsize * filter_size
 Default is 3</li>
-<li><strong>damp</strong> (<em>float</em><em>, </em><em>optional</em>) &#8211; the damping parameter used in accelerating convergence. Default
+<li><strong>damp</strong> (<em>float</em><em>, </em><em>optional</em>) – the damping parameter used in accelerating convergence. Default
 is 0.95</li>
-<li><strong>blocksize</strong> (<em>Int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) &#8211; Memory-based performance feature. For very large <code class="docutils literal"><span class="pre">x</span></code> or <code class="docutils literal"><span class="pre">d</span></code>
+<li><strong>blocksize</strong> (<em>Int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Memory-based performance feature. For very large <code class="docutils literal"><span class="pre">x</span></code> or <code class="docutils literal"><span class="pre">d</span></code>
 calculating the distance matrix between each point can require
 excessive memory overhead. To avoid this, set <code class="docutils literal"><span class="pre">blocksize</span></code> to
 a moderate int, causing the Barnes to compute the distance
 matrix in blocks. Does not change the final results. Default is
 None, which uses all the data all at once, using lots of mem.</li>
-<li><strong>donorm</strong> (<em>bool</em><em>, </em><em>optional</em>) &#8211; If False, uses an old, incorrect method to evaluate the interpolant
-rather than the correct version. Default is True. If you&#8217;re using
+<li><strong>donorm</strong> (<em>bool</em><em>, </em><em>optional</em>) – If False, uses an old, incorrect method to evaluate the interpolant
+rather than the correct version. Default is True. If you’re using
 this, set it to True.</li>
 </ul>
 </td>
@@ -112,7 +112,7 @@ Meteor. 22 1487-1503 (1983)</td></tr>
 </table>
 <dl class="method">
 <dt id="peri.interpolation.BarnesInterpolation1D.__call__">
-<code class="descname">__call__</code><span class="sig-paren">(</span><em>rvecs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/interpolation.html#BarnesInterpolation1D.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.interpolation.BarnesInterpolation1D.__call__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>rvecs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.interpolation.BarnesInterpolation1D.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the values interpolated at positions rvecs</p>
 </dd></dl>
 
@@ -123,7 +123,7 @@ Meteor. 22 1487-1503 (1983)</td></tr>
 <h2>peri.interpolation.ChebyshevInterpolation1D<a class="headerlink" href="#peri-interpolation-chebyshevinterpolation1d" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="peri.interpolation.ChebyshevInterpolation1D">
-<em class="property">class </em><code class="descclassname">peri.interpolation.</code><code class="descname">ChebyshevInterpolation1D</code><span class="sig-paren">(</span><em>func</em>, <em>args=()</em>, <em>window=(0.0</em>, <em>1.0)</em>, <em>degree=3</em>, <em>evalpts=4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/interpolation.html#ChebyshevInterpolation1D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.interpolation.ChebyshevInterpolation1D" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.interpolation.</code><code class="descname">ChebyshevInterpolation1D</code><span class="sig-paren">(</span><em>func</em>, <em>args=()</em>, <em>window=(0.0</em>, <em>1.0)</em>, <em>degree=3</em>, <em>evalpts=4</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.interpolation.ChebyshevInterpolation1D" title="Permalink to this definition">¶</a></dt>
 <dd><p>A 1D Chebyshev approximation / interpolation for an ND function, approximating
 (N-1)D in in the last dimension.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -131,13 +131,13 @@ Meteor. 22 1487-1503 (1983)</td></tr>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>func</strong> (<em>callable</em>) &#8211; A function that takes scalar arguments (1D) and returns a N
+<li><strong>func</strong> (<em>callable</em>) – A function that takes scalar arguments (1D) and returns a N
 dimensional array corresponding to that scalar. Make it such that,
-for an array x, f(x)[.....,a] corresponds to f(x[a])</li>
-<li><strong>args</strong> (<em>tuple</em><em> [</em><em>optional</em><em>]</em><em></em>) &#8211; extra arguments to pass to func</li>
-<li><strong>window</strong> (<em>tuple</em><em> (</em><em>length 2</em><em>)</em><em></em>) &#8211; The bounds of the function over which we desire the interpolation</li>
-<li><strong>degree</strong> (<em>integer</em>) &#8211; Degree of the Chebyshev interpolating polynomial</li>
-<li><strong>evalpts</strong> (<em>integer</em>) &#8211; Number of Chebyshev points to evaluate the function at</li>
+for an array x, f(x)[…..,a] corresponds to f(x[a])</li>
+<li><strong>args</strong> (<em>tuple</em><em> [</em><em>optional</em><em>]</em>) – extra arguments to pass to func</li>
+<li><strong>window</strong> (<em>tuple</em><em> (</em><em>length 2</em><em>)</em>) – The bounds of the function over which we desire the interpolation</li>
+<li><strong>degree</strong> (<em>integer</em>) – Degree of the Chebyshev interpolating polynomial</li>
+<li><strong>evalpts</strong> (<em>integer</em>) – Number of Chebyshev points to evaluate the function at</li>
 </ul>
 </td>
 </tr>
@@ -145,11 +145,11 @@ for an array x, f(x)[.....,a] corresponds to f(x[a])</li>
 </table>
 <dl class="method">
 <dt id="peri.interpolation.ChebyshevInterpolation1D.__call__">
-<code class="descname">__call__</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/interpolation.html#ChebyshevInterpolation1D.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.interpolation.ChebyshevInterpolation1D.__call__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.interpolation.ChebyshevInterpolation1D.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Approximates <cite>func</cite> at the coordinates x, which must be in the window.</p>
 <div class="math">
 \[f(x) = \sum_{k=0}^{N-1} c_k T_k(x) - co/2\]</div>
-<p>Output is in the format [A,...,x]</p>
+<p>Output is in the format [A,…,x]</p>
 </dd></dl>
 
 </dd></dl>
@@ -219,7 +219,7 @@ for an array x, f(x)[.....,a] corresponds to f(x[a])</li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

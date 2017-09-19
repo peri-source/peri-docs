@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -24,14 +24,14 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/mathconf.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="peri.util" href="util.html" />
     <link rel="prev" title="peri.runner" href="runner.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -69,7 +69,7 @@
 <h2>peri.states.State<a class="headerlink" href="#peri-states-state" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="peri.states.State">
-<em class="property">class </em><code class="descclassname">peri.states.</code><code class="descname">State</code><span class="sig-paren">(</span><em>params, values, logpriors=None, hyper_params=['sigma'], hyper_values=[0.04], **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#State"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.State" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.states.</code><code class="descname">State</code><span class="sig-paren">(</span><em>params, values, logpriors=None, hyper_params=[‘sigma’], hyper_values=[0.04], **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.State" title="Permalink to this definition">¶</a></dt>
 <dd><p>A model and corresponding functions to perform a fit to data using a
 variety of optimization routines. A model takes parameters and values
 (names and values) which determine the output of a model, which is then
@@ -79,56 +79,59 @@ compared with data.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>params</strong> (<em>list of strings</em>) &#8211; The names of the parameters (should be a unique set)</li>
-<li><strong>values</strong> (<em>list of numbers</em>) &#8211; The corresponding values of the parameters</li>
-<li><strong>logpriors</strong> (list of <cite>peri.prior.Prior</cite>) &#8211; Priors (constraints) to apply to parameters</li>
-<li><strong>hyper_params</strong> (<em>list of strings</em><em>, </em><em>optional</em>) &#8211; The names of any hyper-parameters (should be a unique set).
-Stored as a <cite>peri.comp.ParameterGroup</cite>. Default is <cite>[&#8216;sigma&#8217;]</cite>,
+<li><strong>params</strong> (<em>list of strings</em>) – The names of the parameters (should be a unique set)</li>
+<li><strong>values</strong> (<em>list of numbers</em>) – The corresponding values of the parameters</li>
+<li><strong>logpriors</strong> (list of <cite>peri.prior.Prior</cite>) – Priors (constraints) to apply to parameters</li>
+<li><strong>hyper_params</strong> (<em>list of strings</em><em>, </em><em>optional</em>) – The names of any hyper-parameters (should be a unique set).
+Stored as a <cite>peri.comp.ParameterGroup</cite>. Default is <cite>[‘sigma’]</cite>,
 the standard-deviation of the noise distribution.</li>
-<li><strong>hyper_values</strong> (<em>list of numbers</em><em>, </em><em>optional</em>) &#8211; The corresponding values of the hyper-parameters. Stored as a
+<li><strong>hyper_values</strong> (<em>list of numbers</em><em>, </em><em>optional</em>) – The corresponding values of the hyper-parameters. Stored as a
 <cite>peri.comp.ParameterGroup</cite>. Default is <cite>[0.04]</cite></li>
-<li><strong>kwargs</strong> &#8211; Arguments to pass to super class <code class="xref py py-class docutils literal"><span class="pre">peri.comp.ParameterGroup</span></code>
+<li><strong>kwargs</strong> – Arguments to pass to super class <code class="xref py py-class docutils literal"><span class="pre">peri.comp.ParameterGroup</span></code>
 including <cite>ordered</cite> and <cite>category</cite>.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="peri.states.State.build_funcs">
+<code class="descname">build_funcs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.State.build_funcs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Here, we build gradient and hessian functions based on the properties
+of a state that are generally wanted. For each one, we fill in _grad or
+_hess with a function that takes care of various options such as
+slicing and flattening. For example, <cite>m</cite> below takes the model, selects
+different indices from it, maybe flattens it and copies it. This is
+then used in the fisherinformation, gradmodel, and hessmodel functions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.states.State.crb">
+<code class="descname">crb</code><span class="sig-paren">(</span><em>params=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.State.crb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the diagonal elements of the minimum covariance of the model
+with respect to parameters params. <code class="docutils literal"><span class="pre">*args</span></code> and <code class="docutils literal"><span class="pre">**kwargs</span></code> go to
+<code class="docutils literal"><span class="pre">fisherinformation</span></code>.</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="peri.states.State.data">
 <code class="descname">data</code><a class="headerlink" href="#peri.states.State.data" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>Class property</em> &#8211; the raw data of the model fit. Should return a number
+<dd><p><em>Class property</em> – the raw data of the model fit. Should return a number
 (preferrably float) or an ndarray (essentially any object which as
-operands +-/...). This object is constant since it is data.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="peri.states.State.model">
-<code class="descname">model</code><a class="headerlink" href="#peri.states.State.model" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>Class property</em> &#8211; the current model fit to the data. Should return a
-number or ndarray. Ideally this object should be an object updated by
-the <a class="reference internal" href="#peri.states.State.update" title="peri.states.State.update"><code class="xref py py-func docutils literal"><span class="pre">peri.states.State.update()</span></code></a> function and simply returned in
-this property</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="peri.states.State.residuals">
-<code class="descname">residuals</code><a class="headerlink" href="#peri.states.State.residuals" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>Class property</em> &#8211; the model residuals wrt data, residuals = data - model,
-<span class="math">\(R_i = D_i - M_i(\theta)\)</span></p>
+operands +-/…). This object is constant since it is data.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="peri.states.State.error">
 <code class="descname">error</code><a class="headerlink" href="#peri.states.State.error" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>Class property</em> &#8211; Sum of the squared errors,
+<dd><p><em>Class property</em> – Sum of the squared errors,
 <span class="math">\(E = \sum_i (D_i - M_i(\theta))^2\)</span></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="peri.states.State.loglikelihood">
 <code class="descname">loglikelihood</code><a class="headerlink" href="#peri.states.State.loglikelihood" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>Class property</em> &#8211; loglikelihood calculated by the model error,
+<dd><p><em>Class property</em> – loglikelihood calculated by the model error,
 <span class="math">\(\mathcal{L} = - \frac{1}{2} \sum\left[
 \left(\frac{D_i - M_i(\theta)}{\sigma}\right)^2
 + \log{(2\pi \sigma^2)} \right]\)</span></p>
@@ -137,7 +140,7 @@ this property</p>
 <dl class="attribute">
 <dt id="peri.states.State.logposterior">
 <code class="descname">logposterior</code><a class="headerlink" href="#peri.states.State.logposterior" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>Class property</em> &#8211; log of posterior prob (including likelihood
+<dd><p><em>Class property</em> – log of posterior prob (including likelihood
 calculated by the model error and priors):</p>
 <p>self.logprior + self.loglikelihood</p>
 </dd></dl>
@@ -145,71 +148,43 @@ calculated by the model error and priors):</p>
 <dl class="attribute">
 <dt id="peri.states.State.logprior">
 <code class="descname">logprior</code><a class="headerlink" href="#peri.states.State.logprior" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>Class property</em> &#8211; logprior calculated from the sum of all prior objects</p>
+<dd><p><em>Class property</em> – logprior calculated from the sum of all prior objects</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="peri.states.State.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#State.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.State.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update a single parameter or group of parameters <code class="docutils literal"><span class="pre">params</span></code>
-with <code class="docutils literal"><span class="pre">values</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>params</strong> (<em>string</em><em> or </em><em>list of strings</em>) &#8211; Parameter names which to update</li>
-<li><strong>value</strong> (<em>number</em><em> or </em><em>list of numbers</em>) &#8211; Values of those parameters which to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.states.State.update_hyper">
-<code class="descname">update_hyper</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#State.update_hyper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.State.update_hyper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update any single hyper parameter or group of parameters <code class="docutils literal"><span class="pre">params</span></code>
-with <code class="docutils literal"><span class="pre">values</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>params</strong> (<em>string</em><em> or </em><em>list of strings</em>) &#8211; Parameter names which to update</li>
-<li><strong>value</strong> (<em>number</em><em> or </em><em>list of numbers</em>) &#8211; Values of those parameters which to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.states.State.update_sigma">
-<code class="descname">update_sigma</code><span class="sig-paren">(</span><em>sigma</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#State.update_sigma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.State.update_sigma" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates the expected sigma of the noise distribution</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.states.State.push_update">
-<code class="descname">push_update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#State.push_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.State.push_update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform a parameter update and keep track of the change on the state.
-Same call structure as <code class="xref py py-func docutils literal"><span class="pre">peri.states.States.update()</span></code></p>
+<dl class="attribute">
+<dt id="peri.states.State.model">
+<code class="descname">model</code><a class="headerlink" href="#peri.states.State.model" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Class property</em> – the current model fit to the data. Should return a
+number or ndarray. Ideally this object should be an object updated by
+the <a class="reference internal" href="#peri.states.State.update" title="peri.states.State.update"><code class="xref py py-func docutils literal"><span class="pre">peri.states.State.update()</span></code></a> function and simply returned in
+this property</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="peri.states.State.pop_update">
-<code class="descname">pop_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#State.pop_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.State.pop_update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pop_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.State.pop_update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pop the last update from the stack push by
 <code class="xref py py-func docutils literal"><span class="pre">peri.states.States.push_update()</span></code> by undoing the chnage last
 performed.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="peri.states.State.push_update">
+<code class="descname">push_update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.State.push_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a parameter update and keep track of the change on the state.
+Same call structure as <code class="xref py py-func docutils literal"><span class="pre">peri.states.States.update()</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="peri.states.State.residuals">
+<code class="descname">residuals</code><a class="headerlink" href="#peri.states.State.residuals" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Class property</em> – the model residuals wrt data, residuals = data - model,
+<span class="math">\(R_i = D_i - M_i(\theta)\)</span></p>
+</dd></dl>
+
+<dl class="method">
 <dt id="peri.states.State.temp_update">
-<code class="descname">temp_update</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwds</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#State.temp_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.State.temp_update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">temp_update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.State.temp_update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Context manager to temporarily perform a parameter update (by using the
 stack structure). To use:</p>
 <blockquote>
@@ -222,22 +197,47 @@ state.error</dd>
 </dd></dl>
 
 <dl class="method">
-<dt id="peri.states.State.build_funcs">
-<code class="descname">build_funcs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#State.build_funcs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.State.build_funcs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Here, we build gradient and hessian functions based on the properties
-of a state that are generally wanted. For each one, we fill in _grad or
-_hess with a function that takes care of various options such as
-slicing and flattening. For example, <cite>m</cite> below takes the model, selects
-different indices from it, maybe flattens it and copies it. This is
-then used in the fisherinformation, gradmodel, and hessmodel functions.</p>
+<dt id="peri.states.State.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.State.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update a single parameter or group of parameters <code class="docutils literal"><span class="pre">params</span></code>
+with <code class="docutils literal"><span class="pre">values</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>params</strong> (<em>string</em><em> or </em><em>list of strings</em>) – Parameter names which to update</li>
+<li><strong>value</strong> (<em>number</em><em> or </em><em>list of numbers</em>) – Values of those parameters which to update</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
-<dt id="peri.states.State.crb">
-<code class="descname">crb</code><span class="sig-paren">(</span><em>params=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#State.crb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.State.crb" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate the diagonal elements of the minimum covariance of the model
-with respect to parameters params. <code class="docutils literal"><span class="pre">*args</span></code> and <code class="docutils literal"><span class="pre">**kwargs</span></code> go to
-<code class="docutils literal"><span class="pre">fisherinformation</span></code>.</p>
+<dt id="peri.states.State.update_hyper">
+<code class="descname">update_hyper</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.State.update_hyper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update any single hyper parameter or group of parameters <code class="docutils literal"><span class="pre">params</span></code>
+with <code class="docutils literal"><span class="pre">values</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>params</strong> (<em>string</em><em> or </em><em>list of strings</em>) – Parameter names which to update</li>
+<li><strong>value</strong> (<em>number</em><em> or </em><em>list of numbers</em>) – Values of those parameters which to update</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.states.State.update_sigma">
+<code class="descname">update_sigma</code><span class="sig-paren">(</span><em>sigma</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.State.update_sigma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the expected sigma of the noise distribution</p>
 </dd></dl>
 
 </dd></dl>
@@ -247,7 +247,7 @@ with respect to parameters params. <code class="docutils literal"><span class="p
 <h2>peri.states.ImageState<a class="headerlink" href="#peri-states-imagestate" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="peri.states.ImageState">
-<em class="property">class </em><code class="descclassname">peri.states.</code><code class="descname">ImageState</code><span class="sig-paren">(</span><em>image</em>, <em>comps</em>, <em>mdl=ConfocalImageModel : H(I*(1-P)+C*P) + B</em>, <em>sigma=0.04</em>, <em>priors=None</em>, <em>pad=24</em>, <em>model_as_data=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#ImageState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.ImageState" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.states.</code><code class="descname">ImageState</code><span class="sig-paren">(</span><em>image</em>, <em>comps</em>, <em>mdl=ConfocalImageModel : H(I*(1-P)+C*P) + B</em>, <em>sigma=0.04</em>, <em>priors=None</em>, <em>pad=24</em>, <em>model_as_data=False</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.ImageState" title="Permalink to this definition">¶</a></dt>
 <dd><p>The state object to create a confocal image.  The model is that of
 a spatially varying illumination field, from which platonic particle
 shapes are subtracted.  This is then spread with a point spread function
@@ -257,12 +257,12 @@ shapes are subtracted.  This is then spread with a point spread function
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>image</strong> (<a class="reference internal" href="util.html#peri.util.Image" title="peri.util.Image"><code class="xref py py-class docutils literal"><span class="pre">peri.util.Image</span></code></a> object) &#8211; The raw image with which to compare the model image from this
+<li><strong>image</strong> (<a class="reference internal" href="util.html#peri.util.Image" title="peri.util.Image"><code class="xref py py-class docutils literal"><span class="pre">peri.util.Image</span></code></a> object) – The raw image with which to compare the model image from this
 class.  This image should have been prepared through
 prepare_for_state, which does things such as padding necessary for
 this class. In the case of the RawImage, paths are used to keep
 track of the image object to save on pickle size.</li>
-<li><strong>comp</strong> (list of <a class="reference internal" href="comp.html#peri.comp.comp.Component" title="peri.comp.comp.Component"><code class="xref py py-class docutils literal"><span class="pre">peri.comp.comp.Component</span></code></a> or <a class="reference internal" href="comp.html#peri.comp.comp.ComponentCollection" title="peri.comp.comp.ComponentCollection"><code class="xref py py-class docutils literal"><span class="pre">peri.comp.comp.ComponentCollection</span></code></a>) &#8211; <p>Components used to make up the model image. Each separate component
+<li><strong>comp</strong> (list of <a class="reference internal" href="comp.html#peri.comp.comp.Component" title="peri.comp.comp.Component"><code class="xref py py-class docutils literal"><span class="pre">peri.comp.comp.Component</span></code></a> or <a class="reference internal" href="comp.html#peri.comp.comp.ComponentCollection" title="peri.comp.comp.ComponentCollection"><code class="xref py py-class docutils literal"><span class="pre">peri.comp.comp.ComponentCollection</span></code></a>) – <p>Components used to make up the model image. Each separate component
 must be of a different category, otherwise combining them would be
 ambiguous. If you desire multiple Components of one category,
 combine them using a ComponentCollection (which has functions for
@@ -271,40 +271,36 @@ combining) and supply that to the comps list.</p>
 <code class="docutils literal"><span class="pre">ImageState.catmap</span></code> which tells how components are matched to
 parts of the model equation.</p>
 </li>
-<li><strong>mdl</strong> (<a class="reference internal" href="models.html#peri.models.Model" title="peri.models.Model"><code class="xref py py-class docutils literal"><span class="pre">peri.models.Model</span></code></a> object) &#8211; Model defining how to combine different Components into a single
+<li><strong>mdl</strong> (<a class="reference internal" href="models.html#peri.models.Model" title="peri.models.Model"><code class="xref py py-class docutils literal"><span class="pre">peri.models.Model</span></code></a> object) – Model defining how to combine different Components into a single
 model.</li>
-<li><strong>priors</strong> (list of <code class="docutils literal"><span class="pre">peri.priors</span></code> [default: ()]) &#8211; Whether or not to turn on overlap priors using neighborlists</li>
-<li><strong>pad</strong> (<em>integer</em><em> or </em><em>tuple of integers</em><em> (</em><em>optional</em><em>)</em><em></em>) &#8211; No recommended to set by hand.  The padding level of the raw image
+<li><strong>priors</strong> (list of <code class="docutils literal"><span class="pre">peri.priors</span></code> [default: ()]) – Whether or not to turn on overlap priors using neighborlists</li>
+<li><strong>pad</strong> (<em>integer</em><em> or </em><em>tuple of integers</em><em> (</em><em>optional</em><em>)</em>) – No recommended to set by hand.  The padding level of the raw image
 needed by the PSF support.</li>
-<li><strong>model_as_data</strong> (<em>boolean</em>) &#8211; Whether to use the model image as the true image after initializing</li>
+<li><strong>model_as_data</strong> (<em>boolean</em>) – Whether to use the model image as the true image after initializing</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="peri.states.ImageState.set_model">
-<code class="descname">set_model</code><span class="sig-paren">(</span><em>mdl</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#ImageState.set_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.ImageState.set_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Setup the image model formation equation and corresponding objects into
-their various objects. <cite>mdl</cite> is a <cite>peri.models.Model</cite> object</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.states.ImageState.set_image">
-<code class="descname">set_image</code><span class="sig-paren">(</span><em>image</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#ImageState.set_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.ImageState.set_image" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the current comparison (real) image</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.states.ImageState.model_to_data">
-<code class="descname">model_to_data</code><span class="sig-paren">(</span><em>sigma=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#ImageState.model_to_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.ImageState.model_to_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Switch out the data for the model&#8217;s recreation of the data.</p>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="peri.states.ImageState.data">
 <code class="descname">data</code><a class="headerlink" href="#peri.states.ImageState.data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the raw data of the model fit</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.states.ImageState.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.ImageState.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return component by category name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.states.ImageState.get_update_io_tiles">
+<code class="descname">get_update_io_tiles</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.ImageState.get_update_io_tiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the tiles corresponding to a particular section of image needed to
+be updated. Inputs are the parameters and values. Returned is the
+padded tile, inner tile, and slicer to go between, but accounting for
+wrap with the edge of the image as necessary.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -314,50 +310,31 @@ their various objects. <cite>mdl</cite> is a <cite>peri.models.Model</cite> obje
 </dd></dl>
 
 <dl class="method">
-<dt id="peri.states.ImageState.get_update_io_tiles">
-<code class="descname">get_update_io_tiles</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#ImageState.get_update_io_tiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.ImageState.get_update_io_tiles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the tiles corresponding to a particular section of image needed to
-be updated. Inputs are the parameters and values. Returned is the
-padded tile, inner tile, and slicer to go between, but accounting for
-wrap with the edge of the image as necessary.</p>
+<dt id="peri.states.ImageState.model_to_data">
+<code class="descname">model_to_data</code><span class="sig-paren">(</span><em>sigma=0.0</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.ImageState.model_to_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Switch out the data for the model’s recreation of the data.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="peri.states.ImageState.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#ImageState.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.ImageState.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Actually perform an image (etc) update based on a set of params and
-values. These parameter can be any present in the components in any
-number. If there is only one component affected then difference image
-updates will be employed.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.states.ImageState.get">
-<code class="descname">get</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#ImageState.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.ImageState.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return component by category name</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.states.ImageState.update_from_model_change">
-<code class="descname">update_from_model_change</code><span class="sig-paren">(</span><em>oldmodel</em>, <em>newmodel</em>, <em>tile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#ImageState.update_from_model_change"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.ImageState.update_from_model_change" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update various internal variables from a model update from oldmodel to
-newmodel for the tile <cite>tile</cite></p>
+<dt id="peri.states.ImageState.set_image">
+<code class="descname">set_image</code><span class="sig-paren">(</span><em>image</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.ImageState.set_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the current comparison (real) image</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="peri.states.ImageState.set_mem_level">
-<code class="descname">set_mem_level</code><span class="sig-paren">(</span><em>mem_level='hi'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#ImageState.set_mem_level"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.ImageState.set_mem_level" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_mem_level</code><span class="sig-paren">(</span><em>mem_level=’hi’</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.ImageState.set_mem_level" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the memory usage level of the state.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mem_level</strong> (<em>string</em>) &#8211; <dl class="docutils">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mem_level</strong> (<em>string</em>) – <dl class="docutils">
 <dt>Can be set to one of:</dt>
 <dd><ul class="first last simple">
-<li>hi      : all mem&#8217;s are np.float64</li>
+<li>hi      : all mem’s are np.float64</li>
 <li>med-hi  : image, platonic are float32, rest are float64</li>
-<li>med     : all mem&#8217;s are float32</li>
+<li>med     : all mem’s are float32</li>
 <li>med-lo  : image, platonic are float16, rest float32</li>
 <li>lo      : all are float16, which is bad for accuracy.</li>
 </ul>
@@ -373,6 +350,29 @@ OK for mem but it means that self._model, self._residuals are always
 float64, which can be a chunk of mem.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="peri.states.ImageState.set_model">
+<code class="descname">set_model</code><span class="sig-paren">(</span><em>mdl</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.ImageState.set_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup the image model formation equation and corresponding objects into
+their various objects. <cite>mdl</cite> is a <cite>peri.models.Model</cite> object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.states.ImageState.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.ImageState.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actually perform an image (etc) update based on a set of params and
+values. These parameter can be any present in the components in any
+number. If there is only one component affected then difference image
+updates will be employed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.states.ImageState.update_from_model_change">
+<code class="descname">update_from_model_change</code><span class="sig-paren">(</span><em>oldmodel</em>, <em>newmodel</em>, <em>tile</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.ImageState.update_from_model_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update various internal variables from a model update from oldmodel to
+newmodel for the tile <cite>tile</cite></p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -380,7 +380,7 @@ float64, which can be a chunk of mem.</p>
 <h2>peri.states.{save,load}<a class="headerlink" href="#peri-states-save-load" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="peri.states.save">
-<code class="descclassname">peri.states.</code><code class="descname">save</code><span class="sig-paren">(</span><em>state</em>, <em>filename=None</em>, <em>desc=''</em>, <em>extra=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.save" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">peri.states.</code><code class="descname">save</code><span class="sig-paren">(</span><em>state</em>, <em>filename=None</em>, <em>desc=”</em>, <em>extra=None</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save the current state with extra information (for example samples and LL
 from the optimization procedure).</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -388,13 +388,13 @@ from the optimization procedure).</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>state</strong> (<a class="reference internal" href="#peri.states.ImageState" title="peri.states.ImageState"><em>peri.states.ImageState</em></a>) &#8211; the state object which to save</li>
-<li><strong>filename</strong> (<em>string</em>) &#8211; if provided, will override the default that is constructed based on
-the state&#8217;s raw image file.  If there is no filename and the state has
-a RawImage, the it is saved to RawImage.filename + &#8220;-peri-save.pkl&#8221;</li>
-<li><strong>desc</strong> (<em>string</em>) &#8211; if provided, will augment the default filename to be
-RawImage.filename + &#8216;-peri-&#8216; + desc + &#8216;.pkl&#8217;</li>
-<li><strong>extra</strong> (<em>list of pickleable objects</em>) &#8211; if provided, will be saved with the state</li>
+<li><strong>state</strong> (<a class="reference internal" href="#peri.states.ImageState" title="peri.states.ImageState"><em>peri.states.ImageState</em></a>) – the state object which to save</li>
+<li><strong>filename</strong> (<em>string</em>) – if provided, will override the default that is constructed based on
+the state’s raw image file.  If there is no filename and the state has
+a RawImage, the it is saved to RawImage.filename + “-peri-save.pkl”</li>
+<li><strong>desc</strong> (<em>string</em>) – if provided, will augment the default filename to be
+RawImage.filename + ‘-peri-‘ + desc + ‘.pkl’</li>
+<li><strong>extra</strong> (<em>list of pickleable objects</em>) – if provided, will be saved with the state</li>
 </ul>
 </td>
 </tr>
@@ -404,14 +404,14 @@ RawImage.filename + &#8216;-peri-&#8216; + desc + &#8216;.pkl&#8217;</li>
 
 <dl class="function">
 <dt id="peri.states.load">
-<code class="descclassname">peri.states.</code><code class="descname">load</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/states.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.states.load" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load the state from the given file, moving to the file&#8217;s directory during
+<code class="descclassname">peri.states.</code><code class="descname">load</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.states.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the state from the given file, moving to the file’s directory during
 load (temporarily, moving back after loaded)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>string</em>) &#8211; name of the file to open, should be a .pkl file</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>string</em>) – name of the file to open, should be a .pkl file</td>
 </tr>
 </tbody>
 </table>
@@ -483,7 +483,7 @@ load (temporarily, moving back after loaded)</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

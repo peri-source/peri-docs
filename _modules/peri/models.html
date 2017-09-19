@@ -1,12 +1,12 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>peri.models &#8212; PERI 0.1.2 documentation</title>
+    <title>peri.models &#8212; PERI 0.1.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.1.2',
+        VERSION:     '0.1.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,12 +24,12 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../_static/mathconf.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -50,7 +50,10 @@
           <div class="body" role="main">
             
   <h1>Source code for peri.models</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span></span><span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">iteritems</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">object</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
 
 <span class="kn">from</span> <span class="nn">peri.comp</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">ComponentCollection</span><span class="p">,</span> <span class="n">GlobalScalar</span><span class="p">,</span> <span class="n">ilms</span><span class="p">,</span> <span class="n">psfs</span><span class="p">,</span> <span class="n">objs</span><span class="p">,</span> <span class="n">exactpsf</span>
@@ -124,7 +127,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">modelstr</span> <span class="o">=</span> <span class="n">modelstr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">varmap</span> <span class="o">=</span> <span class="n">varmap</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">registry</span> <span class="o">=</span> <span class="n">registry</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ivarmap</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">varmap</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ivarmap</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">varmap</span><span class="p">)}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_consistency</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Model.check_consistency"><a class="viewcode-back" href="../../reference/models.html#peri.models.Model.check_consistency">[docs]</a>    <span class="k">def</span> <span class="nf">check_consistency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -144,11 +147,11 @@
             <span class="p">)</span>
 
         <span class="c1"># Check that the two model descriptors are consistent</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">eq</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modelstr</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">eq</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modelstr</span><span class="p">):</span>
             <span class="n">var</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">eq</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">var</span><span class="p">:</span>
                 <span class="c1"># remove the derivative signs if there (dP -&gt; P)</span>
-                <span class="n">v</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">r&quot;^d&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^d&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">varmap</span><span class="p">:</span>
                     <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                         <span class="s2">&quot;Variable &#39;</span><span class="si">%s</span><span class="s2">&#39; (eq. &#39;</span><span class="si">%s</span><span class="s2">&#39;: &#39;</span><span class="si">%s</span><span class="s2">&#39;) not found in category map </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span>
@@ -168,7 +171,7 @@
         <span class="n">compcats</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">category</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]</span>
 
         <span class="c1"># Check that the components are all provided, given the categories</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">varmap</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">varmap</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modelstr</span><span class="p">[</span><span class="s1">&#39;full&#39;</span><span class="p">]:</span>
                 <span class="n">log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Component (</span><span class="si">%s</span><span class="s1"> : </span><span class="si">%s</span><span class="s1">) not used in model.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">))</span>
 
@@ -257,14 +260,14 @@
         <span class="k">if</span> <span class="n">diffmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_base_model</span><span class="p">(),</span> <span class="n">evar</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">compname</span> <span class="o">=</span> <span class="n">diffmap</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">compname</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">diffmap</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_difference_model</span><span class="p">(</span><span class="n">compname</span><span class="p">),</span> <span class="n">evar</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_base_model</span><span class="p">())</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_base_model</span><span class="p">())</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConfocalImageModel"><a class="viewcode-back" href="../../reference/models.html#peri.models.ConfocalImageModel">[docs]</a><span class="k">class</span> <span class="nc">ConfocalImageModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -294,7 +297,7 @@
             <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="n">allobjs</span><span class="p">,</span>
             <span class="s1">&#39;offset&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;const&#39;</span><span class="p">:</span> <span class="n">GlobalScalar</span><span class="p">}</span>
         <span class="p">}</span>
-        <span class="n">Model</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span></div>
+        <span class="n">Model</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span></div>
 
 <span class="k">class</span> <span class="nc">SmoothFieldModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -307,7 +310,7 @@
         <span class="n">varmap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;I&#39;</span><span class="p">:</span> <span class="s1">&#39;ilm&#39;</span><span class="p">}</span>
         <span class="n">modelstr</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;full&#39;</span><span class="p">:</span> <span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="s1">&#39;dI&#39;</span><span class="p">:</span> <span class="s1">&#39;dI&#39;</span><span class="p">}</span>
         <span class="n">registry</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ilm&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">}</span>
-        <span class="n">Model</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
+        <span class="n">Model</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">BlurredFieldModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -320,7 +323,7 @@
         <span class="n">varmap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="s1">&#39;psf&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">:</span> <span class="s1">&#39;ilm&#39;</span><span class="p">}</span>
         <span class="n">modelstr</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;full&#39;</span><span class="p">:</span> <span class="s1">&#39;H(I)&#39;</span><span class="p">,</span> <span class="s1">&#39;dI&#39;</span><span class="p">:</span> <span class="s1">&#39;H(dI)&#39;</span><span class="p">}</span>
         <span class="n">registry</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;psf&#39;</span><span class="p">:</span> <span class="n">allpsfs</span><span class="p">,</span> <span class="s1">&#39;ilm&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">}</span>
-        <span class="n">Model</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
+        <span class="n">Model</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">ParticlesOnlyModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -333,7 +336,7 @@
         <span class="n">varmap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="s1">&#39;obj&#39;</span><span class="p">}</span>
         <span class="n">modelstr</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;full&#39;</span><span class="p">:</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;dP&#39;</span><span class="p">:</span> <span class="s1">&#39;dP&#39;</span><span class="p">}</span>
         <span class="n">registry</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="n">allobjs</span><span class="p">}</span>
-        <span class="n">Model</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
+        <span class="n">Model</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">ConfocalDyedParticlesModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -358,7 +361,7 @@
             <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">,</span>
             <span class="s1">&#39;ilm&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="n">Model</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
+        <span class="n">Model</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">BrightfieldImageModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -387,7 +390,7 @@
             <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="n">allobjs</span><span class="p">,</span>
             <span class="s1">&#39;contrast&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;const&#39;</span><span class="p">:</span> <span class="n">GlobalScalar</span><span class="p">}</span>
         <span class="p">}</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">BrightfieldImageModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">)</span><span class="c1">#registry=registry)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BrightfieldImageModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">)</span><span class="c1">#registry=registry)</span>
 
 <span class="k">class</span> <span class="nc">IlluminatedParticlesModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -409,7 +412,7 @@
             <span class="s1">&#39;ilm&#39;</span><span class="p">:</span> <span class="n">allfields</span><span class="p">,</span>
             <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="n">allobjs</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">IlluminatedParticlesModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">IlluminatedParticlesModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
                 <span class="n">modelstr</span><span class="o">=</span><span class="n">modelstr</span><span class="p">,</span> <span class="n">varmap</span><span class="o">=</span><span class="n">varmap</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
 
 
@@ -450,13 +453,13 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

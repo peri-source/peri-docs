@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -24,14 +24,14 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/mathconf.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="peri.comp" href="reference/comp.html" />
     <link rel="prev" title="Package architecture" href="architecture.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -67,7 +67,7 @@ model. We now need to optimize the model.</p>
 as the illumination field or the point-spread function. Second, the centroid
 methods frequently miss or mis-feature many particles. Third, we would like to
 completely optimize the model to get maximally-accurate position and radii
-measurements. In this section, we&#8217;ll discuss how to optimize a
+measurements. In this section, we’ll discuss how to optimize a
 <a class="reference internal" href="reference/states.html#peri.states.ImageState" title="peri.states.ImageState"><code class="xref py py-class docutils literal"><span class="pre">peri.states.ImageState</span></code></a> and accomplish all three of these goals.</p>
 <p>Most of these steps are implemented in the <code class="xref py py-mod docutils literal"><span class="pre">peri.runner</span></code> convenience
 functions.</p>
@@ -100,18 +100,18 @@ at once. To deal with this, <code class="docutils literal"><span class="pre">opt
 optimizing the global parameters such as the illumination and background, then
 optimizing the particle parameters. Since these two groups of parameters are
 coupled, <code class="docutils literal"><span class="pre">opt.burn</span></code> then alternates back and forth between globals and
-particles <code class="docutils literal"><span class="pre">n_loop</span></code> times or until a sufficient convergence is met &#8211; here
+particles <code class="docutils literal"><span class="pre">n_loop</span></code> times or until a sufficient convergence is met – here
 if the error changes by less than 10% of its best value (<code class="docutils literal"><span class="pre">fractol=0.1</span></code>) <a class="footnote-reference" href="#id3" id="id1">[1]</a>.
-Finally, we&#8217;ve found empirically that it&#8217;s best to avoid optimizing some
+Finally, we’ve found empirically that it’s best to avoid optimizing some
 parameters of the model (such as the point-spread function and the particle
 zscale) until the end. Calling <a class="reference internal" href="reference/opt.html#peri.opt.optimize.burn" title="peri.opt.optimize.burn"><code class="xref py py-func docutils literal"><span class="pre">burn()</span></code></a> with
 <code class="docutils literal"><span class="pre">mode='burn'</span></code> combines all these nuances into one convenience function <a class="footnote-reference" href="#id4" id="id2">[2]</a>.</p>
 <table class="docutils footnote" frame="void" id="id3" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>If <code class="docutils literal"><span class="pre">burn</span></code> doesn&#8217;t converge sufficiently and instead stops because
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>If <code class="docutils literal"><span class="pre">burn</span></code> doesn’t converge sufficiently and instead stops because
 it has iterated for <code class="docutils literal"><span class="pre">n_loop</span></code>, then it will log a warning. For this
-initial optimization we&#8217;ll ignore it, since we&#8217;ll keep optimizing the
+initial optimization we’ll ignore it, since we’ll keep optimizing the
 state later. However, if you get a warning like this in the later steps,
 it might be worthwile to heed the warning and re-optimize the state.</td></tr>
 </tbody>
@@ -165,7 +165,7 @@ overall radii scale or a radii scale that changes with <code class="docutils lit
 <div class="section" id="add-subtract">
 <h2>Add-subtract<a class="headerlink" href="#add-subtract" title="Permalink to this headline">¶</a></h2>
 <p>After the initial optimization we can add any missing particles and remove any
-particles that shouldn&#8217;t be there. To do this, run:</p>
+particles that shouldn’t be there. To do this, run:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">peri.opt.addsubtract</span> <span class="kn">as</span> <span class="nn">addsub</span>
 <span class="n">num_changed</span><span class="p">,</span> <span class="n">removed_positions</span><span class="p">,</span> <span class="n">added_positions</span> <span class="o">=</span> <span class="n">addsub</span><span class="o">.</span><span class="n">add_subtract</span><span class="p">(</span><span class="n">st</span><span class="p">,</span>
         <span class="n">rad</span><span class="o">=</span><span class="s1">&#39;calc&#39;</span><span class="p">,</span> <span class="n">min_rad</span><span class="o">=</span><span class="s1">&#39;calc&#39;</span><span class="p">,</span> <span class="n">max_rad</span><span class="o">=</span><span class="s1">&#39;calc&#39;</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
@@ -173,7 +173,7 @@ particles that shouldn&#8217;t be there. To do this, run:</p>
 </pre></div>
 </div>
 <p>This function adds missing particles to the image by centroid-featuring the
-residuals, with <code class="docutils literal"><span class="pre">invert</span></code> the same as for the initial centroid featuring &#8211;
+residuals, with <code class="docutils literal"><span class="pre">invert</span></code> the same as for the initial centroid featuring –
 set <code class="docutils literal"><span class="pre">invert=True</span></code> if the particles are dark on a bright background; <code class="docutils literal"><span class="pre">False</span></code>
 otherwise. In the residuals image, missing particles stick out like sore thumbs
 and are easy to find. The function adds a particle at this position with radius
@@ -193,7 +193,7 @@ change is made or it has iterated over the maximum number of loops.</p>
 </div>
 <div class="section" id="main-optimization">
 <h2>Main Optimization<a class="headerlink" href="#main-optimization" title="Permalink to this headline">¶</a></h2>
-<p>After adding all the particles, it&#8217;s time to completely optimize the state. In
+<p>After adding all the particles, it’s time to completely optimize the state. In
 my experience, sometimes adding particles causes the globals and the old
 particle positions to no longer be correct. To deal with this, run something
 like</p>
@@ -201,7 +201,7 @@ like</p>
 </pre></div>
 </div>
 <p>This usually sets the illumination and particle positions to reasonable values.
-At this point, it&#8217;s time to optimize all the state including the point-spread
+At this point, it’s time to optimize all the state including the point-spread
 function, which we have so far ignored. We can include this with rest of the
 parameters with <a class="reference internal" href="reference/opt.html#peri.opt.optimize.burn" title="peri.opt.optimize.burn"><code class="xref py py-func docutils literal"><span class="pre">burn()</span></code></a> again:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">opt</span><span class="o">.</span><span class="n">burn</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;polish&#39;</span><span class="p">,</span> <span class="n">n_loop</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -216,7 +216,7 @@ the global parameters (including the PSF) and an iteration of optimizing all
 the particle positions. Similar to <code class="docutils literal"><span class="pre">mode='burn'</span></code>, setting <code class="docutils literal"><span class="pre">mode='polish'</span></code>
 saves the state after each iteration by calling
 <code class="docutils literal"><span class="pre">peri.states.save(st,</span> <span class="pre">desc='polishing')</span></code>; you can set <code class="docutils literal"><span class="pre">desc</span></code> to something
-else if you&#8217;d like.</p>
+else if you’d like.</p>
 </div>
 <div class="section" id="achieving-the-best-possible-state">
 <h2>Achieving the best-possible state<a class="headerlink" href="#achieving-the-best-possible-state" title="Permalink to this headline">¶</a></h2>
@@ -232,7 +232,7 @@ to find all the missing particles, or running the secondary optimizations
 reveals that more particles are missing. In these cases, running another
 <a class="reference internal" href="reference/opt.html#peri.opt.addsubtract.add_subtract" title="peri.opt.addsubtract.add_subtract"><code class="xref py py-func docutils literal"><span class="pre">add_subtract()</span></code></a> usually fixes the problem and gets
 all the particles. However, sometimes there are particles that the normal
-<a class="reference internal" href="reference/opt.html#peri.opt.addsubtract.add_subtract" title="peri.opt.addsubtract.add_subtract"><code class="xref py py-func docutils literal"><span class="pre">add_subtract()</span></code></a> just can&#8217;t seem to get right, such
+<a class="reference internal" href="reference/opt.html#peri.opt.addsubtract.add_subtract" title="peri.opt.addsubtract.add_subtract"><code class="xref py py-func docutils literal"><span class="pre">add_subtract()</span></code></a> just can’t seem to get right, such
 as particles on the edge or tough clusters of particles. For these cases, there
 is another function in the <code class="xref py py-mod docutils literal"><span class="pre">peri.opt.addsubtract</span></code> module:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">num_added</span><span class="p">,</span> <span class="n">added_positions</span> <span class="o">=</span> <span class="n">addsub</span><span class="o">.</span><span class="n">add_subtract_locally</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
@@ -244,7 +244,7 @@ size of the region roughly set by the optional parameter <code class="docutils l
 the threshold for badness set by <code class="docutils literal"><span class="pre">sigma_cutoff</span></code>. The function then removes
 <em>all</em> the particles in that region and re-adds them based on centroid featuring
 again. Since <a class="reference internal" href="reference/opt.html#peri.opt.addsubtract.add_subtract_locally" title="peri.opt.addsubtract.add_subtract_locally"><code class="xref py py-func docutils literal"><span class="pre">add_subtract_locally()</span></code></a> removes all the
-particles in the region, it&#8217;s best not to use it until the image is fairly well
+particles in the region, it’s best not to use it until the image is fairly well
 fit. Otherwise, the function will attempt to remove nearly all the particles in
 the image and re-add them, which takes a long time and will probably fail. That
 being said, this function is excellent at fixing doubly-featured particle and
@@ -255,7 +255,7 @@ for particles at the edge of a well-fit state.</p>
 </div>
 <div class="section" id="additional-optimizations">
 <h3>Additional Optimizations<a class="headerlink" href="#additional-optimizations" title="Permalink to this headline">¶</a></h3>
-<p>Occasionally the number of optimization loops isn&#8217;t enough to completely
+<p>Occasionally the number of optimization loops isn’t enough to completely
 optimize a state. You can try to fix this by running a few more loops of
 <a class="reference internal" href="reference/opt.html#peri.opt.optimize.burn" title="peri.opt.optimize.burn"><code class="xref py py-func docutils literal"><span class="pre">burn()</span></code></a> with <code class="docutils literal"><span class="pre">mode='burn'</span></code> or <code class="docutils literal"><span class="pre">mode='polish'</span></code>,
 depending on whether the illumination is sufficiently far from the minimum as
@@ -286,7 +286,7 @@ parameters at once. In addition, by default <code class="docutils literal"><span
 separately, since it is more difficult to fit.</td></tr>
 </tbody>
 </table>
-<p>Since I like to be sure that I&#8217;m at a global minimum, I always run a few extra
+<p>Since I like to be sure that I’m at a global minimum, I always run a few extra
 loops of <code class="docutils literal"><span class="pre">opt.burn</span></code> with <code class="docutils literal"><span class="pre">mode='polish'</span></code> or of <code class="docutils literal"><span class="pre">opt.finish</span></code> no matter
 what.</p>
 <p>What if the optimizer gets stuck? If the optimizer is stuck, and you know you
@@ -321,7 +321,7 @@ second panel through the reconstructed model, the fit residuals, and individual
 model components. To see if the fit is good, look at the fit residuals. Are
 there missing particles, both in the middle of the frame and near the edges?
 Can you see shadows of particles? If so, then the state is not optimized. In
-contrast, if the residuals are nearly perfect white Gaussian noise, then you&#8217;re
+contrast, if the residuals are nearly perfect white Gaussian noise, then you’re
 done.</p>
 <p>The <a class="reference internal" href="reference/interaction.html#peri.viz.interaction.OrthoManipulator" title="peri.viz.interaction.OrthoManipulator"><code class="xref py py-class docutils literal"><span class="pre">OrthoManipulator</span></code></a> has a lot of additional
 functionality, including a view of the Fourier transform of the residuals and
@@ -339,24 +339,24 @@ see if your protocol is good.</p>
 </div>
 <div class="section" id="seeing-if-the-fitted-values-are-reasonable">
 <h3>Seeing if the fitted values are reasonable<a class="headerlink" href="#seeing-if-the-fitted-values-are-reasonable" title="Permalink to this headline">¶</a></h3>
-<p>Frequently it&#8217;s possible to tell if the fit is good simply by looking at the
+<p>Frequently it’s possible to tell if the fit is good simply by looking at the
 parameters themselves. Do the particle radii vary systematically with <code class="docutils literal"><span class="pre">x</span></code>,
-<code class="docutils literal"><span class="pre">y</span></code>, or <code class="docutils literal"><span class="pre">z</span></code>? If so, then the image is probbaly not at a good fit. We&#8217;ve
+<code class="docutils literal"><span class="pre">y</span></code>, or <code class="docutils literal"><span class="pre">z</span></code>? If so, then the image is probbaly not at a good fit. We’ve
 found that variations in <code class="docutils literal"><span class="pre">x</span></code> or <code class="docutils literal"><span class="pre">y</span></code> tend to be due to imperfections in the
 ILM, which varies strongly in these directions for us, and variations in <code class="docutils literal"><span class="pre">z</span></code>
 tend to be due to imperfections in the PSF, due to the increased aberration
-with depth. Note that this might not just be a case of a poor fit &#8211; the
+with depth. Note that this might not just be a case of a poor fit – the
 complexity of the model could be insufficient. You might need to use a more
 realistic PSF or use a higher order for the ILM.</p>
 <p>You can do similar checks by looking at either the fitted parameters of the PSF
 and other components, or the actual fields themselves using the
 <a class="reference internal" href="reference/interaction.html#peri.viz.interaction.OrthoManipulator" title="peri.viz.interaction.OrthoManipulator"><code class="xref py py-class docutils literal"><span class="pre">OrthoManipulator</span></code></a> or <a class="reference internal" href="reference/interaction.html#peri.viz.interaction.OrthoViewer" title="peri.viz.interaction.OrthoViewer"><code class="xref py py-class docutils literal"><span class="pre">OrthoViewer</span></code></a>.</p>
-<p>As an aside, we don&#8217;t find it terribly useful to check if the residuals are at
+<p>As an aside, we don’t find it terribly useful to check if the residuals are at
 the expected level of the noise. If you somehow knew exactly what the noise
 level was, then you could check that <code class="docutils literal"><span class="pre">st.residuals.std()</span></code> is what it should
 be. However, the difference between a good fit and a poor fit can be one-tenth
 of a percent (i.e. 1e-3) of the residuals. It is highly unlikely that you know
-the level of the noise to that precision &#8211; the noise level can vary by more
+the level of the noise to that precision – the noise level can vary by more
 than that from frame-to-frame in a movie due to photobleaching or laser power
 fluctuations.</p>
 </div>
@@ -400,15 +400,16 @@ returning. Setting <code class="docutils literal"><span class="pre">do_polish</s
 <code class="docutils literal"><span class="pre">opt.burn(st,</span> <span class="pre">mode='polish')</span></code> on both the globals and particles before
 returning the state (takes more time), but this can be omitted for speed. The
 state is automatically saved at several points. Similar functionality is
-provided by some other of the <code class="docutils literal"><span class="pre">runner</span></code> functions &#8211; for instance,
-<code class="docutils literal"><span class="pre">runner.translate_featuring</span></code> if the particle positions haven&#8217;t moved much
+provided by some other of the <code class="docutils literal"><span class="pre">runner</span></code> functions – for instance,
+<code class="docutils literal"><span class="pre">runner.translate_featuring</span></code> if the particle positions haven’t moved much
 between the loaded state and the new image.</p>
 </div>
 <div class="section" id="fitting-a-small-image">
 <h3>Fitting a small image<a class="headerlink" href="#fitting-a-small-image" title="Permalink to this headline">¶</a></h3>
 <p>The larger the image is, the longer it takes to fit. Fitting a small image
 considerably speeds up the fit. You can change the region of the fit by setting
-the <a class="reference internal" href="reference/util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">peri.util.Tile</span></code></a> of the image, as described in section BLAH.</p>
+the <a class="reference internal" href="reference/util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">peri.util.Tile</span></code></a> of the image, as described in the
+<a class="reference internal" href="walkthrough.html"><span class="doc">Walkthrough</span></a>.</p>
 <p>Fitting a small image is useful to get a good estimate of global parameters,
 especially the point-spread function. Since the exact point-spread functions
 included in peri change only with <code class="docutils literal"><span class="pre">z</span></code>, fitting a small portion of the image
@@ -420,8 +421,8 @@ quadratic, and there are slow directions in the fit). Highly-optimizing a small
 state to get an accurate PSF will do more than save a <em>lot</em> of time later. For
 larger states the optimizer can even get stuck and terminate, thinking it is at
 a good fit when it reality the PSF is far from the minimum, which can severely
-bias your fits. Make a small image and optimize it overnight &#8211; say, 50-100
-loops of <code class="docutils literal"><span class="pre">opt.burn</span></code> with <code class="docutils literal"><span class="pre">mode='polish'</span></code> to ensure that you&#8217;ve found the
+bias your fits. Make a small image and optimize it overnight – say, 50-100
+loops of <code class="docutils literal"><span class="pre">opt.burn</span></code> with <code class="docutils literal"><span class="pre">mode='polish'</span></code> to ensure that you’ve found the
 global minimum. You might even want to alternate a loop of burn with a direct
 minimization of the PSF, like so:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -439,26 +440,26 @@ them. For instance, to check the parameter <code class="docutils literal"><span 
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">state_vals</span><span class="p">[:,</span><span class="n">index</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>You should see it smoothly approach a constant value. If it doesn&#8217;t look
-converged, then keep optimizing. If you change your imaging conditions &#8211; the
-index of refraction of the solvent or the microscope and lens &#8211; then you will
+<p>You should see it smoothly approach a constant value. If it doesn’t look
+converged, then keep optimizing. If you change your imaging conditions – the
+index of refraction of the solvent or the microscope and lens – then you will
 need to do this again.</p>
 </div>
 <div class="section" id="sacrificing-precision-for-speed">
 <h3>Sacrificing Precision for Speed<a class="headerlink" href="#sacrificing-precision-for-speed" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal"><span class="pre">peri</span></code> is designed to extract information at the maximum possible accuracy.
 It does this by finding the best fit of an accurate model to the data. If you
-don&#8217;t need the maximal possible accuracy, then running <code class="docutils literal"><span class="pre">peri</span></code> to completion
+don’t need the maximal possible accuracy, then running <code class="docutils literal"><span class="pre">peri</span></code> to completion
 is overkill. For instance, if you just want to distinguish which size a
 particle is in a bidisperse suspension, finding the particle radii accurately
 to 1 nm is not necessary.</p>
 <p>If this is the case, you can save some time by running less optimization loops
 or not worrying about finding every last particle. You might also be able to
-save time by using a less accurate model &#8211; for instance, you could use an ILM
+save time by using a less accurate model – for instance, you could use an ILM
 of lower order to create less parameters to fit, or a less accurate PSF to
 decrease the execution time for one model generation. You can find some of
 these inexact PSFs in <code class="xref py py-mod docutils literal"><span class="pre">peri.comp.psfs</span></code>, along with a description of how well
-they work in the paper&#8217;s Supplemental Information.</p>
+they work in the paper’s Supplemental Information.</p>
 </div>
 <div class="section" id="inventing-a-new-algorithm-for-fitting-in-high-dimensional-spaces">
 <h3>Inventing a new algorithm for fitting in high-dimensional spaces<a class="headerlink" href="#inventing-a-new-algorithm-for-fitting-in-high-dimensional-spaces" title="Permalink to this headline">¶</a></h3>
@@ -549,7 +550,7 @@ they work in the paper&#8217;s Supplemental Information.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

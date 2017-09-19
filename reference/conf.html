@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -24,14 +24,14 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/mathconf.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="peri.fft" href="fft.html" />
     <link rel="prev" title="peri.comp" href="comp.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -102,41 +102,26 @@ of fftw benchmarking itself, allowing it to run as fast as possible.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">verbosity</span></code></td>
 <td>vvv</td>
-<td>Level of verbosity for logs, the more v&#8217;s the more verbose</td>
+<td>Level of verbosity for logs, the more v’s the more verbose</td>
 </tr>
 </tbody>
 </table>
 <dl class="function">
+<dt id="peri.conf.create_default_conf">
+<code class="descclassname">peri.conf.</code><code class="descname">create_default_conf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.conf.create_default_conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dump the default_conf to the configuration file</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="peri.conf.get_conf_filename">
-<code class="descclassname">peri.conf.</code><code class="descname">get_conf_filename</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/conf.html#get_conf_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.conf.get_conf_filename" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">peri.conf.</code><code class="descname">get_conf_filename</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.conf.get_conf_filename" title="Permalink to this definition">¶</a></dt>
 <dd><p>The configuration file either lives in ~/.peri.json or is specified on the
 command line via the environment variables PERI_CONF_FILE</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="peri.conf.transform">
-<code class="descclassname">peri.conf.</code><code class="descname">transform</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/conf.html#transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.conf.transform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Translate environment variables to ones corresponding to keys in the
-configuration.  In particular, env variables may be made with
-&#8220;<a href="#id1"><span class="problematic" id="id2">PERI_</span></a>&#8220;+key_name: fftw-threads = PERI_FFTW_THREADS. Each env var
-is later checked to see if it has to do with PERI</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="peri.conf.read_environment">
-<code class="descclassname">peri.conf.</code><code class="descname">read_environment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/conf.html#read_environment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.conf.read_environment" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read all environment variables to see if they contain PERI</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="peri.conf.create_default_conf">
-<code class="descclassname">peri.conf.</code><code class="descname">create_default_conf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/conf.html#create_default_conf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.conf.create_default_conf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dump the default_conf to the configuration file</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="peri.conf.load_conf">
-<code class="descclassname">peri.conf.</code><code class="descname">load_conf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/conf.html#load_conf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.conf.load_conf" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">peri.conf.</code><code class="descname">load_conf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.conf.load_conf" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Load the configuration with the priority:</dt>
 <dd><ol class="first last arabic simple">
@@ -146,6 +131,21 @@ is later checked to see if it has to do with PERI</p>
 </ol>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.conf.read_environment">
+<code class="descclassname">peri.conf.</code><code class="descname">read_environment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.conf.read_environment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read all environment variables to see if they contain PERI</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="peri.conf.transform">
+<code class="descclassname">peri.conf.</code><code class="descname">transform</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.conf.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate environment variables to ones corresponding to keys in the
+configuration.  In particular, env variables may be made with
+“<a href="#id1"><span class="problematic" id="id2">PERI_</span></a>”+key_name: fftw-threads = PERI_FFTW_THREADS. Each env var
+is later checked to see if it has to do with PERI</p>
 </dd></dl>
 
 </div>
@@ -203,7 +203,7 @@ is later checked to see if it has to do with PERI</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -24,14 +24,14 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/mathconf.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="peri.conf" href="conf.html" />
     <link rel="prev" title="Optimization and sampling" href="../optimization.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -101,7 +101,7 @@
 <span id="id1"></span><h2>peri.comp.comp<a class="headerlink" href="#peri-comp-comp" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="peri.comp.comp.ParameterGroup">
-<em class="property">class </em><code class="descclassname">peri.comp.comp.</code><code class="descname">ParameterGroup</code><span class="sig-paren">(</span><em>params=None</em>, <em>values=None</em>, <em>ordered=True</em>, <em>category='param'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ParameterGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ParameterGroup" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.comp.</code><code class="descname">ParameterGroup</code><span class="sig-paren">(</span><em>params=None</em>, <em>values=None</em>, <em>ordered=True</em>, <em>category=’param’</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.ParameterGroup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Any object which computes something based on parameters and values can
 be considered a <code class="docutils literal"><span class="pre">ParameterGroup</span></code>. This class provides a common
 interface since <code class="docutils literal"><span class="pre">ParameterGroup</span></code> appears throughout <code class="docutils literal"><span class="pre">PERI</span></code>
@@ -110,7 +110,7 @@ form, a <code class="docutils literal"><span class="pre">ParameterGroup</span></
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="n">parameter_name</span><span class="p">:</span> <span class="n">parameter_value</span><span class="p">,</span> <span class="o">...</span> <span class="p">}</span>
 </pre></div>
 </div>
-<p>The use of a dictionary is strictly optional &#8211; as long as the following
+<p>The use of a dictionary is strictly optional – as long as the following
 methods are provided, the parameters and values may be stored in any
 format that is convenient:</p>
 <blockquote>
@@ -127,11 +127,11 @@ format that is convenient:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>params</strong> (<em>string</em><em>, </em><em>list of strings</em>) &#8211; The names of the parameters, in the proper order</li>
-<li><strong>values</strong> (<em>number</em><em>, </em><em>list of numbers</em>) &#8211; The values corresponding to the parameter names</li>
-<li><strong>ordered</strong> (<em>boolean</em><em> (</em><em>default: True</em><em>)</em><em></em>) &#8211; If True, uses an OrderedDict so that parameter order is
+<li><strong>params</strong> (<em>string</em><em>, </em><em>list of strings</em>) – The names of the parameters, in the proper order</li>
+<li><strong>values</strong> (<em>number</em><em>, </em><em>list of numbers</em>) – The values corresponding to the parameter names</li>
+<li><strong>ordered</strong> (<em>boolean</em><em> (</em><em>default: True</em><em>)</em>) – If True, uses an OrderedDict so that parameter order is
 deterministic independent of number of parameters</li>
-<li><strong>category</strong> (<em>string</em><em> (</em><em>default: 'param'</em><em>)</em><em></em>) &#8211; <p>Name of the category associated with this ParameterGroup.</p>
+<li><strong>category</strong> (<em>string</em><em> (</em><em>default: 'param'</em><em>)</em>) – <p>Name of the category associated with this ParameterGroup.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">FIXME : should only be a property of Component</p>
@@ -143,64 +143,39 @@ deterministic independent of number of parameters</li>
 </tbody>
 </table>
 <dl class="method">
-<dt id="peri.comp.comp.ParameterGroup.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ParameterGroup.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ParameterGroup.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the calculation of the class based on a pair or pairs
-of parameters and associated values.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>params</strong> (<em>string</em><em>, </em><em>list of strings</em>) &#8211; name of parameters to update</li>
-<li><strong>values</strong> (<em>number</em><em>, </em><em>list of numbers</em>) &#8211; cooresponding values to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="peri.comp.comp.ParameterGroup.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ParameterGroup.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ParameterGroup.get_values" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_values</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.ParameterGroup.get_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the value of a list or single parameter.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>string</em><em>, </em><em>list of string</em>) &#8211; name of parameters which to retrieve</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>string</em><em>, </em><em>list of string</em>) – name of parameters which to retrieve</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="peri.comp.comp.ParameterGroup.set_values">
-<code class="descname">set_values</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ParameterGroup.set_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ParameterGroup.set_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Directly set the values corresponding to certain parameters.
-This does not necessarily trigger and update of the calculation,</p>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#peri.comp.comp.ParameterGroup.update" title="peri.comp.comp.ParameterGroup.update"><code class="xref py py-func docutils literal"><span class="pre">update()</span></code></a> : full update func</p>
-</div>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="peri.comp.comp.ParameterGroup.params">
-<code class="descname">params</code><a class="headerlink" href="#peri.comp.comp.ParameterGroup.params" title="Permalink to this definition">¶</a></dt>
-<dd><p>The list of parameters</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="peri.comp.comp.ParameterGroup.values">
-<code class="descname">values</code><a class="headerlink" href="#peri.comp.comp.ParameterGroup.values" title="Permalink to this definition">¶</a></dt>
-<dd><p>The list of values</p>
+<dt id="peri.comp.comp.ParameterGroup.initargs">
+<code class="descname">initargs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.ParameterGroup.initargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pickling helper method which returns a dictionary of function
+parameters which get passed to pickle via <a class="reference external" href="https://docs.python.org/2/library/pickle.html#object.__getinitargs__">__getinitargs__</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>arg_dict</strong> – <code class="docutils literal"><span class="pre">**kwargs</span></code> to be passed to the __init__ func after unpickling</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dictionary</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="peri.comp.comp.ParameterGroup.nopickle">
-<code class="descname">nopickle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ParameterGroup.nopickle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ParameterGroup.nopickle" title="Permalink to this definition">¶</a></dt>
+<code class="descname">nopickle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.ParameterGroup.nopickle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Elements of the class that should not be included in pickled objects.
 If inheriting a new class, should be:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">super</span><span class="p">(</span><span class="n">Class</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">nopickle</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;other1&#39;</span><span class="p">,</span> <span class="s1">&#39;other2&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
@@ -210,7 +185,7 @@ If inheriting a new class, should be:</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>elements</strong> &#8211; The name of class member variables which should not be pickled</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>elements</strong> – The name of class member variables which should not be pickled</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list of strings</td>
 </tr>
@@ -218,28 +193,53 @@ If inheriting a new class, should be:</p>
 </table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="peri.comp.comp.ParameterGroup.params">
+<code class="descname">params</code><a class="headerlink" href="#peri.comp.comp.ParameterGroup.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>The list of parameters</p>
+</dd></dl>
+
 <dl class="method">
-<dt id="peri.comp.comp.ParameterGroup.initargs">
-<code class="descname">initargs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ParameterGroup.initargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ParameterGroup.initargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pickling helper method which returns a dictionary of function
-parameters which get passed to pickle via <a class="reference external" href="https://docs.python.org/2/library/pickle.html#object.__getinitargs__">__getinitargs__</a></p>
+<dt id="peri.comp.comp.ParameterGroup.set_values">
+<code class="descname">set_values</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.ParameterGroup.set_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directly set the values corresponding to certain parameters.
+This does not necessarily trigger and update of the calculation,</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#peri.comp.comp.ParameterGroup.update" title="peri.comp.comp.ParameterGroup.update"><code class="xref py py-func docutils literal"><span class="pre">update()</span></code></a> : full update func</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.comp.comp.ParameterGroup.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.ParameterGroup.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the calculation of the class based on a pair or pairs
+of parameters and associated values.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>arg_dict</strong> &#8211; <code class="docutils literal"><span class="pre">**kwargs</span></code> to be passed to the __init__ func after unpickling</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dictionary</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>params</strong> (<em>string</em><em>, </em><em>list of strings</em>) – name of parameters to update</li>
+<li><strong>values</strong> (<em>number</em><em>, </em><em>list of numbers</em>) – cooresponding values to update</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="peri.comp.comp.ParameterGroup.values">
+<code class="descname">values</code><a class="headerlink" href="#peri.comp.comp.ParameterGroup.values" title="Permalink to this definition">¶</a></dt>
+<dd><p>The list of values</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="peri.comp.comp.Component">
-<em class="property">class </em><code class="descclassname">peri.comp.comp.</code><code class="descname">Component</code><span class="sig-paren">(</span><em>params</em>, <em>values</em>, <em>ordered=True</em>, <em>category='comp'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#Component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.Component" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.comp.</code><code class="descname">Component</code><span class="sig-paren">(</span><em>params</em>, <em>values</em>, <em>ordered=True</em>, <em>category=’comp’</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.Component" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <a class="reference internal" href="#peri.comp.comp.ParameterGroup" title="peri.comp.comp.ParameterGroup"><code class="xref py py-class docutils literal"><span class="pre">ParameterGroup</span></code></a> which specifically computes
 over sections of an image for an <a class="reference internal" href="states.html#peri.states.ImageState" title="peri.states.ImageState"><code class="xref py py-class docutils literal"><span class="pre">ImageState</span></code></a>. To
 this end, we require the implementation of several new member functions:</p>
@@ -260,25 +260,62 @@ we must incorporate tiling in this object.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>params</strong> (<em>string</em><em>, </em><em>list of strings</em>) &#8211; The names of the parameters, in the proper order</li>
-<li><strong>values</strong> (<em>number</em><em>, </em><em>list of numbers</em>) &#8211; The values corresponding to the parameter names</li>
-<li><strong>ordered</strong> (<em>boolean</em><em> (</em><em>default: True</em><em>)</em><em></em>) &#8211; If True, uses an OrderedDict so that parameter order is
+<li><strong>params</strong> (<em>string</em><em>, </em><em>list of strings</em>) – The names of the parameters, in the proper order</li>
+<li><strong>values</strong> (<em>number</em><em>, </em><em>list of numbers</em>) – The values corresponding to the parameter names</li>
+<li><strong>ordered</strong> (<em>boolean</em><em> (</em><em>default: True</em><em>)</em>) – If True, uses an OrderedDict so that parameter order is
 deterministic independent of number of parameters</li>
-<li><strong>category</strong> (<em>string</em><em> (</em><em>default: 'param'</em><em>)</em><em></em>) &#8211; Name of the category associated with this ParameterGroup.</li>
+<li><strong>category</strong> (<em>string</em><em> (</em><em>default: 'param'</em><em>)</em>) – Name of the category associated with this ParameterGroup.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
-<dt id="peri.comp.comp.Component.initialize">
-<code class="descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#Component.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.Component.initialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Begin anew and initialize the component</p>
+<dt id="peri.comp.comp.Component.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.Component.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform its routine, whatever that may be</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.comp.comp.Component.exports">
+<code class="descname">exports</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.Component.exports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Which methods a class wants to expose to parent classes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.comp.comp.Component.get">
+<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.Component.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the <cite>natural</cite> part of the model. In the case of most elements it
+is the calculated field, for others it is the object itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.comp.comp.Component.get_padding_size">
+<code class="descname">get_padding_size</code><span class="sig-paren">(</span><em>tile</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.Component.get_padding_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the amount of padding required for this object when calculating
+about a tile <cite>tile</cite>. Padding size is the total size, so half that
+on each side. For example, if this Component is a Gaussian point spread
+function, then the padding returned might be:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">peri</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">))</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tile</strong> (<a class="reference internal" href="util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a>) – A tile defining the region of interest</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>pad</strong> – A tile corresponding to the required padding size</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="peri.comp.comp.Component.get_update_tile">
-<code class="descname">get_update_tile</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#Component.get_update_tile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.Component.get_update_tile" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_update_tile</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.Component.get_update_tile" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method returns a <a class="reference internal" href="util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a> object defining the
 region of a field that has to be modified by the update of (params,
 values). For example, if this Component is the point-spread-function,
@@ -292,12 +329,12 @@ the entire image:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>params</strong> (<em>single param</em><em>, </em><em>list of params</em>) &#8211; A single parameter or list of parameters to be updated</li>
-<li><strong>values</strong> (<em>single value</em><em>, </em><em>list of values</em>) &#8211; The values corresponding to the params</li>
+<li><strong>params</strong> (<em>single param</em><em>, </em><em>list of params</em>) – A single parameter or list of parameters to be updated</li>
+<li><strong>values</strong> (<em>single value</em><em>, </em><em>list of values</em>) – The values corresponding to the params</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>tile</strong> &#8211; A tile corresponding to the image region</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>tile</strong> – A tile corresponding to the image region</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a></p>
@@ -308,83 +345,46 @@ the entire image:</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="peri.comp.comp.Component.get_padding_size">
-<code class="descname">get_padding_size</code><span class="sig-paren">(</span><em>tile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#Component.get_padding_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.Component.get_padding_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the amount of padding required for this object when calculating
-about a tile <cite>tile</cite>. Padding size is the total size, so half that
-on each side. For example, if this Component is a Gaussian point spread
-function, then the padding returned might be:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">peri</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">))</span>
-</pre></div>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tile</strong> (<a class="reference internal" href="util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a>) &#8211; A tile defining the region of interest</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>pad</strong> &#8211; A tile corresponding to the required padding size</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dt id="peri.comp.comp.Component.initialize">
+<code class="descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.Component.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Begin anew and initialize the component</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="peri.comp.comp.Component.set_tile">
-<code class="descname">set_tile</code><span class="sig-paren">(</span><em>tile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#Component.set_tile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.Component.set_tile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the currently active tile region for the calculation</p>
+<dt id="peri.comp.comp.Component.nopickle">
+<code class="descname">nopickle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.Component.nopickle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class attributes which should not be included in a pickle object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.comp.comp.Component.register">
+<code class="descname">register</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.Component.register" title="Permalink to this definition">¶</a></dt>
+<dd><p>Registery a parent object so that communication maybe happen upwards</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="peri.comp.comp.Component.set_shape">
-<code class="descname">set_shape</code><span class="sig-paren">(</span><em>shape</em>, <em>inner</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#Component.set_shape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.Component.set_shape" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_shape</code><span class="sig-paren">(</span><em>shape</em>, <em>inner</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.Component.set_shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the overall shape of the calculation area. The total shape of that
 the calculation can possibly occupy, in pixels. The second, inner, is
 the region of interest within the image.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="peri.comp.comp.Component.execute">
-<code class="descname">execute</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#Component.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.Component.execute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform its routine, whatever that may be</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.Component.get">
-<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#Component.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.Component.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the <cite>natural</cite> part of the model. In the case of most elements it
-is the calculated field, for others it is the object itself.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.Component.exports">
-<code class="descname">exports</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#Component.exports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.Component.exports" title="Permalink to this definition">¶</a></dt>
-<dd><p>Which methods a class wants to expose to parent classes</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.Component.nopickle">
-<code class="descname">nopickle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#Component.nopickle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.Component.nopickle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class attributes which should not be included in a pickle object</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.Component.register">
-<code class="descname">register</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#Component.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.Component.register" title="Permalink to this definition">¶</a></dt>
-<dd><p>Registery a parent object so that communication maybe happen upwards</p>
+<dt id="peri.comp.comp.Component.set_tile">
+<code class="descname">set_tile</code><span class="sig-paren">(</span><em>tile</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.Component.set_tile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the currently active tile region for the calculation</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="peri.comp.comp.Component.trigger_parameter_change">
-<code class="descname">trigger_parameter_change</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#Component.trigger_parameter_change"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.Component.trigger_parameter_change" title="Permalink to this definition">¶</a></dt>
+<code class="descname">trigger_parameter_change</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.Component.trigger_parameter_change" title="Permalink to this definition">¶</a></dt>
 <dd><p>Notify parents of a parameter change</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="peri.comp.comp.Component.trigger_update">
-<code class="descname">trigger_update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#Component.trigger_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.Component.trigger_update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">trigger_update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.Component.trigger_update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Notify parent of a parameter change</p>
 </dd></dl>
 
@@ -392,7 +392,7 @@ is the calculated field, for others it is the object itself.</p>
 
 <dl class="class">
 <dt id="peri.comp.comp.ComponentCollection">
-<em class="property">class </em><code class="descclassname">peri.comp.comp.</code><code class="descname">ComponentCollection</code><span class="sig-paren">(</span><em>comps</em>, <em>field_reduce_func=None</em>, <em>category='comp'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.comp.</code><code class="descname">ComponentCollection</code><span class="sig-paren">(</span><em>comps</em>, <em>field_reduce_func=None</em>, <em>category=’comp’</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.ComponentCollection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Group a number of components into a single coherent object which a
 single interface for each function. Obvious reductions are performed in
 places such as get_update_tile which takes the bounding tile of all
@@ -404,8 +404,8 @@ class has the same interface as Component itself.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>comps</strong> (list of <a class="reference internal" href="#peri.comp.comp.Component" title="peri.comp.comp.Component"><code class="xref py py-class docutils literal"><span class="pre">Component</span></code></a>) &#8211; The components to group together</li>
-<li><strong>field_reduce_func</strong> (<em>function</em><em>(</em><em>list of ndarrays</em><em>)</em><em></em>) &#8211; <p>Reduction function for get object of collection, what happens when
+<li><strong>comps</strong> (list of <a class="reference internal" href="#peri.comp.comp.Component" title="peri.comp.comp.Component"><code class="xref py py-class docutils literal"><span class="pre">Component</span></code></a>) – The components to group together</li>
+<li><strong>field_reduce_func</strong> (<em>function</em><em>(</em><em>list of ndarrays</em><em>)</em>) – <p>Reduction function for get object of collection, what happens when
 all comps are reduced to a single field (etc). For example, nested
 point spread functions may want convolution to be the reduce func:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">reduce_conv</span><span class="p">(</span><span class="n">psfs</span><span class="p">):</span>
@@ -419,27 +419,49 @@ point spread functions may want convolution to be the reduce func:</p>
 </pre></div>
 </div>
 </li>
-<li><strong>category</strong> (<em>string</em>) &#8211; Name of the category associated with this <code class="docutils literal"><span class="pre">ComponentCollection</span></code></li>
+<li><strong>category</strong> (<em>string</em>) – Name of the category associated with this <code class="docutils literal"><span class="pre">ComponentCollection</span></code></li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
+<dt id="peri.comp.comp.ComponentCollection.get">
+<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.ComponentCollection.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine the fields from all components</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="peri.comp.comp.ComponentCollection.initargs">
-<code class="descname">initargs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.initargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.initargs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">initargs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.ComponentCollection.initargs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return arguments that are passed to init to setup the class again</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="peri.comp.comp.ComponentCollection.initialize">
-<code class="descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.initialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Begin anew and initialize the component</p>
+<dt id="peri.comp.comp.ComponentCollection.set_shape">
+<code class="descname">set_shape</code><span class="sig-paren">(</span><em>shape</em>, <em>inner</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.ComponentCollection.set_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the shape for all components</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.comp.comp.ComponentCollection.set_tile">
+<code class="descname">set_tile</code><span class="sig-paren">(</span><em>tile</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.ComponentCollection.set_tile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the current working tile for components</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.comp.comp.ComponentCollection.setup_passthroughs">
+<code class="descname">setup_passthroughs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.ComponentCollection.setup_passthroughs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inherit some functions from the components that we own. In particular,
+let’s grab all functions that begin with <cite>param_</cite> so the super class
+knows how to get parameter groups. Also, take anything that is listed
+under Component.exports and rename with the category type, i.e.,
+SphereCollection.add_particle -&gt; Component.obj_add_particle</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="peri.comp.comp.ComponentCollection.split_params">
-<code class="descname">split_params</code><span class="sig-paren">(</span><em>params</em>, <em>values=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.split_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.split_params" title="Permalink to this definition">¶</a></dt>
+<code class="descname">split_params</code><span class="sig-paren">(</span><em>params</em>, <em>values=None</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.ComponentCollection.split_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Split params, values into groups that correspond to the ordering in
 self.comps. For example, given a sphere collection and slab:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span>
@@ -451,154 +473,9 @@ self.comps. For example, given a sphere collection and slab:</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="peri.comp.comp.ComponentCollection.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the calculation of the class based on a pair or pairs
-of parameters and associated values.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>params</strong> (<em>string</em><em>, </em><em>list of strings</em>) &#8211; name of parameters to update</li>
-<li><strong>values</strong> (<em>number</em><em>, </em><em>list of numbers</em>) &#8211; cooresponding values to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.ComponentCollection.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the value of a list or single parameter.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>string</em><em>, </em><em>list of string</em>) &#8211; name of parameters which to retrieve</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.ComponentCollection.set_values">
-<code class="descname">set_values</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.set_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.set_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Directly set the values corresponding to certain parameters.
-This does not necessarily trigger and update of the calculation,</p>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#peri.comp.comp.ParameterGroup.update" title="peri.comp.comp.ParameterGroup.update"><code class="xref py py-func docutils literal"><span class="pre">update()</span></code></a> : full update func</p>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.ComponentCollection.get_update_tile">
-<code class="descname">get_update_tile</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.get_update_tile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.get_update_tile" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method returns a <a class="reference internal" href="util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a> object defining the
-region of a field that has to be modified by the update of (params,
-values). For example, if this Component is the point-spread-function,
-it might return a tile of entire image since every parameter affects
-the entire image:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
-</pre></div>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>params</strong> (<em>single param</em><em>, </em><em>list of params</em>) &#8211; A single parameter or list of parameters to be updated</li>
-<li><strong>values</strong> (<em>single value</em><em>, </em><em>list of values</em>) &#8211; The values corresponding to the params</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>tile</strong> &#8211; A tile corresponding to the image region</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.ComponentCollection.get_padding_size">
-<code class="descname">get_padding_size</code><span class="sig-paren">(</span><em>tile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.get_padding_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.get_padding_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the amount of padding required for this object when calculating
-about a tile <cite>tile</cite>. Padding size is the total size, so half that
-on each side. For example, if this Component is a Gaussian point spread
-function, then the padding returned might be:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">peri</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">))</span>
-</pre></div>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tile</strong> (<a class="reference internal" href="util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a>) &#8211; A tile defining the region of interest</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>pad</strong> &#8211; A tile corresponding to the required padding size</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="util.html#peri.util.Tile" title="peri.util.Tile"><code class="xref py py-class docutils literal"><span class="pre">Tile</span></code></a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.ComponentCollection.get">
-<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Combine the fields from all components</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.ComponentCollection.set_tile">
-<code class="descname">set_tile</code><span class="sig-paren">(</span><em>tile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.set_tile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.set_tile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the current working tile for components</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.ComponentCollection.set_shape">
-<code class="descname">set_shape</code><span class="sig-paren">(</span><em>shape</em>, <em>inner</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.set_shape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.set_shape" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the shape for all components</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="peri.comp.comp.ComponentCollection.sync_params">
-<code class="descname">sync_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.sync_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.sync_params" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sync_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.comp.ComponentCollection.sync_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ensure that shared parameters are the same value everywhere</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.ComponentCollection.trigger_parameter_change">
-<code class="descname">trigger_parameter_change</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.trigger_parameter_change"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.trigger_parameter_change" title="Permalink to this definition">¶</a></dt>
-<dd><p>Notify parents of a parameter change</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.ComponentCollection.setup_passthroughs">
-<code class="descname">setup_passthroughs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.setup_passthroughs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.setup_passthroughs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inherit some functions from the components that we own. In particular,
-let&#8217;s grab all functions that begin with <cite>param_</cite> so the super class
-knows how to get parameter groups. Also, take anything that is listed
-under Component.exports and rename with the category type, i.e.,
-SphereCollection.add_particle -&gt; Component.obj_add_particle</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.ComponentCollection.exports">
-<code class="descname">exports</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.exports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.exports" title="Permalink to this definition">¶</a></dt>
-<dd><p>Which methods a class wants to expose to parent classes</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.comp.ComponentCollection.nopickle">
-<code class="descname">nopickle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/comp.html#ComponentCollection.nopickle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.comp.ComponentCollection.nopickle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class attributes which should not be included in a pickle object</p>
 </dd></dl>
 
 </dd></dl>
@@ -608,7 +485,7 @@ SphereCollection.add_particle -&gt; Component.obj_add_particle</p>
 <span id="id2"></span><h2>peri.comp.objs<a class="headerlink" href="#peri-comp-objs" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="peri.comp.objs.PlatonicSpheresCollection">
-<em class="property">class </em><code class="descclassname">peri.comp.objs.</code><code class="descname">PlatonicSpheresCollection</code><span class="sig-paren">(</span><em>pos</em>, <em>rad</em>, <em>shape=None</em>, <em>zscale=1.0</em>, <em>support_pad=4</em>, <em>method='exact-gaussian-fast'</em>, <em>alpha=None</em>, <em>user_method=None</em>, <em>exact_volume=True</em>, <em>volume_error=1e-05</em>, <em>max_radius_change=0.01</em>, <em>param_prefix='sph'</em>, <em>grouping='particle'</em>, <em>category='obj'</em>, <em>float_precision=&lt;type 'numpy.float64'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/objs.html#PlatonicSpheresCollection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.objs.</code><code class="descname">PlatonicSpheresCollection</code><span class="sig-paren">(</span><em>pos</em>, <em>rad</em>, <em>shape=None</em>, <em>zscale=1.0</em>, <em>support_pad=4</em>, <em>method=’exact-gaussian-fast’</em>, <em>alpha=None</em>, <em>user_method=None</em>, <em>exact_volume=True</em>, <em>volume_error=1e-05</em>, <em>max_radius_change=0.01</em>, <em>param_prefix=’sph’</em>, <em>grouping=’particle’</em>, <em>category=’obj’</em>, <em>float_precision=&lt;class ‘numpy.float64’&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection" title="Permalink to this definition">¶</a></dt>
 <dd><p>A collection of spheres in real-space with positions and radii, drawn
 not necessarily on a uniform grid (i.e. scale factor associated with
 z-direction).  There are many ways to draw the sphere, currently
@@ -625,28 +502,28 @@ supported  methods can be one of:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pos</strong> (<em>ndarray</em><em> [</em><em>N</em><em>,</em><em>3</em><em>]</em><em></em>) &#8211; Initial positions of the spheres</li>
-<li><strong>rad</strong> (<em>ndarray</em><em> [</em><em>N</em><em>] or </em><em>float</em>) &#8211; Initial radii of the spheres</li>
-<li><strong>shape</strong> (<em>tuple</em>) &#8211; Shape of the field over which to draw the platonic spheres</li>
-<li><strong>zscale</strong> (<em>float</em>) &#8211; scaling of z-pixels in the platonic image</li>
-<li><strong>support_pad</strong> (<em>int</em>) &#8211; how much to pad the boundary of particles when calculating
+<li><strong>pos</strong> (<em>ndarray</em><em> [</em><em>N</em><em>,</em><em>3</em><em>]</em>) – Initial positions of the spheres</li>
+<li><strong>rad</strong> (<em>ndarray</em><em> [</em><em>N</em><em>] or </em><em>float</em>) – Initial radii of the spheres</li>
+<li><strong>shape</strong> (<em>tuple</em>) – Shape of the field over which to draw the platonic spheres</li>
+<li><strong>zscale</strong> (<em>float</em>) – scaling of z-pixels in the platonic image</li>
+<li><strong>support_pad</strong> (<em>int</em>) – how much to pad the boundary of particles when calculating
 support so that there is not more contribution</li>
-<li><strong>method</strong> (<em>string</em>) &#8211; The sphere drawing function to use, see above.</li>
-<li><strong>alpha</strong> (<em>float</em>) &#8211; Parameter supplied to sphere drawing function, set to value to
+<li><strong>method</strong> (<em>string</em>) – The sphere drawing function to use, see above.</li>
+<li><strong>alpha</strong> (<em>float</em>) – Parameter supplied to sphere drawing function, set to value to
 override default value</li>
-<li><strong>user_method</strong> (<em>tuple</em><em> (</em><em>function</em><em>, </em><em>parameters</em><em>)</em><em></em>) &#8211; Provide your own sphere function to the drawing method. First
+<li><strong>user_method</strong> (<em>tuple</em><em> (</em><em>function</em><em>, </em><em>parameters</em><em>)</em>) – Provide your own sphere function to the drawing method. First
 element of tuple is function with call signature <cite>func(dr, a, *args)</cite>
 where the second element is the <cite>*args</cite> that are not the distance
 to edge (dr) or particles radius (a). <cite>method</cite> must be set to
-&#8216;user-defined&#8217;.</li>
-<li><strong>exact_volume</strong> (<em>boolean</em>) &#8211; whether to iterate effective particle size until exact volume
+‘user-defined’.</li>
+<li><strong>exact_volume</strong> (<em>boolean</em>) – whether to iterate effective particle size until exact volume
 (within volume_error) is achieved</li>
-<li><strong>volume_error</strong> (<em>float</em>) &#8211; relative volume error tolerance in iteration steps</li>
-<li><strong>max_radius_change</strong> (<em>float</em>) &#8211; maximum relative radius change allowed during iteration (due to
+<li><strong>volume_error</strong> (<em>float</em>) – relative volume error tolerance in iteration steps</li>
+<li><strong>max_radius_change</strong> (<em>float</em>) – maximum relative radius change allowed during iteration (due to
 edge particles and other confounding factors)</li>
-<li><strong>grouping</strong> (<em>string</em>) &#8211; Either &#8216;particle&#8217; or &#8216;parameter&#8217; parameter grouping. If &#8216;particle&#8217;
-then grouped by xyza,xyza if &#8216;parameter&#8217; then xyz,xyz,a,a</li>
-<li><strong>float_precision</strong> (<em>numpy float datatype</em>) &#8211; One of numpy.float16, numpy.float32, numpy.float64; precision
+<li><strong>grouping</strong> (<em>string</em>) – Either ‘particle’ or ‘parameter’ parameter grouping. If ‘particle’
+then grouped by xyza,xyza if ‘parameter’ then xyz,xyz,a,a</li>
+<li><strong>float_precision</strong> (<em>numpy float datatype</em>) – One of numpy.float16, numpy.float32, numpy.float64; precision
 for precomputed arrays. Default is np.float64; make it 16 or 32
 to save memory.</li>
 </ul>
@@ -655,32 +532,8 @@ to save memory.</li>
 </tbody>
 </table>
 <dl class="method">
-<dt id="peri.comp.objs.PlatonicSpheresCollection.param_radii">
-<code class="descname">param_radii</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/objs.html#PlatonicSpheresCollection.param_radii"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection.param_radii" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return params of all radii</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.objs.PlatonicSpheresCollection.param_particle">
-<code class="descname">param_particle</code><span class="sig-paren">(</span><em>ind</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/objs.html#PlatonicSpheresCollection.param_particle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection.param_particle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get position and radius of one or more particles</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.objs.PlatonicSpheresCollection.param_particle_pos">
-<code class="descname">param_particle_pos</code><span class="sig-paren">(</span><em>ind</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/objs.html#PlatonicSpheresCollection.param_particle_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection.param_particle_pos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get position of one or more particles</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.objs.PlatonicSpheresCollection.param_particle_rad">
-<code class="descname">param_particle_rad</code><span class="sig-paren">(</span><em>ind</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/objs.html#PlatonicSpheresCollection.param_particle_rad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection.param_particle_rad" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get radius of one or more particles</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="peri.comp.objs.PlatonicSpheresCollection.add_particle">
-<code class="descname">add_particle</code><span class="sig-paren">(</span><em>pos</em>, <em>rad</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/objs.html#PlatonicSpheresCollection.add_particle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection.add_particle" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_particle</code><span class="sig-paren">(</span><em>pos</em>, <em>rad</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection.add_particle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a particle or list of particles given by a list of positions and
 radii, both need to be array-like.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -688,12 +541,12 @@ radii, both need to be array-like.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pos</strong> (<em>array-like</em><em> [</em><em>N</em><em>, </em><em>3</em><em>]</em><em></em>) &#8211; Positions of all new particles</li>
-<li><strong>rad</strong> (<em>array-like</em><em> [</em><em>N</em><em>]</em><em></em>) &#8211; Corresponding radii of new particles</li>
+<li><strong>pos</strong> (<em>array-like</em><em> [</em><em>N</em><em>, </em><em>3</em><em>]</em>) – Positions of all new particles</li>
+<li><strong>rad</strong> (<em>array-like</em><em> [</em><em>N</em><em>]</em>) – Corresponding radii of new particles</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>inds</strong> &#8211; Indices of the added particles.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>inds</strong> – Indices of the added particles.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">N-element numpy.ndarray.</p>
@@ -704,15 +557,39 @@ radii, both need to be array-like.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="peri.comp.objs.PlatonicSpheresCollection.param_particle">
+<code class="descname">param_particle</code><span class="sig-paren">(</span><em>ind</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection.param_particle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get position and radius of one or more particles</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.comp.objs.PlatonicSpheresCollection.param_particle_pos">
+<code class="descname">param_particle_pos</code><span class="sig-paren">(</span><em>ind</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection.param_particle_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get position of one or more particles</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.comp.objs.PlatonicSpheresCollection.param_particle_rad">
+<code class="descname">param_particle_rad</code><span class="sig-paren">(</span><em>ind</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection.param_particle_rad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get radius of one or more particles</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.comp.objs.PlatonicSpheresCollection.param_radii">
+<code class="descname">param_radii</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection.param_radii" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return params of all radii</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="peri.comp.objs.PlatonicSpheresCollection.remove_particle">
-<code class="descname">remove_particle</code><span class="sig-paren">(</span><em>inds</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/objs.html#PlatonicSpheresCollection.remove_particle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection.remove_particle" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove_particle</code><span class="sig-paren">(</span><em>inds</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection.remove_particle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove the particle at index <cite>inds</cite>, may be a list.
 Returns [3,N], [N] element numpy.ndarray of pos, rad.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="peri.comp.objs.PlatonicSpheresCollection.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/objs.html#PlatonicSpheresCollection.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>params</em>, <em>values</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.objs.PlatonicSpheresCollection.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls an update, but clips radii to be &gt; 0</p>
 </dd></dl>
 
@@ -720,21 +597,21 @@ Returns [3,N], [N] element numpy.ndarray of pos, rad.</p>
 
 <dl class="class">
 <dt id="peri.comp.objs.Slab">
-<em class="property">class </em><code class="descclassname">peri.comp.objs.</code><code class="descname">Slab</code><span class="sig-paren">(</span><em>zpos=0</em>, <em>angles=(0</em>, <em>0)</em>, <em>param_prefix='slab'</em>, <em>shape=None</em>, <em>float_precision=&lt;type 'numpy.float64'&gt;</em>, <em>category='obj'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/objs.html#Slab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.objs.Slab" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.objs.</code><code class="descname">Slab</code><span class="sig-paren">(</span><em>zpos=0</em>, <em>angles=(0</em>, <em>0)</em>, <em>param_prefix=’slab’</em>, <em>shape=None</em>, <em>float_precision=&lt;class ‘numpy.float64’&gt;</em>, <em>category=’obj’</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.objs.Slab" title="Permalink to this definition">¶</a></dt>
 <dd><p>A half plane corresponding to a cover-slip.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>shape</strong> (<em>tuple</em>) &#8211; field shape over which to calculate</li>
-<li><strong>zpos</strong> (<em>float</em>) &#8211; position of the center of the slab in pixels</li>
-<li><strong>angles</strong> (<em>tuple of float</em><em> (</em><em>2</em><em>,</em><em></em><em>)</em><em></em><em>, </em><em>optional</em>) &#8211; Euler-like Angles of rotation of the normal with respect to the
+<li><strong>shape</strong> (<em>tuple</em>) – field shape over which to calculate</li>
+<li><strong>zpos</strong> (<em>float</em>) – position of the center of the slab in pixels</li>
+<li><strong>angles</strong> (<em>tuple of float</em><em> (</em><em>2</em><em>,</em><em>)</em><em>, </em><em>optional</em>) – Euler-like Angles of rotation of the normal with respect to the
 z-axis, i.e. <code class="docutils literal"><span class="pre">angles=(0.,</span> <span class="pre">0.)</span></code> gives a slab with a normal
 along z. The first angle theta is the rotation about the x-axis;
 the second angle phi is the rotation about the y-axis. Default
 is (0,0).</li>
-<li><strong>float_precision</strong> (<em>numpy float datatype</em>) &#8211; One of numpy.float16, numpy.float32, numpy.float64; precision
+<li><strong>float_precision</strong> (<em>numpy float datatype</em>) – One of numpy.float16, numpy.float32, numpy.float64; precision
 for precomputed arrays. Default is np.float64; make it 16 or 32
 to save memory.</li>
 </ul>
@@ -744,7 +621,7 @@ to save memory.</li>
 </table>
 <dl class="method">
 <dt id="peri.comp.objs.Slab.rmatrix">
-<code class="descname">rmatrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/objs.html#Slab.rmatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.objs.Slab.rmatrix" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rmatrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.objs.Slab.rmatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate the composite rotation matrix that rotates the slab normal.</p>
 <p>The rotation is a rotation about the x-axis, followed by a rotation
 about the z-axis.</p>
@@ -757,22 +634,22 @@ about the z-axis.</p>
 <span id="id3"></span><h2>peri.comp.ilms<a class="headerlink" href="#peri-comp-ilms" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="peri.comp.ilms.Polynomial3D">
-<em class="property">class </em><code class="descclassname">peri.comp.ilms.</code><code class="descname">Polynomial3D</code><span class="sig-paren">(</span><em>order=(1</em>, <em>1</em>, <em>1)</em>, <em>tileinfo=None</em>, <em>constval=None</em>, <em>category='ilm'</em>, <em>shape=None</em>, <em>float_precision=&lt;type 'numpy.float64'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/ilms.html#Polynomial3D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.ilms.Polynomial3D" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.ilms.</code><code class="descname">Polynomial3D</code><span class="sig-paren">(</span><em>order=(1</em>, <em>1</em>, <em>1)</em>, <em>tileinfo=None</em>, <em>constval=None</em>, <em>category=’ilm’</em>, <em>shape=None</em>, <em>float_precision=&lt;class ‘numpy.float64’&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.ilms.Polynomial3D" title="Permalink to this definition">¶</a></dt>
 <dd><p>A polynomial 3D class for updating large fields of polys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>shape</strong> (<cite>peri.util.Tile</cite>) &#8211; shape of the field (z,y,x)</li>
-<li><strong>order</strong> (<em>tuple</em>) &#8211; number of terms in each direction</li>
-<li><strong>tileinfo</strong> (tuple of 2 <cite>peri.util.Tile</cite>) &#8211; These objects help in the transfer of fields from different
+<li><strong>shape</strong> (<cite>peri.util.Tile</cite>) – shape of the field (z,y,x)</li>
+<li><strong>order</strong> (<em>tuple</em>) – number of terms in each direction</li>
+<li><strong>tileinfo</strong> (tuple of 2 <cite>peri.util.Tile</cite>) – These objects help in the transfer of fields from different
 sections of the same image to new fields. <cite>tileinfo</cite> is a tuple
 containing the Tile representing the entire image as well as the
 Tile representing this particular section of field. (typically
 given by <cite>peri.rawimage.tile</cite>)</li>
-<li><strong>constval</strong> (<em>float</em>) &#8211; The initial value of the entire field, if a constant.</li>
-<li><strong>float_precision</strong> (<em>numpy float datatype</em>) &#8211; One of numpy.float16, numpy.float32, numpy.float64; precision
+<li><strong>constval</strong> (<em>float</em>) – The initial value of the entire field, if a constant.</li>
+<li><strong>float_precision</strong> (<em>numpy float datatype</em>) – One of numpy.float16, numpy.float32, numpy.float64; precision
 for precomputed arrays. Default is np.float64; make it 16 or 32
 to save memory.</li>
 </ul>
@@ -784,7 +661,7 @@ to save memory.</li>
 
 <dl class="class">
 <dt id="peri.comp.ilms.Polynomial2P1D">
-<em class="property">class </em><code class="descclassname">peri.comp.ilms.</code><code class="descname">Polynomial2P1D</code><span class="sig-paren">(</span><em>order=(1</em>, <em>1</em>, <em>1)</em>, <em>tileinfo=None</em>, <em>constval=None</em>, <em>operation='*'</em>, <em>category='ilm'</em>, <em>shape=None</em>, <em>float_precision=&lt;type 'numpy.float64'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/ilms.html#Polynomial2P1D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.ilms.Polynomial2P1D" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.ilms.</code><code class="descname">Polynomial2P1D</code><span class="sig-paren">(</span><em>order=(1</em>, <em>1</em>, <em>1)</em>, <em>tileinfo=None</em>, <em>constval=None</em>, <em>operation=’*’</em>, <em>category=’ilm’</em>, <em>shape=None</em>, <em>float_precision=&lt;class ‘numpy.float64’&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.ilms.Polynomial2P1D" title="Permalink to this definition">¶</a></dt>
 <dd><p>A polynomial 2+1D class for updating large fields of polys.  The form
 of these polynomials if P(x,y) () Q(z), separated in the z-direction.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -792,17 +669,17 @@ of these polynomials if P(x,y) () Q(z), separated in the z-direction.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>shape</strong> (<em>tuple</em>) &#8211; shape of the field (z,y,x)</li>
-<li><strong>order</strong> (<em>tuple</em>) &#8211; number of terms in each direction</li>
-<li><strong>tileinfo</strong> (tuple of 2 <cite>peri.util.Tile</cite>) &#8211; These objects help in the transfer of fields from different
+<li><strong>shape</strong> (<em>tuple</em>) – shape of the field (z,y,x)</li>
+<li><strong>order</strong> (<em>tuple</em>) – number of terms in each direction</li>
+<li><strong>tileinfo</strong> (tuple of 2 <cite>peri.util.Tile</cite>) – These objects help in the transfer of fields from different
 sections of the same image to new fields. <cite>tileinfo</cite> is a tuple
 containing the Tile representing the entire image as well as the
 Tile representing this particular section of field. (typically
 given by <cite>peri.rawimage.tile</cite>)</li>
-<li><strong>constval</strong> (<em>float</em>) &#8211; The initial value of the entire field, if a constant.</li>
-<li><strong>operation</strong> (<em>string</em>) &#8211; Type of joining operation between the (x,y) and (z) poly. Can be
-either &#8216;*&#8217; or &#8216;+&#8217;</li>
-<li><strong>float_precision</strong> (<em>numpy float datatype</em>) &#8211; One of numpy.float16, numpy.float32, numpy.float64; precision
+<li><strong>constval</strong> (<em>float</em>) – The initial value of the entire field, if a constant.</li>
+<li><strong>operation</strong> (<em>string</em>) – Type of joining operation between the (x,y) and (z) poly. Can be
+either ‘*’ or ‘+’</li>
+<li><strong>float_precision</strong> (<em>numpy float datatype</em>) – One of numpy.float16, numpy.float32, numpy.float64; precision
 for precomputed arrays. Default is np.float64; make it 16 or 32
 to save memory.</li>
 </ul>
@@ -814,12 +691,12 @@ to save memory.</li>
 
 <dl class="class">
 <dt id="peri.comp.ilms.LegendrePoly2P1D">
-<em class="property">class </em><code class="descclassname">peri.comp.ilms.</code><code class="descname">LegendrePoly2P1D</code><span class="sig-paren">(</span><em>order=(1</em>, <em>1</em>, <em>1)</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/ilms.html#LegendrePoly2P1D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.ilms.LegendrePoly2P1D" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.ilms.</code><code class="descname">LegendrePoly2P1D</code><span class="sig-paren">(</span><em>order=(1</em>, <em>1</em>, <em>1)</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.ilms.LegendrePoly2P1D" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="class">
 <dt id="peri.comp.ilms.BarnesStreakLegPoly2P1D">
-<em class="property">class </em><code class="descclassname">peri.comp.ilms.</code><code class="descname">BarnesStreakLegPoly2P1D</code><span class="sig-paren">(</span><em>npts=(40</em>, <em>20)</em>, <em>zorder=7</em>, <em>op='*'</em>, <em>barnes_dist=1.75</em>, <em>barnes_clip_size=3</em>, <em>local_updates=True</em>, <em>category='ilm'</em>, <em>shape=None</em>, <em>float_precision=&lt;type 'numpy.float64'&gt;</em>, <em>donorm=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/ilms.html#BarnesStreakLegPoly2P1D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.ilms.BarnesStreakLegPoly2P1D" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.ilms.</code><code class="descname">BarnesStreakLegPoly2P1D</code><span class="sig-paren">(</span><em>npts=(40</em>, <em>20)</em>, <em>zorder=7</em>, <em>op=’*’</em>, <em>barnes_dist=1.75</em>, <em>barnes_clip_size=3</em>, <em>local_updates=True</em>, <em>category=’ilm’</em>, <em>shape=None</em>, <em>float_precision=&lt;class ‘numpy.float64’&gt;</em>, <em>donorm=True</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.ilms.BarnesStreakLegPoly2P1D" title="Permalink to this definition">¶</a></dt>
 <dd><p>A Barnes interpolant. This one is of the form</p>
 <div class="math">
 \[I = \left[1 + \left(\sum b_k(x) (o) L_k(y)\right)\right]  (1 + z q(z)) + c\]</div>
@@ -831,17 +708,17 @@ operation (o) is settable.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>shape</strong> (<em>iterable</em>) &#8211; size of the field in pixels, needs to be padded shape</li>
-<li><strong>npts</strong> (<em>tuple of ints</em><em>, </em><em>optional</em>) &#8211; Number of control points used for the Barnes interpolant b_k
+<li><strong>shape</strong> (<em>iterable</em>) – size of the field in pixels, needs to be padded shape</li>
+<li><strong>npts</strong> (<em>tuple of ints</em><em>, </em><em>optional</em>) – Number of control points used for the Barnes interpolant b_k
 in the x-y sum. Default is (40,20)</li>
-<li><strong>zorder</strong> (<em>integer</em>) &#8211; Number of orders for the z-polynomial.</li>
-<li><strong>op</strong> (<em>string</em>) &#8211; The operation to perform between Barnes and LegPoly, &#8216;*&#8217; or &#8216;+&#8217;.</li>
-<li><strong>barnes_dist</strong> (<em>float</em>) &#8211; Fractional distance to use for the barnes interpolator</li>
-<li><strong>local_updates</strong> (<em>boolean</em>) &#8211; Whether to perform local updates on the ILM</li>
-<li><strong>float_precision</strong> (<em>numpy float datatype</em>) &#8211; One of numpy.float16, numpy.float32, numpy.float64; precision
+<li><strong>zorder</strong> (<em>integer</em>) – Number of orders for the z-polynomial.</li>
+<li><strong>op</strong> (<em>string</em>) – The operation to perform between Barnes and LegPoly, ‘*’ or ‘+’.</li>
+<li><strong>barnes_dist</strong> (<em>float</em>) – Fractional distance to use for the barnes interpolator</li>
+<li><strong>local_updates</strong> (<em>boolean</em>) – Whether to perform local updates on the ILM</li>
+<li><strong>float_precision</strong> (<em>numpy float datatype</em>) – One of numpy.float16, numpy.float32, numpy.float64; precision
 for precomputed arrays. Default is np.float64; make it 16 or 32
 to save memory.</li>
-<li><strong>donorm</strong> (<em>Bool</em>) &#8211; Whether or not to normalize the Barnes interpolation
+<li><strong>donorm</strong> (<em>Bool</em>) – Whether or not to normalize the Barnes interpolation
 (compatibility patch). Use True, i.e. normalize the Barnes
 interpolant. Old version is False. Default is True.</li>
 </ul>
@@ -851,7 +728,7 @@ interpolant. Old version is False. Default is True.</li>
 </table>
 <dl class="method">
 <dt id="peri.comp.ilms.BarnesStreakLegPoly2P1D.randomize_parameters">
-<code class="descname">randomize_parameters</code><span class="sig-paren">(</span><em>ptp=0.2</em>, <em>fourier=False</em>, <em>vmin=None</em>, <em>vmax=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/ilms.html#BarnesStreakLegPoly2P1D.randomize_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.ilms.BarnesStreakLegPoly2P1D.randomize_parameters" title="Permalink to this definition">¶</a></dt>
+<code class="descname">randomize_parameters</code><span class="sig-paren">(</span><em>ptp=0.2</em>, <em>fourier=False</em>, <em>vmin=None</em>, <em>vmax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.ilms.BarnesStreakLegPoly2P1D.randomize_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create random parameters for this ILM that mimic experiments
 as closely as possible without real assumptions.</p>
 </dd></dl>
@@ -863,7 +740,7 @@ as closely as possible without real assumptions.</p>
 <span id="id4"></span><h2>peri.comp.psfs<a class="headerlink" href="#peri-comp-psfs" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="peri.comp.psfs.PSF">
-<em class="property">class </em><code class="descclassname">peri.comp.psfs.</code><code class="descname">PSF</code><span class="sig-paren">(</span><em>params</em>, <em>values</em>, <em>shape=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/psfs.html#PSF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.psfs.PSF" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.psfs.</code><code class="descname">PSF</code><span class="sig-paren">(</span><em>params</em>, <em>values</em>, <em>shape=None</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.psfs.PSF" title="Permalink to this definition">¶</a></dt>
 <dd><p>Point spread function classes must contain the following classes in order
 to interface with the states class:</p>
 <blockquote>
@@ -876,24 +753,24 @@ execute : apply the psf to an image</div></blockquote>
 
 <dl class="class">
 <dt id="peri.comp.psfs.IdentityPSF">
-<em class="property">class </em><code class="descclassname">peri.comp.psfs.</code><code class="descname">IdentityPSF</code><a class="reference internal" href="../_modules/peri/comp/psfs.html#IdentityPSF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.psfs.IdentityPSF" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.psfs.</code><code class="descname">IdentityPSF</code><a class="headerlink" href="#peri.comp.psfs.IdentityPSF" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delta-function PSF; returns the field passed to execute identically.
-Params is an N-element numpy.ndarray, doesn&#8217;t do anything.</p>
+Params is an N-element numpy.ndarray, doesn’t do anything.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="peri.comp.psfs.AnisotropicGaussian">
-<em class="property">class </em><code class="descclassname">peri.comp.psfs.</code><code class="descname">AnisotropicGaussian</code><span class="sig-paren">(</span><em>sigmas=(2.0</em>, <em>1.0)</em>, <em>error=0.00392156862745098</em>, <em>shape=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/psfs.html#AnisotropicGaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.psfs.AnisotropicGaussian" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.psfs.</code><code class="descname">AnisotropicGaussian</code><span class="sig-paren">(</span><em>sigmas=(2.0</em>, <em>1.0)</em>, <em>error=0.00392156862745098</em>, <em>shape=None</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.psfs.AnisotropicGaussian" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="class">
 <dt id="peri.comp.psfs.AnisotropicGaussianXYZ">
-<em class="property">class </em><code class="descclassname">peri.comp.psfs.</code><code class="descname">AnisotropicGaussianXYZ</code><span class="sig-paren">(</span><em>sigmas=(2.0</em>, <em>0.5</em>, <em>1.0)</em>, <em>error=0.00392156862745098</em>, <em>shape=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/psfs.html#AnisotropicGaussianXYZ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.psfs.AnisotropicGaussianXYZ" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.psfs.</code><code class="descname">AnisotropicGaussianXYZ</code><span class="sig-paren">(</span><em>sigmas=(2.0</em>, <em>0.5</em>, <em>1.0)</em>, <em>error=0.00392156862745098</em>, <em>shape=None</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.psfs.AnisotropicGaussianXYZ" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="class">
 <dt id="peri.comp.psfs.PSF4D">
-<em class="property">class </em><code class="descclassname">peri.comp.psfs.</code><code class="descname">PSF4D</code><span class="sig-paren">(</span><em>params</em>, <em>values</em>, <em>shape=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/psfs.html#PSF4D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.psfs.PSF4D" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.psfs.</code><code class="descname">PSF4D</code><span class="sig-paren">(</span><em>params</em>, <em>values</em>, <em>shape=None</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.psfs.PSF4D" title="Permalink to this definition">¶</a></dt>
 <dd><p>4-dimensional Point-Spread-Function (PSF) is implemented by assuming
 that the there is only z-dependence of parameters (so that it can be
 separated into x-y and z parts).  Therefore, we keep track of 2D FFTs
@@ -903,7 +780,7 @@ convolve in the z direction</p>
 x-y convolution.  The z-convolution cannot be cached.</p>
 <dl class="method">
 <dt id="peri.comp.psfs.PSF4D.rpsf_xy">
-<code class="descname">rpsf_xy</code><span class="sig-paren">(</span><em>vecs</em>, <em>z</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/psfs.html#PSF4D.rpsf_xy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.psfs.PSF4D.rpsf_xy" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rpsf_xy</code><span class="sig-paren">(</span><em>vecs</em>, <em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.psfs.PSF4D.rpsf_xy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the x-y plane real space psf function as a function of z values.
 This function does not necessarily have to be normalized, it will be
 normalized in k-space layer by layer later.</p>
@@ -911,7 +788,7 @@ normalized in k-space layer by layer later.</p>
 
 <dl class="method">
 <dt id="peri.comp.psfs.PSF4D.rpsf_z">
-<code class="descname">rpsf_z</code><span class="sig-paren">(</span><em>z</em>, <em>zp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/psfs.html#PSF4D.rpsf_z"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.psfs.PSF4D.rpsf_z" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rpsf_z</code><span class="sig-paren">(</span><em>z</em>, <em>zp</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.psfs.PSF4D.rpsf_z" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the z dependence of the PSF.  This section needs to be noramlized.</p>
 </dd></dl>
 
@@ -919,15 +796,15 @@ normalized in k-space layer by layer later.</p>
 
 <dl class="class">
 <dt id="peri.comp.psfs.Gaussian4D">
-<em class="property">class </em><code class="descclassname">peri.comp.psfs.</code><code class="descname">Gaussian4D</code><span class="sig-paren">(</span><em>sigmas=(2.0</em>, <em>0.5</em>, <em>1.0)</em>, <em>order=(1</em>, <em>1</em>, <em>1)</em>, <em>error=0.00392156862745098</em>, <em>zrange=128</em>, <em>shape=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/psfs.html#Gaussian4D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.psfs.Gaussian4D" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.psfs.</code><code class="descname">Gaussian4D</code><span class="sig-paren">(</span><em>sigmas=(2.0</em>, <em>0.5</em>, <em>1.0)</em>, <em>order=(1</em>, <em>1</em>, <em>1)</em>, <em>error=0.00392156862745098</em>, <em>zrange=128</em>, <em>shape=None</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.psfs.Gaussian4D" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="class">
 <dt id="peri.comp.psfs.FromArray">
-<em class="property">class </em><code class="descclassname">peri.comp.psfs.</code><code class="descname">FromArray</code><span class="sig-paren">(</span><em>array</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/psfs.html#FromArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.psfs.FromArray" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.psfs.</code><code class="descname">FromArray</code><span class="sig-paren">(</span><em>array</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.psfs.FromArray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Only thing to pass is the values of the point spread function (does not
 need to be normalized) in the form of a numpy ndarray of shape</p>
-<p>(z&#8217;, z, y, x)</p>
+<p>(z’, z, y, x)</p>
 <p>so if there are 50 layers in the image and the psf is at most 16 wide
 then it must be shaped (50,16,16,16). The values of the psf must
 be centered in this array. Hint: np.fft.fftfreq provides the correct
@@ -939,7 +816,7 @@ ordering of values for both even and odd lattices.</p>
 <span id="id5"></span><h2>peri.comp.exactpsf<a class="headerlink" href="#peri-comp-exactpsf" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="peri.comp.exactpsf.ExactPSF">
-<em class="property">class </em><code class="descclassname">peri.comp.exactpsf.</code><code class="descname">ExactPSF</code><span class="sig-paren">(</span><em>shape=None</em>, <em>zrange=None</em>, <em>laser_wavelength=0.488</em>, <em>zslab=0.0</em>, <em>zscale=1.0</em>, <em>kfki=0.889</em>, <em>n2n1=0.9486166007905138</em>, <em>alpha=1.173</em>, <em>polar_angle=0.0</em>, <em>pxsize=0.125</em>, <em>support_factor=2</em>, <em>normalize=False</em>, <em>sigkf=0.0</em>, <em>nkpts=None</em>, <em>cutoffval=None</em>, <em>measurement_iterations=None</em>, <em>k_dist='gaussian'</em>, <em>use_J1=True</em>, <em>sph6_ab=None</em>, <em>global_zscale=False</em>, <em>cutbyval=False</em>, <em>cutfallrate=0.25</em>, <em>cutedgeval=1e-12</em>, <em>pinhole_width=None</em>, <em>do_pinhole=False</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#ExactPSF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.ExactPSF" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.exactpsf.</code><code class="descname">ExactPSF</code><span class="sig-paren">(</span><em>shape=None</em>, <em>zrange=None</em>, <em>laser_wavelength=0.488</em>, <em>zslab=0.0</em>, <em>zscale=1.0</em>, <em>kfki=0.889</em>, <em>n2n1=0.9486166007905138</em>, <em>alpha=1.173</em>, <em>polar_angle=0.0</em>, <em>pxsize=0.125</em>, <em>support_factor=2</em>, <em>normalize=False</em>, <em>sigkf=0.0</em>, <em>nkpts=None</em>, <em>cutoffval=None</em>, <em>measurement_iterations=None</em>, <em>k_dist=’gaussian’</em>, <em>use_J1=True</em>, <em>sph6_ab=None</em>, <em>global_zscale=False</em>, <em>cutbyval=False</em>, <em>cutfallrate=0.25</em>, <em>cutedgeval=1e-12</em>, <em>pinhole_width=None</em>, <em>do_pinhole=False</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.ExactPSF" title="Permalink to this definition">¶</a></dt>
 <dd><p>Superclass for all the exact PSFs, i.e. any PSF that is based on
 physical properties of the imaging system such as the laser
 wavelength.</p>
@@ -951,47 +828,47 @@ the exact model of image formation).</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>shape</strong> (<em>tuple</em>) &#8211; Shape of the image in (z,y,x) pixel numbers (to be deprecated)</li>
-<li><strong>zrange</strong> (<em>tuple</em>) &#8211; range of z pixels over which we should calculate the psf, good pixels
+<li><strong>shape</strong> (<em>tuple</em>) – Shape of the image in (z,y,x) pixel numbers (to be deprecated)</li>
+<li><strong>zrange</strong> (<em>tuple</em>) – range of z pixels over which we should calculate the psf, good pixels
 being zrange[0] &lt;= z &lt;= zrange[1]. currently must be set to the interior
 of the image, so [state.pad, state.image.shape[0] - state.pad]</li>
-<li><strong>laser_wavelength</strong> (<em>float</em>) &#8211; wavelength of light in um of the incoming laser light</li>
-<li><strong>zslab</strong> (<em>float</em>) &#8211; Pixel position of the optical interface where 0 is the edge of the
+<li><strong>laser_wavelength</strong> (<em>float</em>) – wavelength of light in um of the incoming laser light</li>
+<li><strong>zslab</strong> (<em>float</em>) – Pixel position of the optical interface where 0 is the edge of the
 image in the z direction</li>
-<li><strong>zscale</strong> (<em>float</em>) &#8211; Scaling of the z pixel size, so that each pixel is located at
+<li><strong>zscale</strong> (<em>float</em>) – Scaling of the z pixel size, so that each pixel is located at
 zscale*(z - zint), such that the interface does not move with zscale</li>
-<li><strong>kfki</strong> (<em>float</em>) &#8211; Ratio of outgoing to incoming light wavevectors, 2pi/lambda</li>
-<li><strong>n2n1</strong> (<em>float</em>) &#8211; Ratio of the index mismatch across the optical interface. For typical
+<li><strong>kfki</strong> (<em>float</em>) – Ratio of outgoing to incoming light wavevectors, 2pi/lambda</li>
+<li><strong>n2n1</strong> (<em>float</em>) – Ratio of the index mismatch across the optical interface. For typical
 glass with glycerol/water 80/20 mixture this is 1.4/1.518</li>
-<li><strong>alpha</strong> (<em>float</em>) &#8211; Aperture of the lens in radians, set by arcsin(n2n1)?</li>
-<li><strong>polar_angle</strong> (<em>float</em>) &#8211; the angle of the light polarization with respect to the scanning axis</li>
-<li><strong>pxsize</strong> (<em>float</em>) &#8211; the size of a xy pixel in um, defaults to cohen group size 0.125 um</li>
-<li><strong>support_factor</strong> (<em>integer</em>) &#8211; size of the support</li>
-<li><strong>normalize</strong> (<em>boolean</em>) &#8211; if True, use the normalization as calculated by the PSF instead of
+<li><strong>alpha</strong> (<em>float</em>) – Aperture of the lens in radians, set by arcsin(n2n1)?</li>
+<li><strong>polar_angle</strong> (<em>float</em>) – the angle of the light polarization with respect to the scanning axis</li>
+<li><strong>pxsize</strong> (<em>float</em>) – the size of a xy pixel in um, defaults to cohen group size 0.125 um</li>
+<li><strong>support_factor</strong> (<em>integer</em>) – size of the support</li>
+<li><strong>normalize</strong> (<em>boolean</em>) – if True, use the normalization as calculated by the PSF instead of
 unit normalization</li>
-<li><strong>sigkf</strong> (<em>float</em>) &#8211; Width of wavelengths to use in the polychromatic psf, None is
+<li><strong>sigkf</strong> (<em>float</em>) – Width of wavelengths to use in the polychromatic psf, None is
 monochromatic. Values for kfki = kfki +- sigkf, unitless</li>
-<li><strong>nkpts</strong> (<em>integer</em>) &#8211; number of integration points to use for the polychromatic psf</li>
-<li><strong>cutoffval</strong> (<em>float</em>) &#8211; Percentage of peak psf value to cutoff using a 3-axis
+<li><strong>nkpts</strong> (<em>integer</em>) – number of integration points to use for the polychromatic psf</li>
+<li><strong>cutoffval</strong> (<em>float</em>) – Percentage of peak psf value to cutoff using a 3-axis
 exp(-(r-r0)**4) function where r0 is determined by cutoffval. A
 good value for this is the bit depth of the camera, or possibly the
 SNR, so 1/2**8 or 1/50.</li>
-<li><strong>measurement_iterations</strong> (<em>int</em>) &#8211; number of interations used when trying to find the center of mass
+<li><strong>measurement_iterations</strong> (<em>int</em>) – number of interations used when trying to find the center of mass
 of the psf in a certain slice</li>
-<li><strong>k_dist</strong> (<em>str</em>) &#8211; Eithe [&#8216;gaussian&#8217;, &#8216;gamma&#8217;] which control the wavevector
+<li><strong>k_dist</strong> (<em>str</em>) – Eithe [‘gaussian’, ‘gamma’] which control the wavevector
 distribution for the polychromatic detection psf. Default
 is Gaussian.</li>
-<li><strong>use_J1</strong> (<em>boolean</em>) &#8211; Which hdet confocal model to use. Set to True to include the
+<li><strong>use_J1</strong> (<em>boolean</em>) – Which hdet confocal model to use. Set to True to include the
 J1 term corresponding to a large-NA focusing lens, False to
 exclude it. Default is True</li>
-<li><strong>cutbyval</strong> (<em>boolean</em>) &#8211; If True, cuts the PSF based on the actual value instead of the
+<li><strong>cutbyval</strong> (<em>boolean</em>) – If True, cuts the PSF based on the actual value instead of the
 position associated with the nearest value.</li>
-<li><strong>cutfallrate</strong> (<em>float</em>) &#8211; The relative value of the cutoffval over which to damp the
+<li><strong>cutfallrate</strong> (<em>float</em>) – The relative value of the cutoffval over which to damp the
 remaining values of the psf. 0.3 seems a good fit now.</li>
-<li><strong>cutedgeval</strong> (<em>float</em>) &#8211; The value with which to determine the edge of the psf, typically
+<li><strong>cutedgeval</strong> (<em>float</em>) – The value with which to determine the edge of the psf, typically
 taken around floating point, 1e-12</li>
-<li><strong>pinhole_width</strong> (<em>Float</em>) &#8211; The width of the line illumination, in 1/k units. Default is 1.0.</li>
-<li><strong>do_pinhole</strong> (<em>Bool</em>) &#8211; Whether or not to include pinhole line width in the sampling.
+<li><strong>pinhole_width</strong> (<em>Float</em>) – The width of the line illumination, in 1/k units. Default is 1.0.</li>
+<li><strong>do_pinhole</strong> (<em>Bool</em>) – Whether or not to include pinhole line width in the sampling.
 Default is False.</li>
 </ul>
 </td>
@@ -999,33 +876,47 @@ Default is False.</li>
 </tbody>
 </table>
 <dl class="method">
-<dt id="peri.comp.exactpsf.ExactPSF.psffunc">
-<code class="descname">psffunc</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#ExactPSF.psffunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.ExactPSF.psffunc" title="Permalink to this definition">¶</a></dt>
-<dd><p>The function to evaluate the exact psf. Syntax must be:</p>
-<blockquote>
-<div>psf = psffunc(x, y, z, **kwargs)</div></blockquote>
-<p>and return a <code class="docutils literal"><span class="pre">[x.size,</span> <span class="pre">y.size,</span> <span class="pre">z.size]</span></code> numpy.ndarray, where x,y,z
-are 1D arrays.
-Implement in subclass.</p>
+<dt id="peri.comp.exactpsf.ExactPSF.characterize_psf">
+<code class="descname">characterize_psf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.ExactPSF.characterize_psf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get support size and drift polynomial for current set of params</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.comp.exactpsf.ExactPSF.drift">
+<code class="descname">drift</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.ExactPSF.drift" title="Permalink to this definition">¶</a></dt>
+<dd><p>Give the pixel offset at a given z value for the current parameters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.comp.exactpsf.ExactPSF.measure_size_drift">
+<code class="descname">measure_size_drift</code><span class="sig-paren">(</span><em>z</em>, <em>size=31</em>, <em>zoffset=0.0</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.ExactPSF.measure_size_drift" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the ‘size’ of the psf in each direction a particular z (px)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="peri.comp.exactpsf.ExactPSF.pack_args">
+<code class="descname">pack_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.ExactPSF.pack_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pack the parameters into the form necessary for the integration
+routines above in psfcalc.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="peri.comp.exactpsf.ExactPSF.psf_slice">
-<code class="descname">psf_slice</code><span class="sig-paren">(</span><em>zint</em>, <em>size=11</em>, <em>zoffset=0.0</em>, <em>getextent=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#ExactPSF.psf_slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.ExactPSF.psf_slice" title="Permalink to this definition">¶</a></dt>
+<code class="descname">psf_slice</code><span class="sig-paren">(</span><em>zint</em>, <em>size=11</em>, <em>zoffset=0.0</em>, <em>getextent=False</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.ExactPSF.psf_slice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the 3D psf at a particular z pixel height</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>zint</strong> (<em>float</em>) &#8211; z pixel height in image coordinates , converted to 1/k by the
+<li><strong>zint</strong> (<em>float</em>) – z pixel height in image coordinates , converted to 1/k by the
 function using the slab position as well</li>
-<li><strong>size</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) &#8211; The size over which to calculate the psf, can be 1 or 3 elements
+<li><strong>size</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – The size over which to calculate the psf, can be 1 or 3 elements
 for the different axes in image pixel coordinates</li>
-<li><strong>zoffset</strong> (<em>float</em>) &#8211; Offset in pixel units to use in the calculation of the psf</li>
-<li><strong>cutval</strong> (<em>float</em>) &#8211; If not None, the psf will be cut along a curve corresponding to
+<li><strong>zoffset</strong> (<em>float</em>) – Offset in pixel units to use in the calculation of the psf</li>
+<li><strong>cutval</strong> (<em>float</em>) – If not None, the psf will be cut along a curve corresponding to
 p(r) == 0 with exponential damping exp(-d^4)</li>
-<li><strong>getextent</strong> (<em>boolean</em>) &#8211; If True, also return the extent of the psf in pixels for example
+<li><strong>getextent</strong> (<em>boolean</em>) – If True, also return the extent of the psf in pixels for example
 to get the support size. Can only be used with cutval.</li>
 </ul>
 </td>
@@ -1035,35 +926,21 @@ to get the support size. Can only be used with cutval.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="peri.comp.exactpsf.ExactPSF.pack_args">
-<code class="descname">pack_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#ExactPSF.pack_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.ExactPSF.pack_args" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pack the parameters into the form necessary for the integration
-routines above in psfcalc.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.exactpsf.ExactPSF.drift">
-<code class="descname">drift</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#ExactPSF.drift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.ExactPSF.drift" title="Permalink to this definition">¶</a></dt>
-<dd><p>Give the pixel offset at a given z value for the current parameters</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.exactpsf.ExactPSF.measure_size_drift">
-<code class="descname">measure_size_drift</code><span class="sig-paren">(</span><em>z</em>, <em>size=31</em>, <em>zoffset=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#ExactPSF.measure_size_drift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.ExactPSF.measure_size_drift" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the &#8216;size&#8217; of the psf in each direction a particular z (px)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="peri.comp.exactpsf.ExactPSF.characterize_psf">
-<code class="descname">characterize_psf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#ExactPSF.characterize_psf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.ExactPSF.characterize_psf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get support size and drift polynomial for current set of params</p>
+<dt id="peri.comp.exactpsf.ExactPSF.psffunc">
+<code class="descname">psffunc</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.ExactPSF.psffunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>The function to evaluate the exact psf. Syntax must be:</p>
+<blockquote>
+<div>psf = psffunc(x, y, z, **kwargs)</div></blockquote>
+<p>and return a <code class="docutils literal"><span class="pre">[x.size,</span> <span class="pre">y.size,</span> <span class="pre">z.size]</span></code> numpy.ndarray, where x,y,z
+are 1D arrays.
+Implement in subclass.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="peri.comp.exactpsf.ExactLineScanConfocalPSF">
-<em class="property">class </em><code class="descclassname">peri.comp.exactpsf.</code><code class="descname">ExactLineScanConfocalPSF</code><span class="sig-paren">(</span><em>shape=None</em>, <em>zrange=None</em>, <em>laser_wavelength=0.488</em>, <em>zslab=0.0</em>, <em>zscale=1.0</em>, <em>kfki=0.889</em>, <em>n2n1=0.9486166007905138</em>, <em>alpha=1.173</em>, <em>polar_angle=0.0</em>, <em>pxsize=0.125</em>, <em>support_factor=2</em>, <em>normalize=False</em>, <em>sigkf=0.0</em>, <em>nkpts=None</em>, <em>cutoffval=None</em>, <em>measurement_iterations=None</em>, <em>k_dist='gaussian'</em>, <em>use_J1=True</em>, <em>sph6_ab=None</em>, <em>global_zscale=False</em>, <em>cutbyval=False</em>, <em>cutfallrate=0.25</em>, <em>cutedgeval=1e-12</em>, <em>pinhole_width=None</em>, <em>do_pinhole=False</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#ExactLineScanConfocalPSF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.ExactLineScanConfocalPSF" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.exactpsf.</code><code class="descname">ExactLineScanConfocalPSF</code><span class="sig-paren">(</span><em>shape=None</em>, <em>zrange=None</em>, <em>laser_wavelength=0.488</em>, <em>zslab=0.0</em>, <em>zscale=1.0</em>, <em>kfki=0.889</em>, <em>n2n1=0.9486166007905138</em>, <em>alpha=1.173</em>, <em>polar_angle=0.0</em>, <em>pxsize=0.125</em>, <em>support_factor=2</em>, <em>normalize=False</em>, <em>sigkf=0.0</em>, <em>nkpts=None</em>, <em>cutoffval=None</em>, <em>measurement_iterations=None</em>, <em>k_dist=’gaussian’</em>, <em>use_J1=True</em>, <em>sph6_ab=None</em>, <em>global_zscale=False</em>, <em>cutbyval=False</em>, <em>cutfallrate=0.25</em>, <em>cutedgeval=1e-12</em>, <em>pinhole_width=None</em>, <em>do_pinhole=False</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.ExactLineScanConfocalPSF" title="Permalink to this definition">¶</a></dt>
 <dd><p>PSF for line-scanning confocal microscopes that can be used with the
 peri framework.  Calculates the spatially varying point spread
 function for confocal microscopes and allows them to be applied to
@@ -1075,51 +952,51 @@ and so calculates the local PSF for every z layer in the image.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>shape</strong> (<em>tuple</em>) &#8211; Shape of the image in (z,y,x) pixel numbers (to be deprecated)</li>
-<li><strong>zrange</strong> (<em>tuple</em>) &#8211; range of z pixels over which we should calculate the psf, good pixels
+<li><strong>shape</strong> (<em>tuple</em>) – Shape of the image in (z,y,x) pixel numbers (to be deprecated)</li>
+<li><strong>zrange</strong> (<em>tuple</em>) – range of z pixels over which we should calculate the psf, good pixels
 being zrange[0] &lt;= z &lt;= zrange[1]. currently must be set to the interior
 of the image, so [state.pad, state.image.shape[0] - state.pad]</li>
-<li><strong>laser_wavelength</strong> (<em>float</em>) &#8211; wavelength of light in um of the incoming laser light</li>
-<li><strong>zslab</strong> (<em>float</em>) &#8211; Pixel position of the optical interface where 0 is the edge of the
+<li><strong>laser_wavelength</strong> (<em>float</em>) – wavelength of light in um of the incoming laser light</li>
+<li><strong>zslab</strong> (<em>float</em>) – Pixel position of the optical interface where 0 is the edge of the
 image in the z direction</li>
-<li><strong>zscale</strong> (<em>float</em>) &#8211; Scaling of the z pixel size, so that each pixel is located at
+<li><strong>zscale</strong> (<em>float</em>) – Scaling of the z pixel size, so that each pixel is located at
 zscale*(z - zint), such that the interface does not move with zscale</li>
-<li><strong>kfki</strong> (<em>float</em>) &#8211; Ratio of outgoing to incoming light wavevectors, 2pi/lambda</li>
-<li><strong>n2n1</strong> (<em>float</em>) &#8211; Ratio of the index mismatch across the optical interface. For typical
+<li><strong>kfki</strong> (<em>float</em>) – Ratio of outgoing to incoming light wavevectors, 2pi/lambda</li>
+<li><strong>n2n1</strong> (<em>float</em>) – Ratio of the index mismatch across the optical interface. For typical
 glass with glycerol/water 80/20 mixture this is 1.4/1.518</li>
-<li><strong>alpha</strong> (<em>float</em>) &#8211; Aperture of the lens in radians, set by arcsin(n2n1)?</li>
-<li><strong>polar_angle</strong> (<em>float</em>) &#8211; the angle of the light polarization with respect to the scanning axis</li>
-<li><strong>pxsize</strong> (<em>float</em>) &#8211; the size of a xy pixel in um, defaults to cohen group size 0.125 um</li>
-<li><strong>support_factor</strong> (<em>integer</em>) &#8211; size of the support</li>
-<li><strong>normalize</strong> (<em>boolean</em>) &#8211; if True, use the normalization as calculated by the PSF instead of
+<li><strong>alpha</strong> (<em>float</em>) – Aperture of the lens in radians, set by arcsin(n2n1)?</li>
+<li><strong>polar_angle</strong> (<em>float</em>) – the angle of the light polarization with respect to the scanning axis</li>
+<li><strong>pxsize</strong> (<em>float</em>) – the size of a xy pixel in um, defaults to cohen group size 0.125 um</li>
+<li><strong>support_factor</strong> (<em>integer</em>) – size of the support</li>
+<li><strong>normalize</strong> (<em>boolean</em>) – if True, use the normalization as calculated by the PSF instead of
 unit normalization</li>
-<li><strong>sigkf</strong> (<em>float</em>) &#8211; Width of wavelengths to use in the polychromatic psf, None is
+<li><strong>sigkf</strong> (<em>float</em>) – Width of wavelengths to use in the polychromatic psf, None is
 monochromatic. Values for kfki = kfki +- sigkf, unitless</li>
-<li><strong>nkpts</strong> (<em>integer</em>) &#8211; number of integration points to use for the polychromatic psf</li>
-<li><strong>cutoffval</strong> (<em>float</em>) &#8211; Percentage of peak psf value to cutoff using a 3-axis
+<li><strong>nkpts</strong> (<em>integer</em>) – number of integration points to use for the polychromatic psf</li>
+<li><strong>cutoffval</strong> (<em>float</em>) – Percentage of peak psf value to cutoff using a 3-axis
 exp(-(r-r0)**4) function where r0 is determined by cutoffval. A
 good value for this is the bit depth of the camera, or possibly the
 SNR, so 1/2**8 or 1/50.</li>
-<li><strong>measurement_iterations</strong> (<em>int</em>) &#8211; number of interations used when trying to find the center of mass
+<li><strong>measurement_iterations</strong> (<em>int</em>) – number of interations used when trying to find the center of mass
 of the psf in a certain slice</li>
-<li><strong>k_dist</strong> (<em>str</em>) &#8211; Eithe [&#8216;gaussian&#8217;, &#8216;gamma&#8217;] which control the wavevector
+<li><strong>k_dist</strong> (<em>str</em>) – Eithe [‘gaussian’, ‘gamma’] which control the wavevector
 distribution for the polychromatic detection psf. Default
 is Gaussian.</li>
-<li><strong>use_J1</strong> (<em>boolean</em>) &#8211; Which hdet confocal model to use. Set to True to include the
+<li><strong>use_J1</strong> (<em>boolean</em>) – Which hdet confocal model to use. Set to True to include the
 J1 term corresponding to a large-NA focusing lens, False to
 exclude it. Default is True</li>
-<li><strong>cutbyval</strong> (<em>boolean</em>) &#8211; If True, cuts the PSF based on the actual value instead of the
+<li><strong>cutbyval</strong> (<em>boolean</em>) – If True, cuts the PSF based on the actual value instead of the
 position associated with the nearest value.</li>
-<li><strong>cutfallrate</strong> (<em>float</em>) &#8211; The relative value of the cutoffval over which to damp the
+<li><strong>cutfallrate</strong> (<em>float</em>) – The relative value of the cutoffval over which to damp the
 remaining values of the psf. 0.3 seems a good fit now.</li>
-<li><strong>cutedgeval</strong> (<em>float</em>) &#8211; The value with which to determine the edge of the psf, typically
+<li><strong>cutedgeval</strong> (<em>float</em>) – The value with which to determine the edge of the psf, typically
 taken around floating point, 1e-12</li>
-<li><strong>pinhole_width</strong> (<em>Float</em>) &#8211; The width of the line illumination, in 1/k units. Default is 1.0.</li>
-<li><strong>do_pinhole</strong> (<em>Bool</em>) &#8211; Whether or not to include pinhole line width in the sampling.
+<li><strong>pinhole_width</strong> (<em>Float</em>) – The width of the line illumination, in 1/k units. Default is 1.0.</li>
+<li><strong>do_pinhole</strong> (<em>Bool</em>) – Whether or not to include pinhole line width in the sampling.
 Default is False.</li>
-<li><strong>Notes</strong> &#8211; a = ExactLineScanConfocalPSF((64,)*3)
+<li><strong>Notes</strong> – a = ExactLineScanConfocalPSF((64,)*3)
 psf, (z,y,x) = a.psf_slice(1., size=51)
-imshow((psf*r**4)[:,:,25], cmap=&#8217;bone&#8217;)</li>
+imshow((psf*r**4)[:,:,25], cmap=’bone’)</li>
 </ul>
 </td>
 </tr>
@@ -1127,14 +1004,14 @@ imshow((psf*r**4)[:,:,25], cmap=&#8217;bone&#8217;)</li>
 </table>
 <dl class="method">
 <dt id="peri.comp.exactpsf.ExactLineScanConfocalPSF.pack_args">
-<code class="descname">pack_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#ExactLineScanConfocalPSF.pack_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.ExactLineScanConfocalPSF.pack_args" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pack_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.ExactLineScanConfocalPSF.pack_args" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pack the parameters into the form necessary for the integration
 routines above.  For example, packs for calculate_linescan_psf</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="peri.comp.exactpsf.ExactLineScanConfocalPSF.psffunc">
-<code class="descname">psffunc</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#ExactLineScanConfocalPSF.psffunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.ExactLineScanConfocalPSF.psffunc" title="Permalink to this definition">¶</a></dt>
+<code class="descname">psffunc</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.ExactLineScanConfocalPSF.psffunc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates a linescan psf</p>
 </dd></dl>
 
@@ -1142,7 +1019,7 @@ routines above.  For example, packs for calculate_linescan_psf</p>
 
 <dl class="class">
 <dt id="peri.comp.exactpsf.ExactPinholeConfocalPSF">
-<em class="property">class </em><code class="descclassname">peri.comp.exactpsf.</code><code class="descname">ExactPinholeConfocalPSF</code><span class="sig-paren">(</span><em>shape=None</em>, <em>zrange=None</em>, <em>laser_wavelength=0.488</em>, <em>zslab=0.0</em>, <em>zscale=1.0</em>, <em>kfki=0.889</em>, <em>n2n1=0.9486166007905138</em>, <em>alpha=1.173</em>, <em>polar_angle=0.0</em>, <em>pxsize=0.125</em>, <em>support_factor=2</em>, <em>normalize=False</em>, <em>sigkf=0.0</em>, <em>nkpts=None</em>, <em>cutoffval=None</em>, <em>measurement_iterations=None</em>, <em>k_dist='gaussian'</em>, <em>use_J1=True</em>, <em>sph6_ab=None</em>, <em>global_zscale=False</em>, <em>cutbyval=False</em>, <em>cutfallrate=0.25</em>, <em>cutedgeval=1e-12</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#ExactPinholeConfocalPSF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.ExactPinholeConfocalPSF" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.exactpsf.</code><code class="descname">ExactPinholeConfocalPSF</code><span class="sig-paren">(</span><em>shape=None</em>, <em>zrange=None</em>, <em>laser_wavelength=0.488</em>, <em>zslab=0.0</em>, <em>zscale=1.0</em>, <em>kfki=0.889</em>, <em>n2n1=0.9486166007905138</em>, <em>alpha=1.173</em>, <em>polar_angle=0.0</em>, <em>pxsize=0.125</em>, <em>support_factor=2</em>, <em>normalize=False</em>, <em>sigkf=0.0</em>, <em>nkpts=None</em>, <em>cutoffval=None</em>, <em>measurement_iterations=None</em>, <em>k_dist=’gaussian’</em>, <em>use_J1=True</em>, <em>sph6_ab=None</em>, <em>global_zscale=False</em>, <em>cutbyval=False</em>, <em>cutfallrate=0.25</em>, <em>cutedgeval=1e-12</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.ExactPinholeConfocalPSF" title="Permalink to this definition">¶</a></dt>
 <dd><p>PSF for a pinhole confocal microscopes that can be used with the
 peri framework.  Calculates the spatially varying point spread
 function for confocal microscopes and allows them to be applied to
@@ -1154,48 +1031,48 @@ and so calculates the local PSF for every z layer in the image.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>shape</strong> (<em>tuple</em>) &#8211; Shape of the image in (z,y,x) pixel numbers (to be deprecated)</li>
-<li><strong>zrange</strong> (<em>tuple</em>) &#8211; range of z pixels over which we should calculate the psf, good pixels
+<li><strong>shape</strong> (<em>tuple</em>) – Shape of the image in (z,y,x) pixel numbers (to be deprecated)</li>
+<li><strong>zrange</strong> (<em>tuple</em>) – range of z pixels over which we should calculate the psf, good pixels
 being zrange[0] &lt;= z &lt;= zrange[1]. currently must be set to the interior
 of the image, so [state.pad, state.image.shape[0] - state.pad]</li>
-<li><strong>laser_wavelength</strong> (<em>float</em>) &#8211; wavelength of light in um of the incoming laser light</li>
-<li><strong>zslab</strong> (<em>float</em>) &#8211; Pixel position of the optical interface where 0 is the edge of the
+<li><strong>laser_wavelength</strong> (<em>float</em>) – wavelength of light in um of the incoming laser light</li>
+<li><strong>zslab</strong> (<em>float</em>) – Pixel position of the optical interface where 0 is the edge of the
 image in the z direction</li>
-<li><strong>zscale</strong> (<em>float</em>) &#8211; Scaling of the z pixel size, so that each pixel is located at
+<li><strong>zscale</strong> (<em>float</em>) – Scaling of the z pixel size, so that each pixel is located at
 zscale*(z - zint), such that the interface does not move with zscale</li>
-<li><strong>kfki</strong> (<em>float</em>) &#8211; Ratio of outgoing to incoming light wavevectors, 2pi/lambda</li>
-<li><strong>n2n1</strong> (<em>float</em>) &#8211; Ratio of the index mismatch across the optical interface. For typical
+<li><strong>kfki</strong> (<em>float</em>) – Ratio of outgoing to incoming light wavevectors, 2pi/lambda</li>
+<li><strong>n2n1</strong> (<em>float</em>) – Ratio of the index mismatch across the optical interface. For typical
 glass with glycerol/water 80/20 mixture this is 1.4/1.518</li>
-<li><strong>alpha</strong> (<em>float</em>) &#8211; Aperture of the lens in radians, set by arcsin(n2n1)?</li>
-<li><strong>polar_angle</strong> (<em>float</em>) &#8211; the angle of the light polarization with respect to the scanning axis</li>
-<li><strong>pxsize</strong> (<em>float</em>) &#8211; the size of a xy pixel in um, defaults to cohen group size 0.125 um</li>
-<li><strong>support_factor</strong> (<em>integer</em>) &#8211; size of the support</li>
-<li><strong>normalize</strong> (<em>boolean</em>) &#8211; if True, use the normalization as calculated by the PSF instead of
+<li><strong>alpha</strong> (<em>float</em>) – Aperture of the lens in radians, set by arcsin(n2n1)?</li>
+<li><strong>polar_angle</strong> (<em>float</em>) – the angle of the light polarization with respect to the scanning axis</li>
+<li><strong>pxsize</strong> (<em>float</em>) – the size of a xy pixel in um, defaults to cohen group size 0.125 um</li>
+<li><strong>support_factor</strong> (<em>integer</em>) – size of the support</li>
+<li><strong>normalize</strong> (<em>boolean</em>) – if True, use the normalization as calculated by the PSF instead of
 unit normalization</li>
-<li><strong>sigkf</strong> (<em>float</em>) &#8211; Width of wavelengths to use in the polychromatic psf, None is
+<li><strong>sigkf</strong> (<em>float</em>) – Width of wavelengths to use in the polychromatic psf, None is
 monochromatic. Values for kfki = kfki +- sigkf, unitless</li>
-<li><strong>nkpts</strong> (<em>integer</em>) &#8211; number of integration points to use for the polychromatic psf</li>
-<li><strong>cutoffval</strong> (<em>float</em>) &#8211; Percentage of peak psf value to cutoff using a 3-axis
+<li><strong>nkpts</strong> (<em>integer</em>) – number of integration points to use for the polychromatic psf</li>
+<li><strong>cutoffval</strong> (<em>float</em>) – Percentage of peak psf value to cutoff using a 3-axis
 exp(-(r-r0)**4) function where r0 is determined by cutoffval. A
 good value for this is the bit depth of the camera, or possibly the
 SNR, so 1/2**8 or 1/50.</li>
-<li><strong>measurement_iterations</strong> (<em>int</em>) &#8211; number of interations used when trying to find the center of mass
+<li><strong>measurement_iterations</strong> (<em>int</em>) – number of interations used when trying to find the center of mass
 of the psf in a certain slice</li>
-<li><strong>k_dist</strong> (<em>str</em>) &#8211; Eithe [&#8216;gaussian&#8217;, &#8216;gamma&#8217;] which control the wavevector
+<li><strong>k_dist</strong> (<em>str</em>) – Eithe [‘gaussian’, ‘gamma’] which control the wavevector
 distribution for the polychromatic detection psf. Default
 is Gaussian.</li>
-<li><strong>use_J1</strong> (<em>boolean</em>) &#8211; Which hdet confocal model to use. Set to True to include the
+<li><strong>use_J1</strong> (<em>boolean</em>) – Which hdet confocal model to use. Set to True to include the
 J1 term corresponding to a large-NA focusing lens, False to
 exclude it. Default is True</li>
-<li><strong>cutbyval</strong> (<em>boolean</em>) &#8211; If True, cuts the PSF based on the actual value instead of the
+<li><strong>cutbyval</strong> (<em>boolean</em>) – If True, cuts the PSF based on the actual value instead of the
 position associated with the nearest value.</li>
-<li><strong>cutfallrate</strong> (<em>float</em>) &#8211; The relative value of the cutoffval over which to damp the
+<li><strong>cutfallrate</strong> (<em>float</em>) – The relative value of the cutoffval over which to damp the
 remaining values of the psf. 0.3 seems a good fit now.</li>
-<li><strong>cutedgeval</strong> (<em>float</em>) &#8211; The value with which to determine the edge of the psf, typically
+<li><strong>cutedgeval</strong> (<em>float</em>) – The value with which to determine the edge of the psf, typically
 taken around floating point, 1e-12</li>
-<li><strong>Notes</strong> &#8211; a = ExactLineScanConfocalPSF((64,)*3)
+<li><strong>Notes</strong> – a = ExactLineScanConfocalPSF((64,)*3)
 psf, (z,y,x) = a.psf_slice(1., size=51)
-imshow((psf*r**4)[:,:,25], cmap=&#8217;bone&#8217;)</li>
+imshow((psf*r**4)[:,:,25], cmap=’bone’)</li>
 </ul>
 </td>
 </tr>
@@ -1203,14 +1080,14 @@ imshow((psf*r**4)[:,:,25], cmap=&#8217;bone&#8217;)</li>
 </table>
 <dl class="method">
 <dt id="peri.comp.exactpsf.ExactPinholeConfocalPSF.pack_args">
-<code class="descname">pack_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#ExactPinholeConfocalPSF.pack_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.ExactPinholeConfocalPSF.pack_args" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pack_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.ExactPinholeConfocalPSF.pack_args" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pack the parameters into the form necessary for the integration
 routines above.  For example, packs for calculate_linescan_psf</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="peri.comp.exactpsf.ExactPinholeConfocalPSF.psffunc">
-<code class="descname">psffunc</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#ExactPinholeConfocalPSF.psffunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.ExactPinholeConfocalPSF.psffunc" title="Permalink to this definition">¶</a></dt>
+<code class="descname">psffunc</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.ExactPinholeConfocalPSF.psffunc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates a pinhole psf</p>
 </dd></dl>
 
@@ -1218,7 +1095,7 @@ routines above.  For example, packs for calculate_linescan_psf</p>
 
 <dl class="class">
 <dt id="peri.comp.exactpsf.ChebyshevPSF">
-<em class="property">class </em><code class="descclassname">peri.comp.exactpsf.</code><code class="descname">ChebyshevPSF</code><span class="sig-paren">(</span><em>cheb_degree=6</em>, <em>cheb_evals=8</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#ChebyshevPSF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.ChebyshevPSF" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.exactpsf.</code><code class="descname">ChebyshevPSF</code><span class="sig-paren">(</span><em>cheb_degree=6</em>, <em>cheb_evals=8</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.ChebyshevPSF" title="Permalink to this definition">¶</a></dt>
 <dd><p>Same as ExactPSF, except that the convolution is performed in
 the 4th dimension by employing fast Chebyshev approximates to
 how the PSF varies with depth into the sample. For help, see
@@ -1228,9 +1105,9 @@ ExactPSF.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">Other Parameters:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>cheb_degree</strong> (<em>integer</em>) &#8211; degree of the Chebyshev approximant</li>
-<li><strong>cheb_evals</strong> (<em>integer</em>) &#8211; number of interpolation points used to create the coefficient matrix</li>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><ul class="first last simple">
+<li><strong>cheb_degree</strong> (<em>integer</em>) – degree of the Chebyshev approximant</li>
+<li><strong>cheb_evals</strong> (<em>integer</em>) – number of interpolation points used to create the coefficient matrix</li>
 </ul>
 </td>
 </tr>
@@ -1244,7 +1121,7 @@ ExactPSF.</p>
 
 <dl class="class">
 <dt id="peri.comp.exactpsf.FixedSSChebPSF">
-<em class="property">class </em><code class="descclassname">peri.comp.exactpsf.</code><code class="descname">FixedSSChebPSF</code><span class="sig-paren">(</span><em>support_size=[35, 17, 25], *args, **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#FixedSSChebPSF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.FixedSSChebPSF" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">peri.comp.exactpsf.</code><code class="descname">FixedSSChebPSF</code><span class="sig-paren">(</span><em>support_size=[35, 17, 25], *args, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.FixedSSChebPSF" title="Permalink to this definition">¶</a></dt>
 <dd><p>ChebyshevPSF with a fixed support size</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
@@ -1252,7 +1129,7 @@ ExactPSF.</p>
 </div>
 <dl class="method">
 <dt id="peri.comp.exactpsf.FixedSSChebPSF.characterize_psf">
-<code class="descname">characterize_psf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/peri/comp/exactpsf.html#FixedSSChebPSF.characterize_psf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#peri.comp.exactpsf.FixedSSChebPSF.characterize_psf" title="Permalink to this definition">¶</a></dt>
+<code class="descname">characterize_psf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#peri.comp.exactpsf.FixedSSChebPSF.characterize_psf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get support size and drift polynomial for current set of params</p>
 </dd></dl>
 
@@ -1326,7 +1203,7 @@ ExactPSF.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

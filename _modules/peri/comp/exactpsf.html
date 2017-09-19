@@ -1,12 +1,12 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>peri.comp.exactpsf &#8212; PERI 0.1.2 documentation</title>
+    <title>peri.comp.exactpsf &#8212; PERI 0.1.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.1.2',
+        VERSION:     '0.1.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,12 +24,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../../_static/mathconf.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -50,7 +50,10 @@
           <div class="body" role="main">
             
   <h1>Source code for peri.comp.exactpsf</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span></span><span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">iteritems</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.ndimage</span> <span class="k">as</span> <span class="nn">nd</span>
 
@@ -76,7 +79,7 @@
             <span class="n">polar_angle</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">pxsize</span><span class="o">=</span><span class="mf">0.125</span><span class="p">,</span> <span class="n">support_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">sigkf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">nkpts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cutoffval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">measurement_iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">k_dist</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">use_J1</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sph6_ab</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">global_zscale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">cutbyval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cutfallrate</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">cutedgeval</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span>
+            <span class="n">cutbyval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cutfallrate</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">cutedgeval</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
             <span class="n">pinhole_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">do_pinhole</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Superclass for all the exact PSFs, i.e. any PSF that is based on</span>
@@ -243,12 +246,12 @@
             <span class="c1"># params.pop(ind)</span>
             <span class="c1"># values = np.delete(values, ind)</span>
 
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)):</span>
             <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="s1">&#39;zscale&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_zscale</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;psf-&#39;</span> <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">ExactPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ExactPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
 
@@ -382,7 +385,7 @@
 <div class="viewcode-block" id="ExactPSF.measure_size_drift"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.ExactPSF.measure_size_drift">[docs]</a>    <span class="k">def</span> <span class="nf">measure_size_drift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">31</span><span class="p">,</span> <span class="n">zoffset</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns the &#39;size&#39; of the psf in each direction a particular z (px) &quot;&quot;&quot;</span>
         <span class="n">drift</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">measurement_iterations</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">measurement_iterations</span><span class="p">):</span>
             <span class="n">psf</span><span class="p">,</span> <span class="n">vec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psf_slice</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">zoffset</span><span class="o">=</span><span class="n">zoffset</span><span class="o">+</span><span class="n">drift</span><span class="p">)</span>
             <span class="n">psf</span> <span class="o">=</span> <span class="n">psf</span> <span class="o">/</span> <span class="n">psf</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
@@ -419,7 +422,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">characterize_psf</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">slices</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
             <span class="n">zdrift</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drift</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="n">psf</span><span class="p">,</span> <span class="n">vec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psf_slice</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">,</span> <span class="n">zoffset</span><span class="o">=</span><span class="n">zdrift</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">psf</span><span class="p">)</span>
@@ -436,15 +439,15 @@
         <span class="n">wavelength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;psf-laser-wavelength&#39;</span><span class="p">]</span>
         <span class="n">max_alpha</span><span class="p">,</span> <span class="n">max_zscale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mf">100.</span>
 
-        <span class="k">if</span> <span class="n">alpha</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span> <span class="ow">or</span> <span class="n">alpha</span> <span class="o">&gt;</span> <span class="n">max_alpha</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">alpha</span> <span class="o">&lt;</span> <span class="mf">1e-3</span> <span class="ow">or</span> <span class="n">alpha</span> <span class="o">&gt;</span> <span class="n">max_alpha</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Invalid alpha, clipping&#39;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;psf-alpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_alpha</span><span class="o">-</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">zscale</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span> <span class="ow">or</span> <span class="n">zscale</span> <span class="o">&gt;</span> <span class="n">max_zscale</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;psf-alpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="n">max_alpha</span><span class="o">-</span><span class="mf">1e-3</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">zscale</span> <span class="o">&lt;</span> <span class="mf">1e-3</span> <span class="ow">or</span> <span class="n">zscale</span> <span class="o">&gt;</span> <span class="n">max_zscale</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Invalid zscale, clipping&#39;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">zscale</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">zscale</span><span class="p">,</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_zscale</span><span class="o">-</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">wavelength</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">zscale</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">zscale</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="n">max_zscale</span><span class="o">-</span><span class="mf">1e-3</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">wavelength</span> <span class="o">&lt;</span> <span class="mf">1e-3</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Invalid laser wavelength, clipping&#39;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;psf-laser-wavelength&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">wavelength</span><span class="p">,</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;psf-laser-wavelength&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">wavelength</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">set_tile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;tile&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span> <span class="o">!=</span> <span class="n">tile</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
@@ -500,16 +503,16 @@
                 <span class="k">continue</span>
 
             <span class="n">zslice</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">zrange</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="n">middle</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+            <span class="n">middle</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span>
 
             <span class="n">subpsf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kpad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slices</span><span class="p">[</span><span class="n">zslice</span><span class="p">],</span> <span class="n">fs</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">subfield</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">middle</span> <span class="o">-</span> <span class="n">i</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">subfield</span> <span class="o">=</span> <span class="n">subfield</span><span class="p">[</span><span class="n">middle</span><span class="o">-</span><span class="n">fs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span><span class="n">middle</span><span class="o">+</span><span class="n">fs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">subfield</span> <span class="o">=</span> <span class="n">subfield</span><span class="p">[</span><span class="n">middle</span><span class="o">-</span><span class="n">fs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">:</span><span class="n">middle</span><span class="o">+</span><span class="n">fs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
 
             <span class="n">kshape</span> <span class="o">=</span> <span class="n">subfield</span><span class="o">.</span><span class="n">shape</span>
             <span class="n">kfield</span> <span class="o">=</span> <span class="n">fft</span><span class="o">.</span><span class="n">rfftn</span><span class="p">(</span><span class="n">subfield</span><span class="p">,</span> <span class="o">**</span><span class="n">fftkwargs</span><span class="p">)</span>
 
-            <span class="n">outfield</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fft</span><span class="o">.</span><span class="n">irfftn</span><span class="p">(</span><span class="n">kfield</span> <span class="o">*</span> <span class="n">subpsf</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">kshape</span><span class="p">,</span> <span class="o">**</span><span class="n">fftkwargs</span><span class="p">))[</span><span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">outfield</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fft</span><span class="o">.</span><span class="n">irfftn</span><span class="p">(</span><span class="n">kfield</span> <span class="o">*</span> <span class="n">subpsf</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">kshape</span><span class="p">,</span> <span class="o">**</span><span class="n">fftkwargs</span><span class="p">))[</span><span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">outfield</span>
 
@@ -522,12 +525,12 @@
         <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">odict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">odict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">util</span><span class="o">.</span><span class="n">cdd</span><span class="p">(</span><span class="n">odict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nopickle</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">odict</span>
 
     <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idict</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">idict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">idict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">patch</span><span class="p">({</span><span class="s1">&#39;global_zscale&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span></div>
@@ -538,7 +541,7 @@
             <span class="n">pxsize</span><span class="o">=</span><span class="mf">0.125</span><span class="p">,</span> <span class="n">support_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sigkf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
             <span class="n">nkpts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cutoffval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">measurement_iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">k_dist</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">use_J1</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sph6_ab</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">global_zscale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">cutbyval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cutfallrate</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">cutedgeval</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span>
+            <span class="n">cutbyval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cutfallrate</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">cutedgeval</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
             <span class="n">pinhole_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">do_pinhole</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        PSF for line-scanning confocal microscopes that can be used with the</span>
@@ -644,7 +647,7 @@
 <span class="sd">            psf, (z,y,x) = a.psf_slice(1., size=51)</span>
 <span class="sd">            imshow((psf*r**4)[:,:,25], cmap=&#39;bone&#39;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ExactLineScanConfocalPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ExactLineScanConfocalPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span>
                 <span class="n">zrange</span><span class="o">=</span><span class="n">zrange</span><span class="p">,</span> <span class="n">laser_wavelength</span><span class="o">=</span><span class="n">laser_wavelength</span><span class="p">,</span> <span class="n">zslab</span><span class="o">=</span><span class="n">zslab</span><span class="p">,</span>
                 <span class="n">zscale</span><span class="o">=</span><span class="n">zscale</span><span class="p">,</span> <span class="n">kfki</span><span class="o">=</span><span class="n">kfki</span><span class="p">,</span> <span class="n">n2n1</span><span class="o">=</span><span class="n">n2n1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">pxsize</span><span class="o">=</span>
                 <span class="n">pxsize</span><span class="p">,</span> <span class="n">polar_angle</span><span class="o">=</span><span class="n">polar_angle</span><span class="p">,</span> <span class="n">support_factor</span><span class="o">=</span><span class="n">support_factor</span><span class="p">,</span>
@@ -687,8 +690,8 @@
         <span class="n">bads</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">zscale</span><span class="p">,</span> <span class="s1">&#39;psf-zslab&#39;</span><span class="p">]</span>
 
         <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">mapper</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">mapper</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">:</span>
                 <span class="n">d</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
 
         <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
@@ -721,7 +724,7 @@
             <span class="n">pxsize</span><span class="o">=</span><span class="mf">0.125</span><span class="p">,</span> <span class="n">support_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sigkf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
             <span class="n">nkpts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cutoffval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">measurement_iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">k_dist</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">use_J1</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sph6_ab</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">global_zscale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">cutbyval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cutfallrate</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">cutedgeval</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span>
+            <span class="n">cutbyval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cutfallrate</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">cutedgeval</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
             <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        PSF for a pinhole confocal microscopes that can be used with the</span>
@@ -820,7 +823,7 @@
 <span class="sd">            psf, (z,y,x) = a.psf_slice(1., size=51)</span>
 <span class="sd">            imshow((psf*r**4)[:,:,25], cmap=&#39;bone&#39;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ExactPinholeConfocalPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ExactPinholeConfocalPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span>
                 <span class="n">zrange</span><span class="o">=</span><span class="n">zrange</span><span class="p">,</span> <span class="n">laser_wavelength</span><span class="o">=</span><span class="n">laser_wavelength</span><span class="p">,</span> <span class="n">zslab</span><span class="o">=</span><span class="n">zslab</span><span class="p">,</span>
                 <span class="n">zscale</span><span class="o">=</span><span class="n">zscale</span><span class="p">,</span> <span class="n">kfki</span><span class="o">=</span><span class="n">kfki</span><span class="p">,</span> <span class="n">n2n1</span><span class="o">=</span><span class="n">n2n1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">pxsize</span><span class="o">=</span>
                 <span class="n">pxsize</span><span class="p">,</span> <span class="n">polar_angle</span><span class="o">=</span><span class="n">polar_angle</span><span class="p">,</span> <span class="n">support_factor</span><span class="o">=</span><span class="n">support_factor</span><span class="p">,</span>
@@ -846,8 +849,8 @@
         <span class="n">bads</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">zscale</span><span class="p">,</span> <span class="s1">&#39;psf-zslab&#39;</span><span class="p">]</span>
 
         <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">mapper</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">mapper</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">:</span>
                 <span class="n">d</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
 
         <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
@@ -898,7 +901,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cheb_degree</span> <span class="o">=</span> <span class="n">cheb_degree</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cheb_evals</span> <span class="o">=</span> <span class="n">cheb_evals</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">ChebyshevPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ChebyshevPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_values</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
@@ -933,7 +936,7 @@
         <span class="k">return</span> <span class="n">outfield</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cheb_degree</span><span class="p">,</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cheb_degree</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cheb_evals</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="FixedSSChebPSF"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.FixedSSChebPSF">[docs]</a><span class="k">class</span> <span class="nc">FixedSSChebPSF</span><span class="p">(</span><span class="n">ChebyshevPSF</span><span class="p">):</span>
@@ -947,7 +950,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cutoffval</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">support</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">support_size</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">FixedSSChebPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FixedSSChebPSF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FixedSSChebPSF.characterize_psf"><a class="viewcode-back" href="../../../reference/comp.html#peri.comp.exactpsf.FixedSSChebPSF.characterize_psf">[docs]</a>    <span class="k">def</span> <span class="nf">characterize_psf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get support size and drift polynomial for current set of params &quot;&quot;&quot;</span>
@@ -959,7 +962,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">drift_poly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">([</span><span class="n">l</span><span class="p">,</span> <span class="n">u</span><span class="p">],</span> <span class="p">[</span><span class="n">drift_l</span><span class="p">,</span> <span class="n">drift_u</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">)</span></div>
 
 <span class="c1">##Multiple-inheritance-defined classes, see individual docs for details</span>
 <span class="k">class</span> <span class="nc">ChebyshevLineScanConfocalPSF</span><span class="p">(</span><span class="n">ChebyshevPSF</span><span class="p">,</span> <span class="n">ExactLineScanConfocalPSF</span><span class="p">):</span>
@@ -1007,13 +1010,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">PERI 0.1.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Matt Bierbaum, Brian Leahy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>
